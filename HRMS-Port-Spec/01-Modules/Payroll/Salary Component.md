@@ -23,7 +23,7 @@ Master doctype: defines a reusable "line item" (Basic Salary, HRA, PF, TDS, etc.
 | is_flexible_benefit | Is Flexible Benefit | Check | — | No | 0 | No | shown only when `type != "Employer Contribution"` |
 | max_benefit_amount | Max Benefit Amount (Yearly) | Currency | — | No | — | No | `depends_on: is_flexible_benefit`; `non_negative: 1`; "If greater than zero, this sets the maximum benefit amount assignable to any employee" |
 | variable_based_on_taxable_salary | Variable Based On Taxable Salary | Check | — | No | 0 | No | shown only when `type=="Deduction"`; `search_index`; "the amount will be auto-calculated as per the configured income tax slabs" |
-| accounts | Accounts | Table (`Salary Component Account`) | — | No | — | No | shown only when `!statistical_component && type != "Employer Contribution"` |
+| accounts | Accounts | Table ([[Salary Component Account]]) | — | No | — | No | shown only when `!statistical_component && type != "Employer Contribution"` |
 | condition | Condition | Code (PythonExpression) | — | No | — | No | shown only when `!is_flexible_benefit && !variable_based_on_taxable_salary` |
 | amount_based_on_formula | Amount based on formula | Check | — | No | 0 | No | |
 | formula | Formula | Code (PythonExpression) | — | No | — | No | `depends_on: amount_based_on_formula` |
@@ -43,7 +43,7 @@ Tab breaks group fields into "Overview", "Condition & Formula", "Flexible Benefi
 
 ## Child Tables
 
-- `accounts` (Table, `Salary Component Account`) — see `Salary Component Account.md`.
+- `accounts` (Table, [[Salary Component Account]]) — see `Salary Component Account.md`.
 
 ## State Machine
 
@@ -116,6 +116,13 @@ Additionally, in `before_validate()` (runs before the above, and before Frappe's
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Salary Component Account]] — child table mapping this component to a GL account per company.
+- [[Salary Structure]] — `get_structures_to_be_updated()`/`update_salary_structures()` bulk-propagate a formula/condition change into every structure's `Salary Detail` rows referencing this component.
+- [[Salary Detail]] — the shared child-row shape (on both Salary Structure and Salary Slip) that carries `salary_component`, `condition`, `formula`, `amount`.
+- [[Salary Slip]] — evaluates each component's `condition`/`formula`/flags at slip-generation time; also the target of the `SALARY_COMPONENT_VALUES`/`TAX_COMPONENTS_BY_COMPANY` cache invalidation on save.
 
 ## Port Notes
 

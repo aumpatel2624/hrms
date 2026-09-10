@@ -1,7 +1,7 @@
 # Leave Policy
 
 **Source:** `hrms/hr/doctype/leave_policy/leave_policy.json`, `leave_policy.py`, `leave_policy.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `HR-LPOL-.YYYY.-.#####` (naming series: `HR-LPOL-` + current year + auto-incrementing 5-digit counter, e.g. `HR-LPOL-2026-00001`)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `HR-LPOL-.YYYY.-.#####` (naming series: `HR-LPOL-` + current year + auto-incrementing 5-digit counter, e.g. `HR-LPOL-2026-00001`)
 **Module:** HR
 
 ## Schema
@@ -12,8 +12,8 @@ Full field table, in JSON `field_order`:
 |---|---|---|---|---|---|---|---|
 | title | Title | Data | — | Yes (`reqd`) | — | No | `in_list_view: 1`; `allow_on_submit: 1` (editable even after submission); this is the `title_field` for the doctype |
 | (leave_allocations_section) | Leave Allocations | Section Break | — | — | — | — | `allow_in_quick_entry: 1`; groups the child table below |
-| leave_policy_details | Leave Policy Details | Table | `Leave Policy Detail` | Yes (`reqd`) | — | No | Child table — see `Leave Policy Detail` for schema |
-| amended_from | Amended From | Link | Leave Policy | No | — | Yes | `no_copy: 1`, `print_hide: 1`; standard Frappe amendment-chain pointer, auto-set when this doc is created via "Amend" from a cancelled submitted Leave Policy |
+| leave_policy_details | Leave Policy Details | Table | [[Leave Policy Detail]] | Yes (`reqd`) | — | No | Child table — see `Leave Policy Detail` for schema |
+| amended_from | Amended From | Link | [[Leave Policy]] | No | — | Yes | `no_copy: 1`, `print_hide: 1`; standard Frappe amendment-chain pointer, auto-set when this doc is created via "Amend" from a cancelled submitted Leave Policy |
 
 `track_changes: 1`. `search_fields: "title"`.
 
@@ -50,7 +50,7 @@ Note: the controller (`leave_policy.py`) defines only `validate()` — no `on_su
 
 None beyond the per-row cap check above. This doctype is a static configuration container (leave-type -> annual-allocation mapping); the actual pro-rata/earned-leave allocation math happens downstream in `Leave Policy Assignment`.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -72,9 +72,16 @@ None defined on this controller or a dedicated module file for Leave Policy.
 
 (No `if_owner` or `permlevel` restrictions present in the JSON.)
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 None directly in `scheduler_events`. (`Leave Policy Detail` rows of a submitted Leave Policy are read by the `daily_long` job `hrms.hr.utils.allocate_earned_leaves` via `get_annual_allocation_from_policy`, which looks up `Leave Policy Detail` by `{"parent": allocation.leave_policy, "leave_type": e_leave_type.name}` — this reads through the parent `Leave Policy` name but does not write to `Leave Policy` itself. See `Leave Policy Assignment.md` for the full allocation-scheduling trace.)
+
+## Related Doctypes
+
+- [[Leave Policy Detail]] — `leave_policy_details` child Table field, one row per (Leave Type, annual_allocation) pair.
+- [[Leave Type]] — read (via each `Leave Policy Detail` row) to cap `annual_allocation` at `max_leaves_allowed`.
+- [[Leave Policy Assignment]] — created (single or bulk) referencing this policy via the client-side "Create" buttons on a submitted Leave Policy.
+- [[Leave Policy]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 

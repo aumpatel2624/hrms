@@ -1,7 +1,7 @@
 # Gratuity Rule
 
 **Source:** `hrms/payroll/doctype/gratuity_rule/gratuity_rule.json`, `gratuity_rule.py`, `gratuity_rule.js`, `gratuity_rule_dashboard.py`
-**Submittable:** no   **Tree:** no   **Naming:** Set by user (`autoname: "Prompt"` — user types the name directly, no auto-generated series)
+**Submittable:** no   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** Set by user (`autoname: "Prompt"` — user types the name directly, no auto-generated series)
 **Module:** Payroll
 
 ## Schema
@@ -17,9 +17,9 @@
 | work_experience_calculation_function | Work Experience Calculation Method | Select | `Round off Work Experience` / `Take Exact Completed Years` / `Manual` | no | Round off Work Experience | no | drives whether experience is computed automatically or taken from the manually entered `Gratuity.current_work_experience` |
 | minimum_year_for_gratuity | Minimum Year for Gratuity | Int | — | no | — (blank/0) | no | `non_negative`; floor check in `Gratuity.get_work_experience` |
 | column_break_8 | — | Column Break | — | — | — | — | layout |
-| applicable_earnings_component | Applicable Earnings Component | Table MultiSelect | Gratuity Applicable Component | yes | — | no | description: "Salary components should be part of the Salary Structure." |
+| applicable_earnings_component | Applicable Earnings Component | Table MultiSelect | [[Gratuity Applicable Component]] | yes | — | no | description: "Salary components should be part of the Salary Structure." |
 | gratuity_rules_section | Rules | Section Break | — | — | — | — | heading only |
-| gratuity_rule_slabs | Current Work Experience (label; conceptually "Slabs") | Table | Gratuity Rule Slab | yes | — | no | description: 'Set "From(Year)" and "To(Year)" to 0 for no upper and lower limit.' |
+| gratuity_rule_slabs | Current Work Experience (label; conceptually "Slabs") | Table | [[Gratuity Rule Slab]] | yes | — | no | description: 'Set "From(Year)" and "To(Year)" to 0 for no upper and lower limit.' |
 
 `track_changes: 1` — full version/diff history kept for this doctype.
 
@@ -71,7 +71,7 @@ No `on_update`, `before_insert`, `on_trash`, etc. defined.
 
 None. `get_gratuity_rule(name, slabs, **args)` is a plain Python module function (not decorated `@frappe.whitelist()`), callable only from server-side code (e.g. tests/patches), not exposed as an API endpoint.
 
-## Permissions
+## [[Permission Model (RBAC)|Permissions]]
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -84,10 +84,18 @@ No permlevel restrictions, no `if_owner`.
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Gratuity Applicable Component]] — child table (`applicable_earnings_component`) listing which Salary Component rows count as "applicable earnings" for this rule.
+- [[Gratuity Rule Slab]] — child table (`gratuity_rule_slabs`) of year-of-service brackets consumed by this rule.
+- [[Gratuity]] — the parent transaction doctype that links to a Gratuity Rule (`gratuity_rule` field) and calls into this rule's fields/child tables to compute the gratuity amount.
+- [[Salary Component]] — `applicable_earnings_component` rows reference these by name; must be present in the employee's Salary Structure as earnings.
+- [[Salary Slip]] — its earning rows (filtered to the rule's applicable components) are summed to form the "total component amount" fed into the gratuity formula.
+
 ## Port Notes
 
 - **`disable` field has no enforcement found in this module's code**: no query filter in `Gratuity.js`/`Gratuity.py` excludes disabled Gratuity Rules from the `gratuity_rule` Link dropdown on the `Gratuity` doctype. If disregarding disabled rules is a business requirement, it must be added explicitly in the port (e.g. a Link filter `{"disable": 0}` on Gratuity's `gratuity_rule` field) — not present in source as extracted.
 - **Client-side `to_year`/`from_year` ordering check is incomplete server-side**: see Validation Rules above — a slab with `to_year=0` while `from_year>0` (other than a legitimate single "no-upper-limit final slab") is not rejected by the server `validate()` method at all; only the client-side handler partially guards this, and only interactively (bypassable via API/import). A faithful-but-hardened port should decide whether to also enforce this server-side; document current gap either way.
 - **`get_gratuity_rule` helper sets a nonexistent attribute** `work_experience_calculation_method` instead of the real fieldname `work_experience_calculation_function` — this line is effectively dead code (sets an ad hoc Python attribute on the in-memory doc that is never read back or persisted as that fieldname). Do not port this behavior as if it configures the calculation method; if replicating this helper for tests, note the discrepancy.
 - **Naming is fully user-controlled** (`autoname: "Prompt"`) — the primary key/name is whatever string the user types when creating a Gratuity Rule (must be unique doctype-wide, framework-enforced). A port must allow arbitrary user-supplied primary keys for this table, not a generated ID, and must enforce uniqueness at the DB level.
-- **`track_changes: 1`** — a full audit/version-history mechanism is expected for every save of a Gratuity Rule (including changes to its child tables). This must be implemented explicitly in a new stack (e.g. a `gratuity_rule_version` audit table) since it is a Frappe-framework-provided behavior, not something in this controller's code.
+- **`track_changes: 1`** — a full audit/version-history mechanism is expected for every save of a Gratuity Rule (including changes to its child tables). This must be implemented explicitly in a new stack (e.g. a `gratuity_rule_version` audit table) since it is [[Implicit Framework Behaviors|a Frappe-framework-provided behavior]], not something in this controller's code.

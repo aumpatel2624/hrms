@@ -1,7 +1,7 @@
 # Leave Type
 
 **Source:** `hrms/hr/doctype/leave_type/leave_type.json`, `leave_type.py`, `leave_type.js`
-**Submittable:** no   **Tree:** no   **Naming:** `field:leave_type_name` (the document name IS the value of `leave_type_name`; must be unique)
+**Submittable:** no   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `field:leave_type_name` (the document name IS the value of `leave_type_name`; must be unique)
 **Module:** HR
 
 ## Schema
@@ -30,7 +30,7 @@ Full field table, in JSON `field_order`:
 | max_encashable_leaves | Maximum Encashable Leaves | Int | — | No | — | No | `depends_on: allow_encashment`; `non_negative: 1` |
 | non_encashable_leaves | Non-Encashable Leaves | Int | — | No | — | No | `depends_on: allow_encashment`; `non_negative: 1`; description explains: with balance 10 and 4 non-encashable, 6 can be encashed, 4 carried forward/expired |
 | (column_break_17) | — | Column Break | — | — | — | — | layout only |
-| earning_component | Earning Component | Link | Salary Component | No | — | No | `depends_on: allow_encashment` |
+| earning_component | Earning Component | Link | [[Salary Component]] | No | — | No | `depends_on: allow_encashment` |
 | (earned_leave) | Earned Leave | Section Break | — | — | — | — | collapsible section |
 | is_earned_leave | Is Earned Leave | Check | — | No | 0 | No | — |
 | earned_leave_frequency | Earned Leave Frequency | Select | Monthly / Quarterly / Half-Yearly / Yearly | No | — | No | `depends_on: is_earned_leave` |
@@ -73,7 +73,7 @@ This doctype itself performs no numeric allocation calculation (that logic lives
 - `is_carry_forward` + `maximum_carry_forwarded_leaves` + `expire_carry_forwarded_leaves_after_days` drive carry-forward and expiry logic in `Leave Allocation` / `Leave Ledger Entry` (out of scope of this file).
 - `allow_encashment` + `earning_component` + `max_encashable_leaves` + `non_encashable_leaves` drive `Leave Encashment` (out of scope of this file).
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -98,6 +98,12 @@ None defined on this controller or a dedicated module file for Leave Type.
 ## Scheduled Jobs Touching This Doctype
 
 None directly. (`allocate_earned_leaves`, a `daily_long` scheduler job in `hrms/hooks.py` -> `hrms.hr.utils.allocate_earned_leaves`, reads Leave Type rows via `get_earned_leaves()` filtered on `is_earned_leave: 1` and fields `max_leaves_allowed`, `earned_leave_frequency`, `rounding`, `allocate_on_day` — it reads this doctype's data but does not write to it. See `Leave Allocation`/`Leave Policy Assignment` specs for the write side.)
+
+## Related Doctypes
+
+- [[Salary Component]] — `earning_component` Link field, used by [[Leave Encashment]] to build the `Additional Salary` earning row.
+- [[Leave Allocation]] — read in `validate_lwp`/`validate_allocated_earned_leave` to block/warn on configuration changes that conflict with existing allocations.
+- [[Salary Slip]] — its cached `LEAVE_TYPE_MAP` is invalidated whenever a Leave Type is saved (`clear_cache` override).
 
 ## Port Notes
 

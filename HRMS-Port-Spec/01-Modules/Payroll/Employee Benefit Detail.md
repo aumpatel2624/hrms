@@ -10,7 +10,7 @@ Child table used on `Salary Structure Assignment` (owned by another module agent
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| salary_component | Earning Component | Link | Salary Component | yes | | no | `link_filters`: Salary Component.type = Earning AND Salary Component.is_flexible_benefit = 1 (UI-only filter) |
+| salary_component | Earning Component | Link | [[Salary Component]] | yes | | no | `link_filters`: Salary Component.type = Earning AND Salary Component.is_flexible_benefit = 1 (UI-only filter) |
 | amount | Benefit Amount | Currency | | yes | | no | `non_negative: 1`; the configured yearly flexible-benefit amount for this component |
 
 ## Business Logic / Calculations
@@ -24,6 +24,15 @@ None on this child doctype itself — controller class body is `pass`. This tabl
 ## Permissions
 
 None defined (`"permissions": []`) — inherited from parent doctype (Salary Structure Assignment).
+
+## Related Doctypes
+
+- [[Salary Structure Assignment]] — parent doctype; this child table lives on it and defines the flexible benefit components/amounts for the employee.
+- [[Salary Component]] — the earning component being configured as a flexible benefit.
+- [[Employee Benefit Application]] — reads `amount` into `Employee Benefit Application Detail.max_benefit_amount` as the yearly ceiling.
+- [[Employee Benefit Claim]] — joins with `Salary Component` (via this table) to fetch payout eligibility details.
+- [[Employee Benefit Ledger]] — uses `amount` as the yearly benefit ceiling for the "Allow claim for full benefit amount" payout method.
+- [[Arrear]] — sums amounts from this table for salary components flagged `arrear_component`.
 
 ## Port Notes
 

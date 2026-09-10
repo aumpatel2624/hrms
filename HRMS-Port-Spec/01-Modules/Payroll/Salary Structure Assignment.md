@@ -1,7 +1,7 @@
 # Salary Structure Assignment
 
 **Source:** `hrms/payroll/doctype/salary_structure_assignment/salary_structure_assignment.json`, `salary_structure_assignment.py`, `salary_structure_assignment.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `autoname: "HR-SSA-.YY.-.MM.-.#####"` (naming_rule: "Expression") — a series-based auto-generated name, e.g. `HR-SSA-25-09-00001`, year/month/5-digit auto-increment counter.
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `autoname: "HR-SSA-.YY.-.MM.-.#####"` (naming_rule: "Expression", [[Naming and Autoname Rules]]) — a series-based auto-generated name, e.g. `HR-SSA-25-09-00001`, year/month/5-digit auto-increment counter.
 **Module:** Payroll
 
 ## Schema
@@ -10,13 +10,13 @@ Full field list, JSON field order:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes | - | - | `in_list_view`, `in_standard_filter`, `search_index` |
+| employee | Employee | Link | [[Employee Core Model]] | Yes | - | - | `in_list_view`, `in_standard_filter`, `search_index` |
 | employee_name | Employee Name | Data | - | - | - | Yes | `fetch_from: employee.employee_name` |
 | department | Department | Link | Department | - | - | Yes | `fetch_from: employee.department`, `in_standard_filter` |
 | designation | Designation | Link | Designation | - | - | Yes | `fetch_from: employee.designation`, `in_standard_filter` |
-| grade | Grade | Link | Employee Grade | - | - | Yes | `fetch_from: employee.grade` |
+| grade | Grade | Link | [[Employee Grade]] | - | - | Yes | `fetch_from: employee.grade` |
 | *(column_break_6)* | - | Column Break | - | - | - | - | layout only |
-| salary_structure | Salary Structure | Link | Salary Structure | Yes | - | - | `fetch_from: grade.default_salary_structure`, `fetch_if_empty: 1`, `in_list_view`, `in_standard_filter`, `search_index` |
+| salary_structure | Salary Structure | Link | [[Salary Structure]] | Yes | - | - | `fetch_from: grade.default_salary_structure`, `fetch_if_empty: 1`, `in_list_view`, `in_standard_filter`, `search_index` |
 | from_date | From Date | Date | - | Yes | - | - | see Validation Rules for constraints |
 | company | Company | Link | Company | Yes | - | - | `fetch_from: employee.company` |
 | *(section_break_7)* | Base, Variable & Leave Encashment | Section Break | - | - | - | - | groups pay fields |
@@ -25,19 +25,19 @@ Full field list, JSON field order:
 | ctc | Total Cost To Company (CTC) | Currency | - | - | - | Yes | `allow_on_submit: 1`; computed server-side, see Business Logic |
 | *(column_break_9)* | - | Column Break | - | - | - | - | layout only |
 | variable | Variable | Currency | currency | - | - | - | `non_negative: 1` |
-| amended_from | Amended From | Link | Salary Structure Assignment | - | - | Yes | `no_copy`, `print_hide` |
-| income_tax_slab | Income Tax Slab | Link | Income Tax Slab | conditionally (see Validation Rules) | - | - | `depends_on: salary_structure` |
+| amended_from | Amended From | Link | [[Salary Structure Assignment]] | - | - | Yes | `no_copy`, `print_hide` |
+| income_tax_slab | Income Tax Slab | Link | [[Income Tax Slab]] | conditionally (see Validation Rules) | - | - | `depends_on: salary_structure` |
 | currency | Currency | Link | Currency | Yes | - | Yes | `fetch_from: salary_structure.currency`, `depends_on: eval:(doc.docstatus==1 \|\| doc.salary_structure)`, `print_hide` |
 | payroll_payable_account | Payroll Payable Account | Link | Account | - | - | - | `depends_on: employee`; auto-set server-side if empty (see Validation Rules) |
 | *(section_break_17)* | Payroll Cost Centers | Section Break | - | - | - | - | collapsible, `depends_on: employee` |
-| payroll_cost_centers | Cost Centers | Table | `Employee Cost Center` | - | - | - | `allow_on_submit: 1`; see Child Tables |
+| payroll_cost_centers | Cost Centers | Table | [[Employee Cost Center]] | - | - | - | `allow_on_submit: 1`; see Child Tables |
 | *(column_break_11)* | - | Column Break | - | - | - | - | layout only |
 | tax_deducted_till_date | Tax Deducted Till Date | Currency | currency | - | - | - | `allow_on_submit: 1`, `non_negative: 1` |
 | *(column_break_20)* | - | Column Break | - | - | - | - | layout only |
 | taxable_earnings_till_date | Taxable Earnings Till Date | Currency | currency | - | - | - | `allow_on_submit: 1`, `non_negative: 1` |
 | *(opening_balances_section)* | Opening Balances | Section Break | - | - | - | - | hidden by default in JSON, `collapsible_depends_on: eval:doc.taxable_earnings_till_date && doc.tax_deducted_till_date`; client JS toggles its visibility via `are_opening_entries_required()` (see Whitelisted Methods) |
 | *(employee_benefits_section)* | Employee Benefits | Section Break | - | - | - | - | groups benefit fields |
-| employee_benefits | Flexible Benefits | Table | `Employee Benefit Detail` | - | - | - | see Child Tables |
+| employee_benefits | Flexible Benefits | Table | [[Employee Benefit Detail]] | - | - | - | see Child Tables |
 | max_benefits | Maximum Benefit Amount | Currency | currency | - | - | - | `fetch_from: salary_structure.max_benefits`, `fetch_if_empty: 1`, `non_negative: 1` |
 | *(column_break_kjvm)* | - | Column Break | - | - | - | - | layout only |
 | leave_encashment_amount_per_day | Leave Encashment Amount Per Day | Currency | currency | - | - | - | `fetch_from: salary_structure.leave_encashment_amount_per_day`, `fetch_if_empty: 1`, `non_negative: 1` |
@@ -46,8 +46,8 @@ Doctype-level flags: `editable_grid: 1`, `allow_import: 1`, `track_changes: 1`, 
 
 ## Child Tables
 
-- **payroll_cost_centers** — child doctype **`Employee Cost Center`** (out of this agent's scope; reference by name). Rows carry at least `cost_center` and `percentage` (used in `validate_cost_centers`, see below).
-- **employee_benefits** — child doctype **`Employee Benefit Detail`** (out of scope; reference by name), same shape as on `Salary Structure`: `salary_component`, `amount`.
+- **payroll_cost_centers** — child doctype **[[Employee Cost Center]]** (out of this agent's scope; reference by name). Rows carry at least `cost_center` and `percentage` (used in `validate_cost_centers`, see below).
+- **employee_benefits** — child doctype **[[Employee Benefit Detail]]** (out of scope; reference by name), same shape as on `Salary Structure`: `salary_component`, `amount`.
 
 ## State Machine
 
@@ -210,7 +210,7 @@ This is the authoritative "latest assignment effective on or before `on_date`" r
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Import | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| System Manager | 1 | 1 | 1 | 1 | - | - | - | 1 | 1 | - | no submit/cancel/amend rights |
+| System Manager ([[Permission Model (RBAC)]]) | 1 | 1 | 1 | 1 | - | - | - | 1 | 1 | - | no submit/cancel/amend rights |
 | HR Manager | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | - | full rights except import |
 | HR User | 1 | 1 | 1 | - | 1 | - | - | 1 | 1 | - | can create+submit but not delete/cancel/amend |
 | Employee | 1 | - | - | - | - | - | - | - | - | - | read + `select` only (no write/create) |
@@ -240,6 +240,18 @@ This ONLY blocks a second **submitted** assignment with the **exact same `from_d
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events` referencing `Salary Structure Assignment` directly.
+
+## Related Doctypes
+
+- [[Salary Structure]] — the assigned pay template; its `earnings`/`deductions`/`employer_contributions` rows drive `calculate_ctc_and_gross()` via `_evaluate_all_components()`.
+- [[Employee Grade]] — `fetch_from` source for `salary_structure`/`base` defaults.
+- [[Employee Cost Center]] — `payroll_cost_centers` child table, the per-employee cost-center split percentage used in Payroll Entry's accrual JV.
+- [[Employee Benefit Detail]] — `employee_benefits` child table, capped by `max_benefits`.
+- [[Income Tax Slab]] — mandatory when the assigned structure has a tax component; its currency must match this assignment's.
+- [[Payroll Period]] — resolved via `get_payroll_period()` to decide whether "Opening Balances" (tax deducted/taxable earnings till date) are required.
+- [[Payroll Entry]] — `get_start_end_dates()` (from Payroll Entry's module) is used to build a synthetic full-cycle formula-evaluation window at assignment save time.
+- [[Salary Slip]] — resolves "the" applicable assignment for a slip via `get_assigned_salary_structure()`/direct lookup by `(employee, salary_structure)`.
+- [[Employee Core Model]] — the assignee; joining/relieving dates constrain `from_date`.
 
 ## Port Notes
 

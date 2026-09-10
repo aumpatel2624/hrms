@@ -1,7 +1,7 @@
 # Salary Structure
 
 **Source:** `hrms/payroll/doctype/salary_structure/salary_structure.json`, `salary_structure.py`, `salary_structure.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `autoname: "Prompt"` — the user types the document name directly on creation (no series/expression), `allow_rename: 1`.
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `autoname: "Prompt"` ([[Naming and Autoname Rules]]) — the user types the document name directly on creation (no series/expression), `allow_rename: 1`.
 **Module:** Payroll
 
 ## Schema
@@ -19,14 +19,14 @@ Full field list, JSON field order:
 | *(time_sheet_earning_detail)* | — | Section Break | - | - | - | - | groups timesheet fields |
 | salary_slip_based_on_timesheet | Salary Slip Based on Timesheet | Check | - | - | `0` | - | `search_index` |
 | *(column_break_17)* | - | Column Break | - | - | - | - | layout only |
-| salary_component | Salary Component | Link | Salary Component | conditionally (client-side reqd when timesheet-based) | - | - | "Salary Component for timesheet based payroll." |
+| salary_component | Salary Component | Link | [[Salary Component]] | conditionally (client-side reqd when timesheet-based) | - | - | "Salary Component for timesheet based payroll." |
 | hour_rate | Hour Rate | Currency | currency (options field = `currency`) | conditionally (client-side reqd when timesheet-based) | - | - | `non_negative: 1` |
 | leave_encashment_amount_per_day | Leave Encashment Amount Per Day | Currency | currency | - | - | - | `allow_on_submit: 1`, `non_negative: 1` |
 | max_benefits | Max Benefits (Amount) | Currency | currency | - | - | - | `non_negative: 1` |
 | *(earning_deduction)* | Earnings & Deductions | Tab Break | - | - | - | - | tab container |
-| earnings | Earnings | Table | `Salary Detail` | - | - | - | see Child Tables |
-| deductions | Deductions | Table | `Salary Detail` | - | - | - | see Child Tables |
-| employer_contributions | Employer Contributions | Table | `Salary Detail` | - | - | - | see Child Tables |
+| earnings | Earnings | Table | [[Salary Detail]] | - | - | - | see Child Tables |
+| deductions | Deductions | Table | [[Salary Detail]] | - | - | - | see Child Tables |
+| employer_contributions | Employer Contributions | Table | [[Salary Detail]] | - | - | - | see Child Tables |
 | *(net_pay_detail)* | - | Section Break (options: "Simple") | - | - | - | - | layout only |
 | *(column_break2)* | - | Column Break | - | - | - | - | layout only |
 | total_earning | Total Earning | Currency | currency | - | - | Yes | hidden; computed client-side only (see Business Logic) |
@@ -36,18 +36,18 @@ Full field list, JSON field order:
 | mode_of_payment | Mode of Payment | Link | Mode of Payment | - | - | - | client script fetches `payment_account` from ERPNext POS payment-mode-account helper on change |
 | *(column_break_28)* | - | Column Break | - | - | - | - | layout only |
 | payment_account | Payment Account | Link | Account | - | - | - | client-side query restricts to `account_type in [Bank, Cash]`, `is_group=0`, `company=doc.company` |
-| amended_from | Amended From | Link | Salary Structure | - | - | Yes | standard amendment-chain field, `no_copy`, `print_hide` |
+| amended_from | Amended From | Link | [[Salary Structure]] | - | - | Yes | standard amendment-chain field, `no_copy`, `print_hide` |
 | conditions_and_formula_variable_and_example | Conditions and Formula variable and example | HTML | - | - | - | - | pure UI helper button/dialog, no logic |
 | currency | Currency | Link | Currency | Yes | - | - | `search_index` |
-| employee_benefits | Flexible Benefits | Table | `Employee Benefit Detail` | - | - | - | "Enter yearly benefit amounts"; see Child Tables |
+| employee_benefits | Flexible Benefits | Table | [[Employee Benefit Detail]] | - | - | - | "Enter yearly benefit amounts"; see Child Tables |
 | *(column_break_besp)* | - | Column Break | - | - | - | - | layout only |
 
 Doctype-level flags: `track_changes: 1`, `allow_import: 1`, `allow_rename: 1`, `sort_field: creation` / `sort_order: DESC`, `show_name_in_global_search: 1`.
 
 ## Child Tables
 
-- **earnings**, **deductions**, **employer_contributions** — all three are `Table` fields of child doctype **`Salary Detail`** (see `Salary Detail.md`, documented by another agent). Salary Structure treats these three tables uniformly through the constant `COMPONENT_PARENTFIELDS = ("earnings", "deductions", "employer_contributions")` defined in `hrms/payroll/utils.py`. Every row carries at minimum: `salary_component`, `abbr`, `amount`, `formula`, `condition`, `amount_based_on_formula`, `depends_on_payment_days`, `statistical_component`, `do_not_include_in_total`, `do_not_include_in_accounts`, `is_tax_applicable`, `is_flexible_benefit`, `variable_based_on_taxable_salary` (full field list is in `Salary Detail.md`).
-- **employee_benefits** — child doctype **`Employee Benefit Detail`** (not in this agent's scope; reference by name). Rows carry `salary_component` and `amount` (yearly benefit amount) based on usage in this controller.
+- **earnings**, **deductions**, **employer_contributions** — all three are `Table` fields of child doctype **[[Salary Detail]]** (see `Salary Detail.md`, documented by another agent). Salary Structure treats these three tables uniformly through the constant `COMPONENT_PARENTFIELDS = ("earnings", "deductions", "employer_contributions")` defined in `hrms/payroll/utils.py`. Every row carries at minimum: `salary_component`, `abbr`, `amount`, `formula`, `condition`, `amount_based_on_formula`, `depends_on_payment_days`, `statistical_component`, `do_not_include_in_total`, `do_not_include_in_accounts`, `is_tax_applicable`, `is_flexible_benefit`, `variable_based_on_taxable_salary` (full field list is in `Salary Detail.md`).
+- **employee_benefits** — child doctype **[[Employee Benefit Detail]]** (not in this agent's scope; reference by name). Rows carry `salary_component` and `amount` (yearly benefit amount) based on usage in this controller.
 
 ## State Machine
 
@@ -197,6 +197,16 @@ No `if_owner` or `permlevel` restrictions defined.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events` referencing `Salary Structure` directly.
+
+## Related Doctypes
+
+- [[Salary Detail]] — the child-row shape shared by `earnings`, `deductions`, `employer_contributions`.
+- [[Salary Component]] — the `salary_component` field (timesheet earning target) and the component master consulted by `set_missing_values()`/`get_salary_component()`.
+- [[Salary Component Account]] — joined in `get_salary_component()` to filter the component picker by company-scoped account availability.
+- [[Salary Structure Assignment]] — created (singly or in bulk) by `create_salary_structure_assignment()`/`assign_salary_structure()`; computes CTC/gross from this structure's component rows.
+- [[Employee Benefit Detail]] — `employee_benefits` child table, capped per-component and in total by `max_benefits`.
+- [[Salary Slip]] — `make_salary_slip()` maps a Salary Structure into a new/preview Salary Slip.
+- [[Bulk Salary Structure Assignment]] — reuses `create_salary_structure_assignment()` for its own bulk-assign flow.
 
 ## Port Notes
 

@@ -1,7 +1,7 @@
 # Income Tax Slab
 
 **Source:** `hrms/payroll/doctype/income_tax_slab/income_tax_slab.json`, `income_tax_slab.py`, `income_tax_slab.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `Prompt`, `naming_rule: "Set by user"` — the user types the `name` on creation (e.g. "Tax Slab FY 2024-25")
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `Prompt`, `naming_rule: "Set by user"` — the user types the `name` on creation (e.g. "Tax Slab FY 2024-25")
 **Module:** Payroll
 
 ## Schema
@@ -16,14 +16,14 @@
 | currency | Currency | Link | `Currency` | yes | — | no | `fetch_from: company.default_currency`; also force-overwritten in `validate()` whenever `company` is set (see Validation Rules #1). `print_hide`. |
 | standard_tax_exemption_amount | Standard Tax Exemption Amount | Currency | — | no | — | no | A flat annual exemption amount, applied unconditionally in addition to any declared/proof exemption when `allow_tax_exemption` is enabled (see Business Logic / cross-doctype linkage). |
 | allow_tax_exemption | Allow Tax Exemption | Check | — | no | `0` | no | Description: "If enabled, Tax Exemption Declaration will be considered for income tax calculation." Master switch controlling whether Salary Slip looks up Employee Tax Exemption Declaration/Proof Submission and the standard exemption amount at all. |
-| amended_from | Amended From | Link | `Income Tax Slab` | no | — | yes | Standard Frappe amend-chain pointer. `no_copy`, `print_hide`. |
+| amended_from | Amended From | Link | [[Income Tax Slab]] | no | — | yes | Standard Frappe amend-chain pointer. `no_copy`, `print_hide`. |
 | *(taxable_salary_slabs_section)* | Taxable Salary Slabs | Section Break | — | — | — | — | groups `slabs` |
-| slabs | Taxable Salary Slabs | Table | `Taxable Salary Slab` | yes | — | no | The bracket rows — see `Taxable Salary Slab.md`. |
+| slabs | Taxable Salary Slabs | Table | [[Taxable Salary Slab]] | yes | — | no | The bracket rows — see `Taxable Salary Slab.md`. |
 | *(section_break_cajo)* | — | Section Break | — | — | — | — | layout only |
 | tax_relief_limit | Taxable Income Relief Threshold Limit | Currency | — | no | — | no | `non_negative`. Description: "Maximum annual taxable income eligible for full tax relief. No tax is applied if income does not exceed this limit." Hard short-circuit — see Business Logic. |
 | *(column_break_pdmy)* | — | Column Break | — | — | — | — | layout only |
 | *(taxes_and_charges_on_income_tax_section)* | Taxes and Charges on Income Tax | Section Break | — | — | — | — | `collapsible: 1`, `collapsible_depends_on: other_taxes_and_charges`; groups `other_taxes_and_charges` |
-| other_taxes_and_charges | Other Taxes and Charges | Table | `Income Tax Slab Other Charges` | no | — | no | Surcharge/cess-style additional charges — see `Income Tax Slab Other Charges.md`. |
+| other_taxes_and_charges | Other Taxes and Charges | Table | [[Income Tax Slab Other Charges]] | no | — | no | Surcharge/cess-style additional charges — see `Income Tax Slab Other Charges.md`. |
 
 `row_format: "Dynamic"` at the doctype level (grid rendering hint only, no business-logic effect).
 
@@ -102,7 +102,7 @@ From `hrms/payroll/doctype/salary_slip/salary_slip.py` (read-only reference, not
 
 None defined directly on this doctype's controller. The module-level functions `calculate_tax_by_tax_slab`, `calculate_base_tax_from_tax_slabs`, `calculate_other_charges`, `eval_tax_slab_condition` are plain Python functions (not `@frappe.whitelist()`), callable only from server-side code (e.g. Salary Slip), not directly from a frontend/API client.
 
-## Permissions
+## [[Permission Model (RBAC)|Permissions]]
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -120,10 +120,21 @@ None found in `hrms/hooks.py`. (`Income Tax Slab` appears only in the `company_d
 
 **Not enforced in source.** There is no `is_default` field on `Income Tax Slab` at all (confirmed absent from the full field list above), and no code anywhere in `income_tax_slab.py`, `salary_structure_assignment.py`, or `salary_slip.py` implements a "resolve the default slab for a company" lookup. The linkage is entirely explicit and manual: each `Salary Structure Assignment` document must have its own `income_tax_slab` Link field set directly (validated as mandatory only when the assigned Salary Structure has a tax component — see step 4 above); there is no automatic fallback to a company-wide default when it's blank (Salary Slip throws instead, per step 1 above). Consequently there is also no invariant to violate — an implementer could create arbitrarily many non-disabled `Income Tax Slab` documents for the same `company` with no conflict, because nothing ever asks "which slab is the default for this company." **Flag for the port:** if a "default slab per company" convenience feature is desired in the new system (e.g. to reduce manual selection burden on every Salary Structure Assignment), it would be new functionality with no reference behavior in this codebase to replicate — document it as a deliberate addition, not a ported behavior.
 
+## Related Doctypes
+
+- [[Taxable Salary Slab]] — child table (`slabs`); the bracket rows walked by `calculate_base_tax_from_tax_slabs`.
+- [[Income Tax Slab Other Charges]] — child table (`other_taxes_and_charges`); surcharge/cess rows layered on top of the base slab tax.
+- [[Income Tax Slab]] — `amended_from` points back to the cancelled document in the standard amend chain.
+- [[Salary Structure Assignment]] — holds the `income_tax_slab` Link that resolves which slab document applies to an employee; also validates the slab's currency matches its own.
+- [[Salary Slip]] — the consumer: resolves the applicable slab, calls `calculate_tax_by_tax_slab()`, and looks up exemption amounts as described in the Business Logic section.
+- [[Employee Tax Exemption Declaration]] — read (when `allow_tax_exemption` is set and not yet at the payroll period's final sub-period) to source `total_exemption_amount`.
+- [[Employee Tax Exemption Proof Submission]] — read instead of the Declaration once Salary Slip forces year-end proof reconciliation.
+- [[Payroll Period]] — its `start_date` is compared against `effective_from` to determine slab eligibility for a given period.
+
 ## Port Notes
 
 - **Regional/localization extension points are stubs in core HRMS.** `calculate_tax_with_marginal_relief` and `apply_surcharge_with_marginal_relief` (both `@erpnext.allow_regional`) and `calculate_annual_eligible_hra_exemption`/`calculate_hra_exemption_for_period` (referenced from the Declaration/Proof Submission doctypes) are all no-op/`None`-returning placeholders in this repository — the real India-specific tax logic they represent lives in a separate regional app (`erpnext.regional.india` or similar, not present in this repo) that monkey-patches/overrides them via the `allow_regional` decorator mechanism. A port targeting only the behavior visible in THIS repository will therefore have: no marginal relief, no surcharge-with-relief adjustment, and zero HRA exemption contribution, ever — reproduce these as true no-ops (not "TODO: implement India tax rules") unless the country-specific behavior is separately sourced and explicitly requested.
 - `frappe.get_cached_doc` is used to fetch the resolved slab in Salary Slip — a port should note this is a read-through cache keyed by doctype+name, invalidated on document save; if a slab is edited mid-payroll-run in the target system, cached-vs-fresh read semantics should be considered.
-- `disabled` uses `allow_on_submit: 1`, meaning in Frappe's UI this single checkbox is editable on an already-submitted document without going through the amend workflow — this is a Frappe-specific "field-level submit-time editability" mechanism the target stack has no free equivalent for; implement it explicitly as "field X remains mutable post-submit while all other fields on this record are locked."
+- `disabled` uses `allow_on_submit: 1`, meaning in Frappe's UI this single checkbox is editable on an already-submitted document without going through the amend workflow — this is a [[Implicit Framework Behaviors|Frappe-specific]] "field-level submit-time editability" mechanism the target stack has no free equivalent for; implement it explicitly as "field X remains mutable post-submit while all other fields on this record are locked."
 - `company` and `currency` are both optional-then-optionally-forced: `currency` is nominally `reqd: 1` but is silently overwritten whenever `company` is set, and `company` itself is NOT `reqd`, so a slab can exist with no `company` and a manually chosen `currency` that will never be overwritten. Preserve this "conditional server-side overwrite" rather than making `currency` a strict computed/derived-only field, since a company-less slab genuinely accepts a user-chosen currency.
 - The `slabs` table's `reqd: 1` combined with Frappe's default child-table-mandatory behavior means a slab document cannot be saved with zero bracket rows — a port should enforce "at least one Taxable Salary Slab row" as an explicit save-time constraint since it isn't visible as an explicit `frappe.throw` in this `.py` file (it's framework-level mandatory-table enforcement, invisible in the controller code but real).

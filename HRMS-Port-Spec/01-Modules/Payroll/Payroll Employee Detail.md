@@ -10,7 +10,7 @@ Child table of `Payroll Entry` (fieldname `employees`, options `Payroll Employee
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | No (not `reqd` in JSON, but always populated by `fill_employee_details`) | — | No | `columns: 2`, in_list_view |
+| employee | Employee | Link | [[Employee Core Model]] | No (not `reqd` in JSON, but always populated by `fill_employee_details`) | — | No | `columns: 2`, in_list_view |
 | employee_name | Employee Name | Data | — | No | — | Yes | `fetch_from: employee.employee_name` |
 | *(Column Break — `column_break_3`)* | | | | | | | |
 | department | Department | Link | Department | No | — | Yes | `fetch_from: employee.department` |
@@ -52,6 +52,12 @@ No `permissions` array entries in the JSON (`"permissions": []`) — access is g
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Payroll Entry]] — sole parent doctype; this child table is the `employees` field, wholesale-replaced by `fill_employee_details()`.
+- [[Employee Core Model]] — the `employee` Link identifies the person; `employee_name`/`department`/`designation` are `fetch_from` snapshots of Employee fields.
+- [[Salary Withholding Cycle]] — matched by payroll period to set `is_salary_withheld` on each row.
 
 ## Port Notes
 

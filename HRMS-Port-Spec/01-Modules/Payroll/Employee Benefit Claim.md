@@ -1,20 +1,20 @@
 # Employee Benefit Claim
 
 **Source:** `hrms/payroll/doctype/employee_benefit_claim/employee_benefit_claim.json`, `employee_benefit_claim.py`, `employee_benefit_claim.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `HR-BEN-CLM-.YY.-.MM.-.#####` (expression-based autoname)
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `HR-BEN-CLM-.YY.-.MM.-.#####` (expression-based autoname) ([[Naming and Autoname Rules]])
 **Module:** Payroll
 
 ## Schema
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | | no | `link_filters`: Employee.status = Active (UI-only filter) |
+| employee | Employee | Link | [[Employee Core Model]] | yes | | no | `link_filters`: Employee.status = Active (UI-only filter) |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | no | | yes | fetch_from `employee.department` |
-| benefit_type/earning_component (section: Benefits) | Claim Benefit For | Link | Salary Component | yes | | no | query restricted client-side to `get_benefit_components` whitelisted method |
+| benefit_type/earning_component (section: Benefits) | Claim Benefit For | Link | [[Salary Component]] | yes | | no | query restricted client-side to `get_benefit_components` whitelisted method |
 | max_amount_eligible | Max Amount Eligible For Claim | Currency | options: currency | no | | yes | computed by `get_benefit_details()` |
 | claimed_amount | Claimed Amount | Currency | options: currency | yes | | no | `non_negative: 1` |
-| amended_from | Amended From | Link | Employee Benefit Claim | no | | yes | |
+| amended_from | Amended From | Link | [[Employee Benefit Claim]] | no | | yes | |
 | attachments (section: Expense Proof) | Attachments | Attach | | no | | no | |
 | currency | Currency | Link | Currency | yes | | yes | `depends_on: eval: doc.employee` |
 | company | Company | Link | Company | yes | | no | fetch_from `employee.company` |
@@ -94,12 +94,12 @@ ref_docname: self.name
 ```
 This is a one-time (non-recurring) Additional Salary since `is_recurring` defaults to 0 and `overwrite_salary_structure_amount` is forced 0. Amount flows into the employee's Salary Slip earnings for the payroll cycle covering `payroll_date` via `Additional Salary.get_additional_salaries()` (see `Additional Salary.md`).
 
-## Lifecycle Hooks (exact)
+## Lifecycle Hooks (exact) ([[Cross-Doctype Hooks (doc_events)]])
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
 | validate | `validate_date_and_benefit_claim_amount`, `validate_duplicate_claim` | none |
-| on_submit | `create_additional_salary()` | Inserts + submits a new `Additional Salary` record referencing this claim |
+| on_submit | `create_additional_salary()` | Inserts + submits a new [[Additional Salary]] record referencing this claim |
 
 No `on_cancel` override exists on this controller — cancelling an Employee Benefit Claim does NOT automatically cancel the Additional Salary it created (flagged in Port Notes).
 
@@ -110,7 +110,7 @@ No `on_cancel` override exists on this controller — cancelling an Employee Ben
 | `get_benefit_details` (instance method) | POST (form doc method call) | none (uses self.employee/payroll_date/company/earning_component) | None (mutates doc) | Computes and sets `yearly_benefit` and `max_amount_eligible` per algorithm above |
 | `get_benefit_components` (module function) | GET (Link-field query/autocomplete source) | `doctype, txt, searchfield, start, page_len, filters` (filters must include `employee`, `date`; `company` optional) | list of tuples `(salary_component,)` | Checks read permission on `employee`. Resolves salary structure assignment and payroll period, resolves benefit-details parent via `get_benefits_details_parent`, then lists `salary_component`s from that parent's benefit-detail child table whose `Salary Component.payout_method` is `"Accrue per cycle, pay only on claim"` or `"Allow claim for full benefit amount"`. Returns `[]` on any exception (logged via `frappe.log_error`) or if no employee/date given. |
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -119,9 +119,20 @@ No `on_cancel` override exists on this controller — cancelling an Employee Ben
 | HR User | yes | yes | yes | yes | yes | yes | yes | yes | yes | share/email/print also 1 |
 | Employee | yes | yes | yes | yes | no | no | no | yes | yes | share/email/print also 1 |
 
-## Scheduled Jobs Touching This Doctype
+## Scheduled Jobs Touching This Doctype ([[Background Jobs (Scheduler Events)]])
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee filing the benefit claim.
+- [[Salary Component]] — the benefit component being claimed against (`earning_component`).
+- [[Additional Salary]] — created and submitted on `on_submit` to actually pay out the claimed amount via payroll.
+- [[Salary Structure Assignment]] — read via `get_salary_structure_assignment()` to resolve the flexible-benefit configuration and payroll period for eligibility calculations.
+- [[Employee Benefit Application]] — one of the possible sources `get_benefits_details_parent()` resolves to for this employee's flexible-benefit configuration in the current payroll period.
+- [[Employee Benefit Detail]] / [[Employee Benefit Application Detail]] — child-table sources of the `payout_method`/`amount` details joined against `Salary Component` to compute claim eligibility.
+- [[Employee Benefit Ledger]] — `get_max_claim_eligible()` on this doctype delegates to the ledger's accrual/payout math to cap `max_amount_eligible`.
+- [[Salary Slip]] / [[Salary Structure]] — a preview (unsaved) Salary Slip is generated against the assigned Salary Structure to compute the current month's accrued benefit amount for "Accrue per cycle, pay only on claim" components.
 
 ## Port Notes
 

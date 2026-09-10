@@ -11,9 +11,9 @@ Full field list, JSON field order:
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(set_assignment_details_section)* | Set Assignment Details | Section Break | - | - | - | - | groups the fields below |
-| salary_structure | Salary Structure | Link | Salary Structure | Yes | - | - | `in_list_view` (irrelevant for a Single, but present in JSON) |
+| salary_structure | Salary Structure | Link | [[Salary Structure]] | Yes | - | - | `in_list_view` (irrelevant for a Single, but present in JSON) |
 | from_date | From Date | Date | - | Yes | - | - | `in_list_view`; drives eligible-employee query, see Whitelisted Methods |
-| income_tax_slab | Income Tax Slab | Link | Income Tax Slab | - | - | - | `depends_on: salary_structure` |
+| income_tax_slab | Income Tax Slab | Link | [[Income Tax Slab]] | - | - | - | `depends_on: salary_structure` |
 | *(column_break_rsep)* | - | Column Break | - | - | - | - | layout only |
 | payroll_payable_account | Payroll Payable Account | Link | Account | - | - | - | `fetch_from: .default_payroll_payable_account` (malformed/empty link-path prefix in source JSON — see Port Notes; actual population is done client-side, see below) |
 | branch | Branch | Link | Branch | - | - | - | quick filter |
@@ -25,8 +25,8 @@ Full field list, JSON field order:
 | *(select_employees_section)* | Select Employees | Section Break | - | - | - | - | groups the employee picker |
 | employees_html | Employees HTML | HTML | - | - | - | - | client-only datatable rendering the eligible-employee list with editable Base/Variable columns and row checkboxes |
 | company | Company | Link | Company | Yes | - | Yes | `fetch_from: salary_structure.company` |
-| employment_type | Employment Type | Link | Employment Type | - | - | - | quick filter |
-| grade | Employee Grade | Link | Employee Grade | - | - | - | quick filter |
+| employment_type | Employment Type | Link | [[Employment Type]] | - | - | - | quick filter |
+| grade | Employee Grade | Link | [[Employee Grade]] | - | - | - | quick filter |
 | *(quick_filters_section)* | Quick Filters | Section Break | - | - | - | - | collapsible |
 | currency | Currency | Link | Currency | - | - | Yes | `fetch_from: salary_structure.currency`, `depends_on: salary_structure` |
 
@@ -111,7 +111,7 @@ Not applicable in the usual sense — as a Single, non-submittable doctype with 
 
 `_bulk_assign_structure` itself is a plain instance method (not whitelisted) — only reachable via `bulk_assign_structure` or the Frappe job queue.
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -120,9 +120,19 @@ Not applicable in the usual sense — as a Single, non-submittable doctype with 
 
 No `if_owner` or `permlevel` restrictions. Because this is a Single doctype used only as a tool screen, these permissions effectively gate who can open/use the bulk-assign screen at all; the actual `Salary Structure Assignment` records it creates are subject to **that** doctype's own permission checks too, except `create_salary_structure_assignment` calls `assignment.save(ignore_permissions=True)`, so the assignment-creation step itself bypasses `Salary Structure Assignment` create/write permission checks — the gate is entirely "can this user read/write the Bulk Salary Structure Assignment tool."
 
-## Scheduled Jobs Touching This Doctype
+## Scheduled Jobs Touching This Doctype ([[Background Jobs (Scheduler Events)]])
 
 None found in `hrms/hooks.py` `scheduler_events` referencing `Bulk Salary Structure Assignment`.
+
+## Related Doctypes
+
+- [[Salary Structure]] — the structure being bulk-assigned; also the source of the `assign_salary_structure_for_employees` helper this doctype's `create_salary_structure_assignment` call fully reuses.
+- [[Salary Structure Assignment]] — the record created (and submitted) per selected employee; per-employee validation (duplicate `from_date`, company, tax slab) lives entirely in that doctype's `validate()`.
+- [[Employee Grade]] — read to pre-populate each eligible employee's default base pay in the picker.
+- [[Income Tax Slab]] — passed through to each created Salary Structure Assignment.
+- [[Employment Type]] — one of the quick-filter fields used to narrow the eligible-employee query.
+- [[Employee Core Model]] — the pool of records queried/filtered by `get_employees()` and assigned in bulk.
+- Company, Branch, Designation, Department, Account (core ERPNext, not specified in this port-spec tree) — used as quick filters and fetched/company-derived fields.
 
 ## Port Notes
 

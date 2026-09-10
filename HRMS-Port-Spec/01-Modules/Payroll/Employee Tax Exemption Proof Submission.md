@@ -1,7 +1,7 @@
 # Employee Tax Exemption Proof Submission
 
 **Source:** `hrms/payroll/doctype/employee_tax_exemption_proof_submission/employee_tax_exemption_proof_submission.json`, `employee_tax_exemption_proof_submission.py`, `employee_tax_exemption_proof_submission.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `autoname: "HR-TAX-PRF-.YYYY.-.#####"` (naming series, same mechanics as `Employee Tax Exemption Declaration`, prefix `HR-TAX-PRF-`), `naming_rule: "Expression (old style)"`
+**Submittable:** yes   **Tree:** no   **Naming:** `autoname: "HR-TAX-PRF-.YYYY.-.#####"` ([[Naming and Autoname Rules|naming series]], same mechanics as `Employee Tax Exemption Declaration`, prefix `HR-TAX-PRF-`), `naming_rule: "Expression (old style)"`
 **Module:** Payroll
 
 ## Schema
@@ -11,17 +11,17 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(employee_details_tab, "Employee")* | — | Tab Break | — | — | — | — | tab heading |
-| employee | Employee | Link | `Employee` | yes | — | no | `in_list_view`, `in_standard_filter`. Client-side picker filters to `status: "Active"` (UI-only, see Port Notes in the Declaration file — same caveat applies here). |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | `in_list_view`, `in_standard_filter`. Client-side picker filters to `status: "Active"` (UI-only, see Port Notes in the Declaration file — same caveat applies here). |
 | employee_name | Employee Name | Data | — | no | — | yes | `fetch_from: employee.employee_name`. |
 | department | Department | Link | `Department` | no | — | yes | `fetch_from: employee.department`. |
 | currency | Currency | Link | `Currency` | yes | — | no | `depends_on: eval: doc.employee`; `print_hide`. Populated client-side via `salary_structure_assignment.get_employee_currency`. |
-| amended_from | Amended From | Link | `Employee Tax Exemption Proof Submission` | no | — | yes | Standard amend pointer. `no_copy`, `print_hide`. |
+| amended_from | Amended From | Link | [[Employee Tax Exemption Proof Submission]] | no | — | yes | Standard amend pointer. `no_copy`, `print_hide`. |
 | *(column_break_2)* | — | Column Break | — | — | — | — | layout only |
 | submission_date | Submission Date | Date | — | yes | `Today` | no | |
-| payroll_period | Payroll Period | Link | `Payroll Period` | yes | — | no | `in_list_view`, `in_standard_filter`. Client-side query filters to the employee's company's periods. |
+| payroll_period | Payroll Period | Link | [[Payroll Period]] | yes | — | no | `in_list_view`, `in_standard_filter`. Client-side query filters to the employee's company's periods. |
 | company | Company | Link | `Company` | yes | — | yes | `fetch_from: employee.company`. Note: unlike the Declaration doctype (where `company` is optional), here `company` is `reqd: 1` in addition to being `read_only`/fetched — since it's fetched-and-required, in practice it is populated automatically whenever `employee` is set and Employee has a `company`; if `employee.company` is itself blank, this fetched-required field would be blank and fail the mandatory check at save time. |
 | *(exemption_proofs_details_tab, "Exemption Proofs")* | — | Tab Break | — | — | — | — | tab heading |
-| tax_exemption_proofs | Tax Exemption Proofs | Table | `Employee Tax Exemption Proof Submission Detail` | no | — | no | The per-sub-category proof rows — see `Employee Tax Exemption Proof Submission Detail.md`. |
+| tax_exemption_proofs | Tax Exemption Proofs | Table | [[Employee Tax Exemption Proof Submission Detail]] | no | — | no | The per-sub-category proof rows — see `Employee Tax Exemption Proof Submission Detail.md`. |
 | *(section_break_10)* | — | Section Break | — | — | — | — | layout only |
 | total_actual_amount | Total Actual Amount | Currency | `options: "currency"` | no | — | yes | Computed — sum of all proof-row `amount`s, plus an optional legacy `house_rent_payment_amount` (see Business Logic; not a schema field, see Port Notes). |
 | *(column_break_12)* | — | Column Break | — | — | — | — | layout only |
@@ -46,7 +46,7 @@ stateDiagram-v2
 Plain list:
 - (none) -> submit -> Submitted — guard: all `validate()` checks below must pass; `employee`, `submission_date`, `payroll_period`, `company`, `currency` must be set (`reqd: 1`).
 - Submitted -> cancel -> Cancelled — no doctype-specific cancel guard beyond standard Frappe cancel permission.
-- Cancelled -> amend -> new Draft — standard Frappe amend.
+- Cancelled -> amend -> new Draft — [[Submittable Document Lifecycle|standard Frappe amend]].
 
 No separate `status`/`workflow_state` field — only standard `docstatus`. **This `docstatus == 1` (Submitted) state is itself the signal Salary Slip uses to treat a proof submission as authoritative** — see cross-doctype linkage in `Income Tax Slab.md` (`frappe.db.get_value(..., {"docstatus": 1}, ...)`); a Draft or Cancelled proof submission is invisible to Salary Slip's tax computation.
 
@@ -127,9 +127,18 @@ None defined directly on this doctype's controller (`employee_tax_exemption_proo
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee this proof submission is filed for; also drives `employee_name`, `department`, and the required `company` via `fetch_from`.
+- [[Payroll Period]] — the period this proof submission applies to; at most one non-cancelled proof submission may exist per (employee, payroll_period) pair.
+- [[Employee Tax Exemption Proof Submission Detail]] — child table (`tax_exemption_proofs`) holding the per-sub-category proof rows this document aggregates.
+- [[Employee Tax Exemption Category]] — read (via sub-category rows) for per-category `max_amount` caps during `get_total_exemption_amount()`.
+- [[Employee Tax Exemption Declaration]] — source doctype for the whitelisted `make_proof_submission` mapper that creates this document; once this document is submitted, its `exemption_amount` fully replaces the Declaration's `total_exemption_amount` for the final sub-period of the payroll period.
+- [[Employee Tax Exemption Proof Submission]] — self-referenced by `amended_from` on the amend chain.
+
 ## Port Notes
 
-- **Same ownership-scoping gap as `Employee Tax Exemption Declaration`**: no `if_owner` restriction on the `Employee` role means any employee-role user can, per the raw JSON permissions, read/write/submit/cancel/amend any other employee's proof submissions. Flag identically for the port — add explicit row-level ownership scoping even though it's not encoded here.
+- **Same ownership-scoping gap as `Employee Tax Exemption Declaration`**: no `if_owner` restriction on the `Employee` role (see [[Permission Model (RBAC)]]) means any employee-role user can, per the raw JSON permissions, read/write/submit/cancel/amend any other employee's proof submissions. Flag identically for the port — add explicit row-level ownership scoping even though it's not encoded here.
 - **Same dead-code HRA pattern** as the Declaration doctype (`house_rent_payment_amount`, `monthly_hra_exemption`, `monthly_house_rent`, `total_eligible_hra_exemption` referenced via `self.get(...)`/`self.<attr> =` but absent from schema) — do not port these as real fields unless implementing India-specific HRA-over-period logic separately; document their exclusion explicitly.
 - **Validation-order divergence from the sibling Declaration doctype is intentional-looking but easy to miss**: the Declaration validates duplicate-period THIRD (before computing totals); the Proof Submission validates duplicate-period LAST (after computing totals and the HRA no-op). Since none of the total-computation steps have any side effect beyond mutating `self` in-memory (no external writes), this ordering difference has no observable behavioral consequence in either doctype UNLESS `set_total_actual_amount`/`set_total_exemption_amount`/`calculate_hra_exemption` were ever changed to throw (they currently never do) — but a faithful port should still preserve the literal method-call order per doctype in case future logic depends on it, per the ground rule of exact-order reproduction.
 - `company` is both `fetch_from` AND `reqd: 1` here (unlike the Declaration doctype where `company` is fetched but not required) — a port must apply the mandatory check to the fetched value, i.e., reject save if `employee.company` was blank at fetch time and no company was otherwise supplied, exactly mirroring Frappe's fetch-then-validate-mandatory sequencing (fetch happens client-side/on save before the mandatory-field check runs).

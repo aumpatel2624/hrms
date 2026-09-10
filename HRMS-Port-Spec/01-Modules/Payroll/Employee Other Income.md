@@ -1,7 +1,7 @@
 # Employee Other Income
 
 **Source:** `hrms/payroll/doctype/employee_other_income/employee_other_income.json`, `employee_other_income.py`, `employee_other_income.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `HR-INCOME-.######` (expression-based autoname, sequential, no year/month segment)
+**Submittable:** yes   **Tree:** no   **Naming:** `HR-INCOME-.######` (expression-based autoname, sequential, no year/month segment — see [[Naming and Autoname Rules]])
 **Module:** Payroll
 
 Declares an employee's income from a source other than this employer (e.g. other employer, rental income), used as an input to income-tax computation elsewhere (Salary Slip / tax module — owned by other agents; cross-reference only).
@@ -10,13 +10,13 @@ Declares an employee's income from a source other than this employer (e.g. other
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee (section: Employee Details) | Employee | Link | Employee | yes | | no | `search_index: 1` |
-| payroll_period | Payroll Period | Link | Payroll Period | yes | | no | `search_index: 1` |
+| employee (section: Employee Details) | Employee | Link | [[Employee Core Model]] | yes | | no | `search_index: 1` |
+| payroll_period | Payroll Period | Link | [[Payroll Period]] | yes | | no | `search_index: 1` |
 | company | Company | Link | Company | yes | | no | `search_index: 1` |
 | source (section: Income Source) | Source | Data | | no | | no | free-text description of the income source |
 | amount | Amount | Currency | options: `Company:company:default_currency` (dynamic currency precision/symbol from the linked Company's default currency) | yes | | no | `non_negative: 1` |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
-| amended_from | Amended From | Link | Employee Other Income | no | | yes | |
+| amended_from | Amended From | Link | [[Employee Other Income]] | no | | yes | |
 
 Layout-only fields skipped: column_break_3, column_break_10, employee_section, income_source_details_section.
 
@@ -34,7 +34,7 @@ stateDiagram-v2
     Cancelled --> Draft: amend
 ```
 
-No explicit `status` field; state is `docstatus` only. No custom submit/cancel guards — controller has no `validate`/`on_submit`/`on_cancel` overrides at all (see below).
+No explicit `status` field; state is `docstatus` only (see [[Submittable Document Lifecycle]]). No custom submit/cancel guards — controller has no `validate`/`on_submit`/`on_cancel` overrides at all (see below).
 
 ## Validation Rules (exact, in execution order)
 
@@ -67,6 +67,13 @@ Note: `System Manager` is not explicitly listed here either (same pattern as `Em
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — `employee` link; the person whose external income is being declared.
+- [[Payroll Period]] — `payroll_period` link; scopes which period this declared income applies to.
+- [[Salary Slip]] — consumes this declared income as an input to income-tax computation (owned by another agent; cross-reference only).
+- [[Employee Benefit Claim]] — referenced in Port Notes for contrast (it has a per-month duplicate check this doctype lacks).
 
 ## Port Notes
 

@@ -96,6 +96,13 @@ None — no `@frappe.whitelist()` decorated methods in `payroll_settings.py`.
 
 None found in `hrms/hooks.py` `scheduler_events` that write to Payroll Settings. It is read (not scheduled-job-triggered) on-demand by the consumers listed above.
 
+## Related Doctypes
+
+- [[Salary Slip]] — the primary consumer of nearly every setting here (working-days basis, half-day fraction, rounding, email, flexible-benefit gating).
+- [[Payroll Entry]] — reads `process_payroll_accounting_entry_based_on_employee` for GL posting mode and `create_overtime_slip` to gate the overtime-slip step.
+- [[Payroll Period]] — `include_holidays_in_total_working_days` affects `get_payroll_period_days()`.
+- [[Employee Benefit Application]] — `mandatory_benefit_application` gates whether flexible-benefit components apply without an approved application.
+
 ## Port Notes
 
 - **Single doctype semantics**: Frappe's "Single" doctype pattern means there is exactly one row for this "table" ever, conventionally with no primary key beyond the fixed doctype name. A port should model this as either (a) a table with a single fixed-id row (e.g. `id=1`), or (b) a dedicated key-value settings table/config service — but must preserve the "exactly one record system-wide, no per-company/per-tenant variation" semantic, since nothing in the source scopes these settings by Company.

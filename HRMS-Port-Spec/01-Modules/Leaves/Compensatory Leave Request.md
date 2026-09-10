@@ -1,19 +1,19 @@
 # Compensatory Leave Request
 
 **Source:** `hrms/hr/doctype/compensatory_leave_request/compensatory_leave_request.json`, `compensatory_leave_request.py`, `compensatory_leave_request.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `autoname: "HR-CMP-.YY.-.MM.-.#####"` (auto-increment counter per year+month, e.g. `HR-CMP-26-09-00001`)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `autoname: "HR-CMP-.YY.-.MM.-.#####"` (auto-increment counter per year+month, e.g. `HR-CMP-26-09-00001`)
 **Module:** HR
 
 ## Schema
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | - | - | in_list_view |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | yes | - | - | in_list_view |
 | employee_name | Employee Name | Data | - | - | - | yes | `fetch_from: employee.employee_name` |
 | department | Department | Link | Department | - | - | yes | `fetch_from: employee.department` |
 | *(Column Break)* | | | | | | | |
-| leave_type | Leave Type | Link | Leave Type | - | - | - | client-side query restricted to `is_compensatory=true`; server requires it non-empty via explicit throw (not `reqd` in schema — see Validation) |
-| leave_allocation | Leave Allocation | Link | Leave Allocation | - | - | yes | set server-side in `on_submit` via `db_set` |
+| leave_type | Leave Type | Link | [[Leave Type]] | - | - | - | client-side query restricted to `is_compensatory=true`; server requires it non-empty via explicit throw (not `reqd` in schema — see Validation) |
+| leave_allocation | Leave Allocation | Link | [[Leave Allocation]] | - | - | yes | set server-side in `on_submit` via `db_set` |
 | *(Section Break: "Worked On Holiday")* | | | | | | | |
 | work_from_date | Work From Date | Date | - | yes | - | - | |
 | work_end_date | Work End Date | Date | - | yes | - | - | |
@@ -21,7 +21,7 @@
 | half_day_date | Half Day Date | Date | - | - | - | - | `depends_on: half_day`; client-side sets `reqd` dynamically when `half_day` checked |
 | *(Column Break)* | | | | | | | |
 | reason | Reason | Small Text | - | yes | - | - | |
-| amended_from | Amended From | Link | Compensatory Leave Request | - | - | yes | standard amendment field |
+| amended_from | Amended From | Link | [[Compensatory Leave Request]] | - | - | yes | standard amendment field |
 
 ## Child Tables
 
@@ -141,7 +141,7 @@ No separate `status`/`workflow_state` field — only `docstatus`.
 ```
 Note: `on_cancel` does NOT clear `self.leave_allocation` back to null, and does not distinguish between the "existing allocation extended" vs "new allocation created" cases from `on_submit` — it always treats the linked allocation as one whose `new_leaves_allocated` should be decremented by the same `date_difference`, regardless of which path created it. If the allocation was newly created in `on_submit` (case 6c), cancelling this request reduces (but does not delete/cancel) that Leave Allocation record — it is left behind with `new_leaves_allocated` clamped to 0 rather than being cancelled itself.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -165,6 +165,13 @@ None — no `@frappe.whitelist()` methods defined on this doctype's controller o
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee who worked the holiday/weekend day; `employee` Link field, also read for active-status/attendance validation.
+- [[Leave Type]] — `leave_type` Link field, restricted to compensatory-eligible types.
+- [[Leave Allocation]] — `leave_allocation` Link field; created or extended (`new_leaves_allocated` incremented) on approval/submit, decremented on cancel.
+- [[Compensatory Leave Request]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 

@@ -10,7 +10,7 @@ Shared child table used by BOTH `Payroll Correction` (fields `earning_arrears`, 
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| salary_component | Salary Component | Link | Salary Component | yes | | no | |
+| salary_component | Salary Component | Link | [[Salary Component]] | yes | | no | |
 | amount | Amount | Float | | yes | | no | `non_negative: 1` |
 
 ## Business Logic / Calculations
@@ -20,6 +20,12 @@ None on this child doctype itself — controller class body is `pass`. All popul
 ## Permissions
 
 None defined (`"permissions": []`) — inherited from whichever parent doctype (`Payroll Correction` or `Arrear`) owns the row.
+
+## Related Doctypes
+
+- [[Payroll Correction]] — one of two parent doctypes that own rows of this child table (`earning_arrears`, `deduction_arrears`, `accrual_arrears`).
+- [[Arrear]] — the other parent doctype reusing this same child table shape.
+- [[Salary Component]] — each row's `salary_component` Link identifies the component the arrear amount applies to.
 
 ## Port Notes
 

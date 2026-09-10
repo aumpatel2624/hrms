@@ -51,6 +51,11 @@ None.
 
 None found.
 
+## Related Doctypes
+
+- [[Salary Component]] — sole parent doctype (`accounts` field); `validate_accounts()` warns (non-blocking) when rows are missing/incomplete.
+- [[Salary Slip]] — `get_tax_components()`/`_fetch_tax_components_by_company()` reads this table's company-scoped rows to resolve which component counts as "the tax component" per company.
+
 ## Port Notes
 
 - This is a straightforward company-scoped override/join table: `(salary_component_id, company_id) -> account_id`, with `company` optional (an unset company should be treated as a global/default fallback, since the querying code in `_fetch_tax_components_by_company()` explicitly groups un-companied rows under a `"default"` key). A port should enforce **uniqueness of `(salary_component, company)`** at the database level even though the Frappe schema does not declare this constraint explicitly — duplicate rows for the same company are only prevented by UI/data-entry discipline in the source, not by a DB constraint. Flag this as a gap to close in the port rather than silently reproduce.

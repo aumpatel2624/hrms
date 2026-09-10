@@ -11,19 +11,19 @@ A one-off retention/loyalty bonus committed to a specific employee, paid out thr
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(Section: "Employee", `employee_section`)* | | | | | | | heading only |
-| employee | Employee | Link | Employee | yes | — | no | `in_list_view`; client script filters dropdown to `status: "Active"` AND `company: frm.doc.company` (client-side only — see Validation Rules) |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | `in_list_view`; client script filters dropdown to `status: "Active"` AND `company: frm.doc.company` (client-side only — see Validation Rules) |
 | employee_name | Employee Name | Data | — | no | — | yes | `fetch_from: employee.employee_name` |
 | department | Department | Link | Department | no | — | yes | `fetch_from: employee.department` |
 | column_break_6 | — | Column Break | — | — | — | — | layout |
 | company | Company | Link | Company | yes | — | no | NOT a fetch-from field — user-selectable directly (unlike Gratuity's company, which is fetched from Employee) |
 | date_of_joining | Date of Joining | Data | — | no | — | yes | `fetch_from: employee.date_of_joining`; stored as plain Data (text), not a Date type, despite representing a date |
 | *(Section: "Bonus", `bonus_section`)* | | | | | | | heading only |
-| salary_component | Salary Component | Link | Salary Component | yes | — | no | client script restricts dropdown query to `type: "Earning"` (client-side convenience filter only) |
+| salary_component | Salary Component | Link | [[Salary Component]] | yes | — | no | client script restricts dropdown query to `type: "Earning"` (client-side convenience filter only) |
 | bonus_amount | Bonus Amount | Currency | `options: "currency"` (currency-field-linked-to-another-field pattern, pointing at this doc's own `currency` field for symbol/precision) | yes | — | no | `non_negative` |
 | column_break_12 | — | Column Break | — | — | — | — | layout |
 | bonus_payment_date | Bonus Payment Date | Date | — | yes | — | no | `in_list_view`; must not be in the past (see Validation Rules) |
 | currency | Currency | Link | Currency | conditionally reqd via UI (`reqd: 1` in schema, always required at DB level) | — | yes | `depends_on: eval:(doc.docstatus==1 \|\| doc.employee)`; `print_hide`; populated by client script's `employee` handler via whitelisted call `hrms.payroll.doctype.salary_structure_assignment.salary_structure_assignment.get_employee_currency` (client-side only — see Port Notes; no equivalent server-side default-setting found in `retention_bonus.py`) |
-| amended_from | Amended From | Link | Retention Bonus | no | — | yes | `no_copy`, `print_hide`; standard amend-chain pointer |
+| amended_from | Amended From | Link | [[Retention Bonus]] | no | — | yes | `no_copy`, `print_hide`; standard amend-chain pointer |
 
 `title_field`: employee_name. `search_fields`: employee_name. `track_changes: 1`. `allow_import: 1`. `allow_rename: 1`.
 
@@ -164,6 +164,12 @@ Unlike `Gratuity`, this permissions array DOES explicitly include `submit`/`canc
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` scheduler_events referencing Retention Bonus.
+
+## Related Doctypes
+
+- [[Additional Salary]] — created or merged into on `on_submit()`; the actual payroll delivery mechanism for the bonus, and reversed/adjusted on `on_cancel()`.
+- [[Salary Component]] — the earning component the bonus amount is posted against.
+- [[Employee Core Model]] — the recipient employee; also the source of the `company` used when creating the linked Additional Salary.
 
 ## Port Notes
 

@@ -21,6 +21,10 @@ None on this child doctype itself — controller class body is `pass`. No aggreg
 
 None defined (`"permissions": []`) — inherited from parent doctype.
 
+## Related Doctypes
+
+- [[Salary Structure Assignment]] — parent doctype; this child table splits the employee's salary cost across cost centers by percentage.
+
 ## Port Notes
 
 - Both fields carry `allow_on_submit: 1`, meaning Frappe permits editing `cost_center`/`percentage` rows on an already-submitted parent document (bypassing the normal "submitted docs are locked" rule) — a port must explicitly allow post-submit mutation of this specific child table while keeping other parent fields locked, if replicating this behavior.

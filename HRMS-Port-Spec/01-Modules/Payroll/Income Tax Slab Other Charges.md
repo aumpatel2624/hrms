@@ -46,19 +46,24 @@ Edge cases handled explicitly: `flt(d.min_taxable_income)`/`flt(d.max_taxable_in
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
-| (none) | No overridden lifecycle methods on the child doctype itself | Consumed read-only by `Income Tax Slab.calculate_other_charges()`, in turn called from `Salary Slip`'s tax computation (`Salary Slip` is out of this agent's scope — referenced by name only). |
+| (none) | No overridden lifecycle methods on the child doctype itself | Consumed read-only by `Income Tax Slab.calculate_other_charges()`, in turn called from [[Salary Slip]]'s tax computation (`Salary Slip` is out of this agent's scope — referenced by name only). |
 
 ## Whitelisted / API Methods
 
 None.
 
-## Permissions
+## [[Permission Model (RBAC)|Permissions]]
 
 None defined in JSON (`"permissions": []`) — inherits from parent `Income Tax Slab`.
 
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Income Tax Slab]] — parent doctype; this child table (`other_taxes_and_charges`) holds its surcharge/cess rows, iterated by the parent's `calculate_other_charges()`.
+- [[Salary Slip]] — indirectly consumes this data via `Income Tax Slab.calculate_tax_by_tax_slab()`, which is called during Salary Slip's tax computation.
 
 ## Port Notes
 

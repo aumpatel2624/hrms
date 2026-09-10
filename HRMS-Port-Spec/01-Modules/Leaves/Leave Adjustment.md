@@ -1,7 +1,7 @@
 # Leave Adjustment
 
 **Source:** `hrms/hr/doctype/leave_adjustment/leave_adjustment.json`, `leave_adjustment.py`, `leave_adjustment.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `naming_series:` -> series `HR-LAD-.YYYY.-`
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `naming_series:` -> series `HR-LAD-.YYYY.-`
 **Module:** HR
 
 ## Schema
@@ -9,12 +9,12 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(Section Break)* | | | | | | | |
-| amended_from | Amended From | Link | Leave Adjustment | - | - | yes | standard amendment field; `no_copy`, `search_index` |
-| employee | Employee | Link | Employee | yes | - | - | |
+| amended_from | Amended From | Link | [[Leave Adjustment]] | - | - | yes | standard amendment field; `no_copy`, `search_index` |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | yes | - | - | |
 | *(Column Break)* | | | | | | | |
 | employee_name | Employee Name | Data | - | - | - | yes | `fetch_from: employee.employee_name` |
-| leave_type | Leave Type | Link | Leave Type | yes | - | - | client-side query restricted to leave types already allocated to `employee` (see Port Notes) |
-| leave_allocation | Allocation to Adjust | Link | Leave Allocation | yes | - | yes | auto-populated client-side via `get_leave_allocation_for_posting_date`; read-only in form |
+| leave_type | Leave Type | Link | [[Leave Type]] | yes | - | - | client-side query restricted to leave types already allocated to `employee` (see Port Notes) |
+| leave_allocation | Allocation to Adjust | Link | [[Leave Allocation]] | yes | - | yes | auto-populated client-side via `get_leave_allocation_for_posting_date`; read-only in form |
 | naming_series | Series | Select | `HR-LAD-.YYYY.-` | yes | - | - | in_list_view |
 | from_date | From Date | Date | - | - | - | yes | `fetch_from: leave_allocation.from_date` |
 | to_date | To Date | Date | - | - | - | yes | `fetch_from: leave_allocation.to_date` |
@@ -82,7 +82,7 @@ No separate `status`/`workflow_state` field exists on this doctype — only `doc
 
 **Note:** Unlike `Leave Allocation`, `Leave Adjustment` does NOT itself mutate `Leave Allocation.total_leaves_allocated` directly — the effect on the employee's leave balance flows purely through the `Leave Ledger Entry` created here (the ledger is the single source of truth for balance; `Leave Allocation.total_leaves_allocated` is a separate, informational running total maintained independently by the Leave Allocation controller and is NOT recalculated by this doctype). **Port Note:** confirm this is intentional in the source — no code path in `Leave Adjustment` calls back into `Leave Allocation` to update its `total_leaves_allocated` field, so a balance-reporting UI must sum ledger entries (or a materialized balance) rather than trusting `Leave Allocation.total_leaves_allocated` alone once adjustments exist.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -111,6 +111,14 @@ No separate `status`/`workflow_state` field exists on this doctype — only `doc
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee whose allocation is being adjusted; `employee` Link field.
+- [[Leave Type]] — `leave_type` Link field.
+- [[Leave Allocation]] — `leave_allocation` Link field; the allocation this adjustment modifies (read for balance/cap checks, not itself mutated).
+- [[Leave Ledger Entry]] — created on submit (signed delta), deleted on cancel.
+- [[Leave Adjustment]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 

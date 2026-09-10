@@ -47,6 +47,10 @@ No `permissions` array entries (`"permissions": []`) — governed by the parent 
 
 None.
 
+## Related Doctypes
+
+- [[Payroll Period]] — sole parent doctype (`periods` field); this child table's section is hidden and unpopulated by any controller code in this repo.
+
 ## Port Notes
 
 - This doctype is present purely as a schema shell for a feature (sub-period breakdown of a Payroll Period) that has no implemented logic anywhere in this version of the source tree. A port should still create the table (per the shared spec's "cover every doctype including child tables" rule) but should flag to product/engineering stakeholders that there is currently no generation, validation, or consumption logic to replicate — this is a genuine gap in the source, not an omission in this spec.

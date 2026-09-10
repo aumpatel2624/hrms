@@ -10,7 +10,7 @@ Child table of `Salary Slip` (field `leave_details`, table field on `Salary Slip
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| leave_type | Leave Type | Link | Leave Type | No | — | Yes | `no_copy` |
+| leave_type | Leave Type | Link | [[Leave Type]] | No | — | Yes | `no_copy` |
 | total_allocated_leaves | Total Allocated Leave(s) | Float | — | No | — | Yes | `no_copy` |
 | expired_leaves | Expired Leave(s) | Float | — | No | — | Yes | `no_copy` |
 | used_leaves | Used Leave(s) | Float | — | No | — | Yes | `no_copy` |
@@ -62,6 +62,12 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None found.
+
+## Related Doctypes
+
+- [[Salary Slip]] — sole parent doctype (`leave_details` field); fully cleared and repopulated by `add_leave_balances()` on every save.
+- [[Leave Type]] — identifies which leave type each snapshot row summarizes.
+- [[Leave Application]] — its `get_leave_details()` helper (from the Leaves module) is the actual source of the five balance numbers per leave type.
 
 ## Port Notes
 

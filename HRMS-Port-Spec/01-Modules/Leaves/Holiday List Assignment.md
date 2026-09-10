@@ -1,7 +1,7 @@
 # Holiday List Assignment
 
 **Source:** `hrms/hr/doctype/holiday_list_assignment/holiday_list_assignment.json`, `holiday_list_assignment.py`, `holiday_list_assignment.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `naming_series:` on field `naming_series`, series pattern `HR-HLA-.YYYY.-` (e.g. `HR-HLA-2026-00001`, auto-incrementing per year)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `naming_series:` on field `naming_series`, series pattern `HR-HLA-.YYYY.-` (e.g. `HR-HLA-2026-00001`, auto-incrementing per year)
 **Module:** HR
 
 ## Schema
@@ -9,7 +9,7 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(Section Break)* `section_break_wnwa` | — | Section Break | — | — | — | — | Layout only, skipped |
-| `amended_from` | Amended From | Link | Holiday List Assignment | No | — | Yes | `no_copy: 1`, `print_hide: 1`, `search_index: 1` — standard Frappe amend-chain pointer, set automatically when a cancelled submitted doc is amended |
+| `amended_from` | Amended From | Link | [[Holiday List Assignment]] | No | — | Yes | `no_copy: 1`, `print_hide: 1`, `search_index: 1` — standard Frappe amend-chain pointer, set automatically when a cancelled submitted doc is amended |
 | `holiday_list` | Holiday List | Link | Holiday List (external/core doctype, not in this repo — see Port Notes) | Yes | — | No | `in_list_view: 1` |
 | `naming_series` | Naming Series | Select | `HR-HLA-.YYYY.-` (single option) | Yes | — | No | `in_list_view: 1`; drives autoname |
 | `employee_name` | Employee Name | Data | — | No | — | Yes | `hidden: 1`; `fetch_from: employee.employee_name` — **Note:** the fetch-from source field is literally `employee.employee_name`, but this doctype has no field named `employee`; it is populated instead by client-script logic reading from `assigned_to` when `applicable_for = "Employee"` (see Lifecycle Hooks) — the `fetch_from` declaration itself is effectively dead/inconsistent metadata (flag as Port Note) |
@@ -62,7 +62,7 @@ Two virtual (computed, not stored) properties — recomputed on every access, no
 
 A port should implement these as computed/derived fields at read time (e.g. a SQL join or application-layer lookup against the Holiday List record), NOT as stored columns, since `is_virtual: 1` means Frappe never persists them.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -96,6 +96,11 @@ None. No `@frappe.whitelist()` methods defined on this doctype's controller or i
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` scheduler_events referencing `Holiday List Assignment`.
+
+## Related Doctypes
+
+- [[Holiday List Assignment]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
+- [[Employee Core Model]] — one of the two possible targets of the `assigned_to` Dynamic Link (when `applicable_for = "Employee"`); also the source of `employee_name`/`employee_company` on assignment.
 
 ## Port Notes
 

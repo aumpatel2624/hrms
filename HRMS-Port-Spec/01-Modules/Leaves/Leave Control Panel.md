@@ -11,16 +11,16 @@ This is a **bulk-action tool doctype** (Single), not a transactional record — 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | company | Company | Link | Company | conditionally | - | - | `mandatory_depends_on: eval:doc.dates_based_on == 'Leave Period'`; `remember_last_selected_value` |
-| employment_type | Employment Type | Link | Employment Type | - | - | - | in_list_view (quick filter) |
+| employment_type | Employment Type | Link | [[Employment Type]] | - | - | - | in_list_view (quick filter) |
 | branch | Branch | Link | Branch | - | - | - | in_list_view (quick filter) |
 | department | Department | Link | Department | - | - | - | in_list_view (quick filter) |
 | designation | Designation | Link | Designation | - | - | - | in_list_view (quick filter) |
-| employee_grade | Employee Grade | Link | Employee Grade | - | - | - | (quick filter, maps to Employee's `grade` field — see Business Logic) |
+| employee_grade | Employee Grade | Link | [[Employee Grade]] | - | - | - | (quick filter, maps to Employee's `grade` field — see Business Logic) |
 | *(Column Break)* | | | | | | | |
 | from_date | From Date | Date | - | conditionally | Today | conditionally | `depends_on: eval:doc.dates_based_on != 'Joining Date'`; `mandatory_depends_on: eval:doc.dates_based_on == 'Custom Range'`; `read_only_depends_on: eval:doc.dates_based_on == 'Leave Period'` |
 | to_date | To Date | Date | - | conditionally | - | conditionally | `mandatory_depends_on: eval:doc.dates_based_on != 'Leave Period'`; `read_only_depends_on: eval:doc.dates_based_on == 'Leave Period'` |
-| leave_policy | Leave Policy | Link | Leave Policy | conditionally | - | - | `depends_on`/`mandatory_depends_on: eval:doc.allocate_based_on_leave_policy` |
-| leave_type | Leave Type | Link | Leave Type | conditionally | - | - | `depends_on`/`mandatory_depends_on: eval:!doc.allocate_based_on_leave_policy` |
+| leave_policy | Leave Policy | Link | [[Leave Policy]] | conditionally | - | - | `depends_on`/`mandatory_depends_on: eval:doc.allocate_based_on_leave_policy` |
+| leave_type | Leave Type | Link | [[Leave Type]] | conditionally | - | - | `depends_on`/`mandatory_depends_on: eval:!doc.allocate_based_on_leave_policy` |
 | carry_forward | Carry Forward | Check | - | - | 1 | - | description: "Add unused leaves from previous leave period's allocation to this allocation" |
 | no_of_days | New Leaves Allocated (In Days) | Float | - | conditionally | - | - | `non_negative`; `depends_on`/`mandatory_depends_on: eval:!doc.allocate_based_on_leave_policy` |
 | *(Section Break: "Select Employees")* | | | | | | | |
@@ -28,7 +28,7 @@ This is a **bulk-action tool doctype** (Single), not a transactional record — 
 | *(Column Break)* | | | | | | | |
 | employees_html | Employees HTML | HTML | - | - | - | yes | client-rendered datatable of matching employees (see Business Logic / Port Notes) |
 | dates_based_on | Dates Based On | Select | `Leave Period\nJoining Date\nCustom Range` | - | Leave Period | - | drives which of `leave_period`/`from_date`/`to_date` apply |
-| leave_period | Leave Period | Link | Leave Period | conditionally | - | - | `depends_on`/`mandatory_depends_on: eval:doc.dates_based_on == 'Leave Period'` |
+| leave_period | Leave Period | Link | [[Leave Period]] | conditionally | - | - | `depends_on`/`mandatory_depends_on: eval:doc.dates_based_on == 'Leave Period'` |
 | allocate_based_on_leave_policy | Allocate Based On Leave Policy | Check | - | - | 1 | - | toggles the two mutually-exclusive allocation modes |
 | *(Section Break: "Advanced Filters", collapsible)* | | | | | | | |
 | filter_list | Filter List | HTML | - | - | - | - | client-rendered advanced filter-group builder (via `hrms.setup_employee_filter_group`) |
@@ -203,7 +203,7 @@ No `validate()` controller method exists (no override) since this Single doctype
    for the company)
 ```
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -227,6 +227,17 @@ No `validate()` controller method exists (no override) since this Single doctype
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employees selected/filtered for bulk allocation/assignment.
+- [[Employment Type]] — `employment_type` Link field, a quick filter on the employee query.
+- [[Employee Grade]] — `employee_grade` Link field, mapped to Employee's `grade` column for filtering.
+- [[Leave Policy]] — `leave_policy` Link field, used when allocating based on a policy.
+- [[Leave Type]] — `leave_type` Link field, used when allocating a flat number of days directly.
+- [[Leave Period]] — `leave_period` Link field, one of the date-resolution modes.
+- [[Leave Allocation]] — created and submitted per employee when not allocating via policy.
+- [[Leave Policy Assignment]] — created and submitted per employee when allocating via policy.
 
 ## Port Notes
 

@@ -1,7 +1,7 @@
 # Gratuity
 
 **Source:** `hrms/payroll/doctype/gratuity/gratuity.json`, `gratuity.py`, `gratuity.js`, `gratuity_dashboard.py`, `gratuity_list.js`
-**Submittable:** yes   **Tree:** no   **Naming:** Expression (old style), autoname pattern `HR-GRA-PAY-.#####` (auto-incrementing numeric suffix, zero-padded to 5 digits, prefixed `HR-GRA-PAY-`)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** Expression (old style), autoname pattern `HR-GRA-PAY-.#####` (auto-incrementing numeric suffix, zero-padded to 5 digits, prefixed `HR-GRA-PAY-`)
 **Module:** Payroll
 
 ## Schema
@@ -11,7 +11,7 @@ Field order per JSON. Layout-only fields (Tab Break, Column Break, Section Break
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(Tab: "Gratuity")* | | | | | | | section heading only |
-| employee | Employee | Link | Employee | yes (`reqd`) | — | no | `in_global_search`, `in_list_view`, `search_index` |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | yes (`reqd`) | — | no | `in_global_search`, `in_list_view`, `search_index` |
 | company | Company | Link | Company | yes | — | yes | `fetch_from: employee.company` |
 | posting_date | Posting date | Date | — | yes | — | no | |
 | current_work_experience | Current Work Experience | Float | — | no | 0 | no | `non_negative`; computed server-side (see Business Logic) |
@@ -19,17 +19,17 @@ Field order per JSON. Layout-only fields (Tab Break, Column Break, Section Break
 | employee_name | Employee Name | Data | — | no | — | yes | `fetch_from: employee.employee_name` |
 | department | Department | Link | Department | no | — | yes | `fetch_from: employee.department` |
 | designation | Designation | Data | — | no | — | yes | `fetch_from: employee.designation` |
-| gratuity_rule | Gratuity Rule | Link | Gratuity Rule | yes | — | no | |
+| gratuity_rule | Gratuity Rule | Link | [[Gratuity Rule]] | yes | — | no | |
 | status | Status | Select | Draft / Unpaid / Paid / Submitted / Cancelled | no | Draft | yes | computed in `set_status()`, never user-editable |
 | company (see above) | | | | | | | |
-| amended_from | Amended From | Link | Gratuity | no | — | yes | `no_copy`, `print_hide`; standard amend-chain pointer |
+| amended_from | Amended From | Link | [[Gratuity]] | no | — | yes | `no_copy`, `print_hide`; standard amend-chain pointer |
 | *(Tab Break: "Payment and Accounting")* | | | | | | | section heading only |
 | pay_via_salary_slip | Pay via Salary Slip | Check | — | no | 1 (checked) | no | toggles which accounting path is used |
 | amount | Total Amount | Currency | — | yes | 0 | yes | computed server-side (see Business Logic) |
 | paid_amount | Paid Amount | Currency | — | no | 0 | yes | `no_copy`; `depends_on: eval:doc.pay_via_salary_slip == 0`; set via `set_total_advance_paid()` from Advance Payment Ledger Entry sums |
 | column_break_13 | — | Column Break | — | — | — | — | layout |
 | payroll_date | Payroll Date | Date | — | conditionally (`mandatory_depends_on: pay_via_salary_slip`) | — | no | `depends_on: pay_via_salary_slip` |
-| salary_component | Salary Component | Link | Salary Component | conditionally (`mandatory_depends_on: pay_via_salary_slip`) | — | no | `depends_on: pay_via_salary_slip`; client script restricts query to `type = "Earning"` |
+| salary_component | Salary Component | Link | [[Salary Component]] | conditionally (`mandatory_depends_on: pay_via_salary_slip`) | — | no | `depends_on: pay_via_salary_slip`; client script restricts query to `type = "Earning"` |
 | cost_center | Cost Center | Link | Cost Center | no | — | no | used only in GL-entry (non-salary-slip) path |
 | mode_of_payment | Mode of Payment | Link | Mode of Payment | conditionally (`mandatory_depends_on: eval: !doc.pay_via_salary_slip`) | — | no | `depends_on: eval: !doc.pay_via_salary_slip` |
 | expense_account | Expense Account | Link | Account | conditionally (`mandatory_depends_on: eval: !doc.pay_via_salary_slip`) | — | no | `depends_on: eval: !doc.pay_via_salary_slip`; client query restricts to root_type in [Expense, Liability], is_group=0, company=doc.company |
@@ -214,7 +214,7 @@ Edge cases explicitly handled in source:
 
 No module-level whitelisted functions in `gratuity.py`. Note: `hrms.overrides.employee_payment_entry.get_payment_entry_for_employee` is called from the client script's "Create Payment Entry" button (visible when `docstatus==1 && !pay_via_salary_slip && status=="Unpaid"`) but that whitelisted method lives in a different module file, not in this doctype's controller — reference only.
 
-## Permissions
+## [[Permission Model (RBAC)|Permissions]]
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -227,6 +227,17 @@ Only two roles are defined; no permlevel restrictions, no `if_owner`.
 
 None found in `hrms/hooks.py` `scheduler_events` referencing Gratuity directly. `Gratuity` is listed in the module-level constant `advance_payment_payable_doctypes` (`hrms/hooks.py` line 281) and `audit_trail_doctypes` (line 297) — these are configuration lists consumed by ERPNext/HRMS shared advance-payment and audit-trail features, not scheduler jobs themselves.
 
+## Related Doctypes
+
+- [[Gratuity Rule]] — links to (`gratuity_rule`); supplies the slab table, applicable-earnings components, and experience-calculation method used to compute `amount`.
+- [[Employee Core Model]] — links to (`employee`); `date_of_joining`/`relieving_date` drive work-experience calculation, and several fields (`company`, `employee_name`, `department`, `designation`) are fetched from it.
+- [[Salary Component]] — links to (`salary_component`); the Additional Salary/GL posting target when `pay_via_salary_slip` is used.
+- [[Salary Slip]] — read to find the employee's most recent submitted slip, whose earning rows (filtered by the rule's applicable components) form `total_component_amount`.
+- [[Payroll Settings]] — read (`payroll_based_on`) to decide whether Attendance is queried by "On Leave" or "Absent" status when computing total working days.
+- [[Attendance]] — read (submitted rows) to subtract leave/absent days from total working days between joining and relieving dates.
+- [[Gratuity]] — `amended_from` points back to the cancelled document in the standard amend chain.
+- [[Additional Salary]] — created and submitted on `on_submit` when `pay_via_salary_slip` is checked, to actually pay the gratuity through payroll.
+
 ## Port Notes
 
 - **Status "Submitted" is effectively unreachable**: the `status` field's Select options include "Submitted", but `set_status()` always overrides to Paid/Unpaid whenever `docstatus == 1`. A faithful port should still allow the value in the enum (framework/UI code elsewhere may reference it) but the business logic will never actually set it.
@@ -236,7 +247,7 @@ None found in `hrms/hooks.py` `scheduler_events` referencing Gratuity directly. 
 - **Slab fallthrough on zero fraction**: in "Current Slab" mode, if the matching slab's `fraction_of_applicable_earnings` is 0, `slab_found` stays False and the loop moves on to check subsequent slabs (which likely won't match the same experience range), ultimately potentially raising "No applicable slab found" instead of returning a $0 amount. Reproduce this exact behavior rather than "fixing" it.
 - **No statutory cap/floor on final gratuity amount**: unlike some real-world gratuity acts (which impose a maximum payable, e.g. a legal ceiling), this implementation applies no such clamp. If the target jurisdiction requires one, it is out of scope of ported behavior — flag as a business requirement, not a code gap.
 - **On-cancel does not cancel the linked Additional Salary**: when `pay_via_salary_slip` was used and the Gratuity is later cancelled, the created `Additional Salary` document is left submitted/untouched. Only the GL-entry path is reversed on cancel. Port this asymmetry faithfully.
-- **Frappe framework behaviors relied on implicitly** (must be built explicitly in a new stack):
+- **[[Implicit Framework Behaviors|Frappe framework behaviors relied on implicitly]]** (must be built explicitly in a new stack):
   - Auto `creation`/`modified`/`modified_by`/`owner` timestamps and audit columns.
   - `track_changes` is NOT set on Gratuity itself (only on Gratuity Rule and its children) — no automatic version/diff history expected for Gratuity documents.
   - Autoname counter `HR-GRA-PAY-.#####` requires a persistent auto-incrementing sequence per this prefix, shared across the whole doctype (Frappe's `Series` mechanism) — must be implemented as a dedicated counter table/sequence, not per-row logic.

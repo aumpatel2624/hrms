@@ -72,6 +72,11 @@ None defined in JSON (`"permissions": []`) — inherits from parent `Income Tax 
 
 None.
 
+## Related Doctypes
+
+- [[Income Tax Slab]] — sole parent doctype (`slabs` field); `calculate_base_tax_from_tax_slabs()` iterates these rows to compute base tax.
+- [[Salary Slip]] — the ultimate consumer, via `Income Tax Slab`'s `calculate_tax_by_tax_slab()`, of the marginal tax computed from these brackets.
+
 ## Port Notes
 
 - **No overlap/gap/ordering validation exists anywhere in source** for this bracket table — a re-implementer might reasonably expect the framework to enforce contiguous, ascending, non-overlapping `from_amount`/`to_amount` ranges across rows of the same conditional group, but no such check exists in `.py`. This is called out explicitly per the ground rules: it is a gap in the original system, not something to silently add unless the new product spec wants it.

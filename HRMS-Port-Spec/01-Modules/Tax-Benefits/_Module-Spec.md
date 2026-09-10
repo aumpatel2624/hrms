@@ -9,16 +9,16 @@
 
 ## Doctypes (see `01-Modules/Payroll/` for full specs)
 
-- `Income Tax Slab.md`
-- `Income Tax Slab Other Charges.md`
-- `Taxable Salary Slab.md`
-- `Employee Tax Exemption Category.md`
-- `Employee Tax Exemption Sub Category.md`
-- `Employee Tax Exemption Declaration.md`
-- `Employee Tax Exemption Declaration Category.md`
-- `Employee Tax Exemption Proof Submission.md`
-- `Employee Tax Exemption Proof Submission Detail.md`
-- `Employee Other Income.md`
+- [[Income Tax Slab]]
+- [[Income Tax Slab Other Charges]]
+- [[Taxable Salary Slab]]
+- [[Employee Tax Exemption Category]]
+- [[Employee Tax Exemption Sub Category]]
+- [[Employee Tax Exemption Declaration]]
+- [[Employee Tax Exemption Declaration Category]]
+- [[Employee Tax Exemption Proof Submission]]
+- [[Employee Tax Exemption Proof Submission Detail]]
+- [[Employee Other Income]]
 
 ## Why It's Split Out Conceptually Anyway
 

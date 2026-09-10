@@ -10,7 +10,7 @@ Shared child-table doctype used by **three** different table fields across two p
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| salary_component | Component | Link | Salary Component | Yes | — | No | |
+| salary_component | Component | Link | [[Salary Component]] | Yes | — | No | |
 | abbr | Abbr | Data | — | No | — | Yes | `fetch_from: salary_component.salary_component_abbr`; shown only when `parenttype=='Salary Structure'` |
 | statistical_component | Statistical Component | Check | — | No | 0 | No | `fetch_from: salary_component.statistical_component` |
 | is_tax_applicable | Is Tax Applicable | Check | — | No | 0 | Yes | `fetch_from: salary_component.is_tax_applicable`; shown only when `parentfield=='earnings'` |
@@ -27,7 +27,7 @@ Shared child-table doctype used by **three** different table fields across two p
 | additional_amount | Additional Amount | Currency | currency | No | — | Yes | `hidden`, `no_copy`, `print_hide` — portion of `amount` contributed by an `Additional Salary` |
 | tax_on_flexible_benefit | Tax on flexible benefit | Currency | currency | No | — | Yes | shown only on `Salary Slip` deduction rows where `variable_based_on_taxable_salary` |
 | tax_on_additional_salary | Tax on additional salary | Currency | currency | No | — | Yes | shown only on `Salary Slip` deduction rows where `variable_based_on_taxable_salary` |
-| additional_salary | Additional Salary | Link | Additional Salary | No | — | Yes | set when this row (or part of it) originates from an `Additional Salary` record |
+| additional_salary | Additional Salary | Link | [[Additional Salary]] | No | — | Yes | set when this row (or part of it) originates from an `Additional Salary` record |
 | exempted_from_income_tax | Exempted from Income Tax | Check | — | No | 0 | Yes | `fetch_from: salary_component.exempted_from_income_tax`; shown only when `parentfield=='deductions'`; `search_index` |
 | is_recurring_additional_salary | Is Recurring Additional Salary | Check | — | No | 0 | Yes | shown only when `parenttype=='Salary Slip'` and `additional_salary` set |
 | do_not_include_in_accounts | Do Not Include in Accounting Entries | Check | — | No | 0 | No | `fetch_from: salary_component.do_not_include_in_accounts`; shown only when `do_not_include_in_total` |
@@ -76,6 +76,13 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None directly. `Salary Slip`'s `compute_component_wise_year_to_date()` runs on every slip save (not a scheduled job) and updates each row's `year_to_date` — see `Salary Slip.md`.
+
+## Related Doctypes
+
+- [[Salary Structure]] — one of two parent doctypes (`earnings`/`deductions` fields); rows here are the *template* lines.
+- [[Salary Slip]] — the other parent doctype (`earnings`/`deductions`/`employer_contributions` fields); rows here are the *resolved instance* lines for one pay period, computed via `add_structure_component`/`update_component_row`/`eval_condition_and_formula`.
+- [[Salary Component]] — every row's `salary_component` Link; most other fields (`abbr`, `statistical_component`, flags) are one-time `fetch_from` copies of this master.
+- [[Additional Salary]] — `additional_salary` Link marks a row (or the portion of its amount) as originating from an Additional Salary override/addition.
 
 ## Port Notes
 

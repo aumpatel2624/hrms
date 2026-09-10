@@ -25,10 +25,10 @@ Field order follows the JSON `field_order` array. Layout-only fields (Section Br
 | branch | Branch | Link | Branch | No | — | No | employee filter |
 | department | Department | Link | Department | No | — | No | employee filter; client-side query filtered by `company` |
 | designation | Designation | Link | Designation | No | — | No | employee filter |
-| grade | Grade | Link | Employee Grade | No | — | No | employee filter |
+| grade | Grade | Link | [[Employee Grade]] | No | — | No | employee filter |
 | number_of_employees | Number Of Employees | Int | — | No | — | Yes | computed = `len(self.employees)` in `validate()` |
 | *(Section: Employee Details — `section_break_24`)* | | | | | | | |
-| employees | (no label) | Table | Payroll Employee Detail | No | — | No | see Child Tables |
+| employees | (no label) | Table | [[Payroll Employee Detail]] | No | — | No | see Child Tables |
 | *(Section — `section_break_26`)* | | | | | | | |
 | validate_attendance | Validate Attendance | Check | — | No | 0 | No | if checked, gates `on_submit`/`before_submit` attendance check |
 | attendance_detail_html | (no label) | HTML | — | No | — | No | client-rendered summary of unmarked-attendance employees; no server persistence |
@@ -42,7 +42,7 @@ Field order follows the JSON `field_order` array. Layout-only fields (Section Br
 | exchange_rate | Exchange Rate | Float | — | Yes | — | No | precision 9; `depends_on: company` |
 | *(Tab: Failure Details — `failure_details_section`, collapsible)* | | | | | | | |
 | error_message | Error Message | Text Editor | — | No | — | Yes | `depends_on: eval:doc.status=='Failed'`; `no_copy` |
-| amended_from | Amended From | Link | Payroll Entry | No | — | Yes | standard amendment link; `no_copy`, `print_hide` |
+| amended_from | Amended From | Link | [[Payroll Entry]] | No | — | Yes | standard amendment link; `no_copy`, `print_hide` |
 | salary_slips_created | Salary Slips Created | Check | — | No | 0 | Yes | hidden, `no_copy`; internal flag set by `create_salary_slips_for_employees` |
 | salary_slips_submitted | Salary Slips Submitted | Check | — | No | 0 | Yes | hidden, `no_copy`; internal flag set by `submit_salary_slips_for_employees` |
 | overtime_step | Overtime Slip Step | Select | (blank)/Create/Submit | No | — | No | computed on `onload()`, not persisted by validate; drives client button label |
@@ -52,7 +52,7 @@ Column Break / Section Break / Tab Break fields with no logic (`column_break_5`,
 
 ## Child Tables
 
-- `employees` (Table, fieldtype Table, options `Payroll Employee Detail`) — see `Payroll Employee Detail.md`. Populated wholesale (replaced, not merged) by `fill_employee_details()`.
+- `employees` (Table, fieldtype Table, options [[Payroll Employee Detail]]) — see `Payroll Employee Detail.md`. Populated wholesale (replaced, not merged) by `fill_employee_details()`.
 
 ## State Machine
 
@@ -82,7 +82,7 @@ Plain transition list:
 | Submitted | `cancel()` | Cancelled | `docstatus` transitions 1->2 via Frappe framework cancel; if linked Salary Slip count > 50, cancellation itself is queued (`self.queue_action("cancel", timeout=3000)`) rather than status field, but end state after completion is Cancelled |
 | Draft | discard | Cancelled | `on_discard` sets `status` to `"Cancelled"` directly (this is a UI "discard draft" action, not a real docstatus cancel) |
 
-Note: `status` is a Select field independent of the framework `docstatus` (0=Draft/1=Submitted/2=Cancelled). `set_status()` defaults status from `docstatus` (`{0: "Draft", 1: "Submitted", 2: "Cancelled"}[self.docstatus or 0]`) whenever called without an explicit `status` argument, but background/queue code overrides it explicitly to `"Queued"` or `"Failed"` regardless of `docstatus` (which stays 1/Submitted throughout queued/failed processing since the document itself was already submitted).
+Note: `status` is a Select field independent of the framework [[Submittable Document Lifecycle]] `docstatus` (0=Draft/1=Submitted/2=Cancelled). `set_status()` defaults status from `docstatus` (`{0: "Draft", 1: "Submitted", 2: "Cancelled"}[self.docstatus or 0]`) whenever called without an explicit `status` argument, but background/queue code overrides it explicitly to `"Queued"` or `"Failed"` regardless of `docstatus` (which stays 1/Submitted throughout queued/failed processing since the document itself was already submitted).
 
 ## Validation Rules (exact, in execution order)
 
@@ -252,7 +252,7 @@ Multi-currency handling: `get_amount_and_exchange_rate_for_journal_entry` conver
 | `onload` | Computes `overtime_step` (Create/Submit/None) via `get_overtime_slip_details()` when draft & no salary slips created yet & employees exist. When submitted and not yet flagged `salary_slips_submitted`, counts submitted Salary Slips for this Payroll Entry and sets `onload.submitted_ss = True` if all employee rows have a matching submitted slip (detects manual out-of-band submission). | Reads `Salary Slip`, `Overtime Slip` |
 | `validate` | Recomputes `number_of_employees`; recomputes `status` from `docstatus` via `set_status()`. | none |
 | `before_submit` | `validate_existing_salary_slips()`, `validate_payroll_payable_account()`, unmarked-attendance guard. | Reads `Salary Slip`, `Account`, `Attendance`, `Holiday` |
-| `on_submit` | `set_status(update=True, status="Submitted")`; `create_salary_slips()` (sync or enqueued). | Creates `Salary Slip` records; fires `hrms.telemetry.on_payroll_entry_submit` (hooks.py `doc_events`) |
+| `on_submit` | `set_status(update=True, status="Submitted")`; `create_salary_slips()` (sync or enqueued). | Creates `Salary Slip` records; fires `hrms.telemetry.on_payroll_entry_submit` (hooks.py [[Cross-Doctype Hooks (doc_events)]]) |
 | `on_cancel` | Sets `ignore_linked_doctypes = (GL Entry, Salary Slip, Journal Entry)`; `delete_linked_salary_slips()` (cancels then deletes every linked Salary Slip); `cancel_linked_journal_entries()` (cancels Journal Entries referencing this Payroll Entry via `Journal Entry Account`, and any Payment Ledger Entries against those JEs); `cancel_linked_payment_ledger_entries()` (cancels Payment Ledger Entries directly against this Payroll Entry); resets `salary_slips_created`/`salary_slips_submitted` to 0; `set_status(update=True, status="Cancelled")`; clears `error_message`. | Deletes `Salary Slip`; cancels `Journal Entry`, `Payment Ledger Entry` |
 | `on_discard` (draft-only "discard" action, not a real cancel) | `self.db_set("status", "Cancelled")` only — no linked-doc cleanup. | none |
 | `cancel()` (overridden framework method, wraps standard cancel) | IF more than 50 linked Salary Slips exist: msgprint "Payroll Entry cancellation is queued..." and `self.queue_action("cancel", timeout=3000)` (background job runs the real cancel); ELSE calls `self._cancel()` synchronously. | Background job eventually triggers `on_cancel` as above |
@@ -284,17 +284,27 @@ Multi-currency handling: `get_amount_and_exchange_rate_for_journal_entry` conver
 |---|---|---|---|---|---|---|---|---|---|---|
 | HR Manager | Yes | Yes | Yes | Yes | Yes | Yes | (amend implied by submit/cancel/write, not explicitly listed as a separate flag in JSON) | Yes | (not explicitly set; `share: 1` present) | Only role granted access in the DocType JSON permissions array |
 
-Port Note: this repo's `permissions` array lists only **HR Manager** for Payroll Entry (no System Manager, no HR User, no Employee/self-service access) — narrower than many other HR doctypes in this app. A port should preserve this restrictive default unless product requirements say otherwise.
+Port Note ([[Permission Model (RBAC)]]): this repo's `permissions` array lists only **HR Manager** for Payroll Entry (no System Manager, no HR User, no Employee/self-service access) — narrower than many other HR doctypes in this app. A port should preserve this restrictive default unless product requirements say otherwise.
 
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`. Payroll Entry is listed in `hooks.py`'s `doc_events` (`"Payroll Entry": {"on_submit": "hrms.telemetry.on_payroll_entry_submit"}`, telemetry only — no business effect) and in the module-level lists `period_closing_doctypes`, `accounting_dimension_doctypes`, and `audit_trail_doctypes` (framework-level participation flags, not scheduler jobs).
 
+## Related Doctypes
+
+- [[Payroll Employee Detail]] — child table holding the selected employee rows (`employees`), replaced wholesale by `fill_employee_details()`.
+- [[Salary Slip]] — created (and optionally submitted) per employee by this batch run; `create_salary_slips()`/`submit_salary_slips()` are the primary orchestration entry points.
+- [[Salary Structure]] / [[Salary Structure Assignment]] — read to determine which employees are eligible for a run (matching company/currency/frequency/timesheet-flag).
+- [[Salary Withholding Cycle]] — checked to flag `employees.is_salary_withheld` and to drive the withheld-salary bank-entry path.
+- [[Salary Component Account]] — resolves GL accounts per salary component/cost-center when posting the accrual Journal Entry.
+- [[Employee Cost Center]] — per-employee cost-center split read via the latest Salary Structure Assignment when building accrual JV lines.
+- [[Employee Core Model]] — filtered/joined heavily during employee selection (status, company, joining/relieving dates).
+
 ## Port Notes
 
-- **Naming**: `HR-PRUN-.YYYY.-.#####` relies on Frappe's naming-series auto-increment keyed by the literal year token; a port must implement an equivalent sequence generator scoped per calendar year (resets/continues per Frappe's series-counter semantics — verify against the framework's actual `.YYYY.` behavior, which typically continues incrementing per year value, not resetting to 1 each year, unless a fresh series row is created).
+- **Naming** ([[Naming and Autoname Rules]]): `HR-PRUN-.YYYY.-.#####` relies on Frappe's naming-series auto-increment keyed by the literal year token; a port must implement an equivalent sequence generator scoped per calendar year (resets/continues per Frappe's series-counter semantics — verify against the framework's actual `.YYYY.` behavior, which typically continues incrementing per year value, not resetting to 1 each year, unless a fresh series row is created).
 - **`status` vs `docstatus` duality**: the `status` field is a denormalized convenience column that mostly mirrors `docstatus` (0/1/2 -> Draft/Submitted/Cancelled) but is also overloaded with two extra values (`Queued`, `Failed`) that exist purely at the `status`-field level while `docstatus` stays `1` (Submitted) throughout. A port's state machine must model `docstatus` and `status` as two separate fields with this exact relationship, not collapse them into one enum.
-- **Background job semantics**: `frappe.enqueue(...)` submits to Frappe's default RQ-backed background worker queue with `timeout=3000` seconds; a port on a different stack needs an equivalent durable job queue (e.g. BullMQ/Sidekiq/Celery) with comparable timeout and at-least-once semantics, since job failure handling here relies on the job process itself catching exceptions and calling back into `db_set` (i.e. the job is responsible for its own status reporting — there's no separate job-monitor).
+- **Background job semantics** ([[Background Jobs (Scheduler Events)]]): `frappe.enqueue(...)` submits to Frappe's default RQ-backed background worker queue with `timeout=3000` seconds; a port on a different stack needs an equivalent durable job queue (e.g. BullMQ/Sidekiq/Celery) with comparable timeout and at-least-once semantics, since job failure handling here relies on the job process itself catching exceptions and calling back into `db_set` (i.e. the job is responsible for its own status reporting — there's no separate job-monitor).
 - **`frappe.flags.enqueue_payroll_entry`**: a process-global flag (used in tests to force async path deterministically) — not a persisted setting; a port doesn't need to replicate this exact mechanism, just note the >30-employee sync/async threshold is the real business rule.
 - **`self.reload()` after synchronous `create_salary_slips_for_employees`**: relies on Frappe's document caching model where `db_set` calls bypass the in-memory document object; a port using an ORM with unit-of-work/session tracking must explicitly refetch or must not rely on stale in-memory field values after any direct-SQL-style update path.
 - **Realtime events** (`frappe.publish_realtime("completed_salary_slip_creation"/"completed_salary_slip_submission"/"completed_overtime_slip_creation"/"completed_overtime_slip_submission")**: drive the client's `frm.reload_doc()` after a background job completes. A port needs an equivalent push mechanism (WebSocket/SSE) so the UI refreshes after async payroll processing finishes; without it, a queued run will appear stuck in the UI until manual refresh.

@@ -1,7 +1,7 @@
 # Salary Withholding
 
 **Source:** `hrms/payroll/doctype/salary_withholding/salary_withholding.json`, `salary_withholding.py`, `salary_withholding.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `format:SAL-WTH-{#####}` (expression naming rule)
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `format:SAL-WTH-{#####}` (expression naming rule, [[Naming and Autoname Rules]])
 **Module:** Payroll
 
 Withholds an employee's salary for a specified number of upcoming payroll cycles (e.g. pending exit formalities/clearance), splitting the withholding window into discrete "cycles" matching the employee's payroll frequency, and tracks per-cycle release status once each cycle's salary is eventually paid out via a bank/journal entry.
@@ -10,7 +10,7 @@ Withholds an employee's salary for a specified number of upcoming payroll cycles
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | | no | `search_index: 1` |
+| employee | Employee | Link | [[Employee Core Model]] | yes | | no | `search_index: 1` |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
 | company | Company | Link | Company | no | | yes | fetch_from `employee.company` |
 | payroll_frequency | Payroll Frequency | Select | ``, `Monthly`, `Fortnightly`, `Bimonthly`, `Weekly`, `Daily` | no | | yes | auto-derived server-side from the employee's Salary Structure if not already set |
@@ -21,8 +21,8 @@ Withholds an employee's salary for a specified number of upcoming payroll cycles
 | date_of_joining | Date of Joining | Date | | no | | yes | fetch_from `employee.date_of_joining` |
 | relieving_date | Relieving Date | Date | | no | | yes | fetch_from `employee.relieving_date` |
 | reason_for_withholding_salary (collapsible section: Reason) | Reason for Withholding Salary | Small Text | | no | | no | |
-| cycles | Cycles | Table | Salary Withholding Cycle | no | | yes | server-generated breakdown of the withholding window into payroll-frequency-sized chunks |
-| amended_from | Amended From | Link | Salary Withholding | no | | yes | `search_index: 1` |
+| cycles | Cycles | Table | [[Salary Withholding Cycle]] | no | | yes | server-generated breakdown of the withholding window into payroll-frequency-sized chunks |
+| amended_from | Amended From | Link | [[Salary Withholding]] | no | | yes | `search_index: 1` |
 | status | Status | Select | ``, `Draft`, `Withheld`, `Released`, `Cancelled` | no | Draft | yes | server-computed in `set_status()`; not directly user-editable |
 
 Layout-only fields skipped: section_break_fwuv, column_break_hbju, column_break_rhlv, exit_details_section, column_break_qlwx, section_break_xeyl.
@@ -31,7 +31,7 @@ Layout-only fields skipped: section_break_fwuv, column_break_hbju, column_break_
 
 ## Child Tables
 
-### Salary Withholding Cycle (`cycles`)
+### [[Salary Withholding Cycle]] (`cycles`)
 See `Salary Withholding Cycle.md`.
 
 | Field | Label | Type | Options | Required | Default | Read-Only | Notes |
@@ -138,6 +138,14 @@ This confirms the release flow: releasing withheld salary is NOT a direct action
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` directly. (The release mechanism is doc-event-driven off a Journal Entry / bank-entry submission, not a scheduled/cron job.)
+
+## Related Doctypes
+
+- [[Salary Withholding Cycle]] — child table of per-frequency cycle rows generated and tracked by this doctype.
+- [[Salary Structure Assignment]] / [[Salary Structure]] — `get_payroll_frequency()` derives the withholding cycle frequency from the employee's active assignment/structure.
+- [[Salary Slip]] — `check_salary_withholding()` (owned by that doctype) detects an active withholding covering the slip's period and marks the slip `Withheld`.
+- [[Payroll Employee Detail]] — `is_salary_withheld` flag toggled alongside a cycle's release status.
+- [[Employee Core Model]] — the employee whose pay is withheld.
 
 ## Port Notes
 

@@ -12,7 +12,7 @@ Full field table, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| leave_type | Leave Type | Link | Leave Type | Yes (`reqd`) | — | No | `in_list_view: 1`, `columns: 3` (grid column width hint); client script (in parent `leave_policy.js`) auto-fills `annual_allocation` from `Leave Type.max_leaves_allowed` when this changes — CLIENT-SIDE ONLY, see `Leave Policy.md` Port Notes |
+| leave_type | Leave Type | Link | [[Leave Type]] | Yes (`reqd`) | — | No | `in_list_view: 1`, `columns: 3` (grid column width hint); client script (in parent `leave_policy.js`) auto-fills `annual_allocation` from `Leave Type.max_leaves_allowed` when this changes — CLIENT-SIDE ONLY, see `Leave Policy.md` Port Notes |
 | annual_allocation | Annual Allocation | Float | — | Yes (`reqd`) | — | No | `in_list_view: 1`, `columns: 2`, `non_negative: 1`; server-validated against `Leave Type.max_leaves_allowed` in the parent `Leave Policy.validate()` (see `Leave Policy.md` Validation Rules #1) |
 
 Implicit child-row system fields (auto-generated types confirm these exist per standard Frappe child-table convention, not itemized in the JSON `fields` array): `parent` (Data — parent doc name), `parentfield` (Data — `"leave_policy_details"`), `parenttype` (Data — `"Leave Policy"`), plus standard `idx` (row order), `name`, `creation`, `modified`, `modified_by`, `owner`.
@@ -53,9 +53,14 @@ None. It is also read (not written) by `hrms.hr.utils.get_annual_allocation_from
 
 `"permissions": []` — empty in the JSON. As a child table (`istable: 1`), Frappe does not apply independent role permissions to it; access is governed entirely by the parent `Leave Policy` doctype's permissions (see `Leave Policy.md`).
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 - `daily_long` -> `hrms.hr.utils.allocate_earned_leaves`: reads (not writes) `Leave Policy Detail` rows via `get_annual_allocation_from_policy(allocation, e_leave_type)`, which does `frappe.db.get_value("Leave Policy Detail", filters={"parent": allocation.leave_policy, "leave_type": e_leave_type.name}, fieldname=["annual_allocation"])`. This value feeds `update_previous_leave_allocation`'s cap check against the annual allocation (see `Leave Policy Assignment.md` for the full trace).
+
+## Related Doctypes
+
+- [[Leave Policy]] — parent doctype; this table is embedded via its `leave_policy_details` Table field.
+- [[Leave Type]] — `leave_type` Link field; each row pairs a leave type with an `annual_allocation`.
 
 ## Port Notes
 

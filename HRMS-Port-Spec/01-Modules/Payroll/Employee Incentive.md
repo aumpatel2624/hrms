@@ -1,20 +1,20 @@
 # Employee Incentive
 
 **Source:** `hrms/payroll/doctype/employee_incentive/employee_incentive.json`, `employee_incentive.py`, `employee_incentive.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `HR-EINV-.YY.-.MM.-.#####` (expression-based autoname)
+**Submittable:** yes   **Tree:** no   **Naming:** `HR-EINV-.YY.-.MM.-.#####` (expression-based autoname, see [[Naming and Autoname Rules]])
 **Module:** Payroll
 
 ## Schema
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee (section: Employee) | Employee | Link | Employee | yes | | no | client-side query filters to `status: "Active"` (UI-only) |
+| employee (section: Employee) | Employee | Link | [[Employee Core Model]] | yes | | no | client-side query filters to `status: "Active"` (UI-only) |
 | incentive_amount (section: Incentive) | Incentive Amount | Currency | options: currency | yes | | no | `non_negative: 1` |
 | payroll_date | Payroll Date | Date | | yes | | no | one-time/non-recurring only — no recurring option on this doctype |
-| amended_from | Amended From | Link | Employee Incentive | no | | yes | |
+| amended_from | Amended From | Link | [[Employee Incentive]] | no | | yes | |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | no | | yes | fetch_from `employee.department` |
-| salary_component | Salary Component | Link | Salary Component | yes | | no | client-side query restricted to `component_type: Earning` for the selected company |
+| salary_component | Salary Component | Link | [[Salary Component]] | yes | | no | client-side query restricted to `component_type: Earning` for the selected company |
 | currency | Currency | Link | Currency | yes | | yes | `depends_on: eval:(doc.docstatus==1 || doc.employee)`, `print_hide: 1` |
 | company | Company | Link | Company | yes | | no | |
 
@@ -39,7 +39,7 @@ Plain list:
 - (Submitted, cancel, Cancelled, guard: standard cancel; no explicit `on_cancel` override on this controller — see Port Notes)
 - (any, amend, new Draft, guard: standard amend)
 
-No explicit `status` field; state is `docstatus` only.
+No explicit `status` field; state is `docstatus` only (see [[Submittable Document Lifecycle]]).
 
 ## Validation Rules (exact, in execution order)
 
@@ -91,6 +91,14 @@ Note: unlike most other payroll doctypes in this batch, `System Manager` is NOT 
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — `employee` link; must be Active (client-side check) and must have a Salary Structure Assignment (server-validated).
+- [[Salary Component]] — `salary_component` link; the earning component the incentive is paid through.
+- [[Salary Structure Assignment]] — existence for `employee` is validated (any docstatus/date) before submit.
+- [[Additional Salary]] — created and submitted by `on_submit()`, referencing this document via `ref_doctype`/`ref_docname`.
+- [[Employee Benefit Claim]] — referenced in Port Notes as sharing the same "no on_cancel cleanup" gap pattern.
 
 ## Port Notes
 

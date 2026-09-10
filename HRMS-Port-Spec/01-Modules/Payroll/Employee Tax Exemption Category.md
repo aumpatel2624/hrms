@@ -1,7 +1,7 @@
 # Employee Tax Exemption Category
 
 **Source:** `hrms/payroll/doctype/employee_tax_exemption_category/employee_tax_exemption_category.json`, `employee_tax_exemption_category.py`, `employee_tax_exemption_category.js`
-**Submittable:** no   **Tree:** no   **Naming:** `Prompt` (user types the `name` on creation, e.g. "House Rent Allowance")
+**Submittable:** no   **Tree:** no   **Naming:** `Prompt` (user types the `name` on creation, e.g. "House Rent Allowance" — see [[Naming and Autoname Rules]])
 **Module:** Payroll
 
 ## Schema
@@ -27,8 +27,8 @@ None. The controller class (`EmployeeTaxExemptionCategory(Document)`) has no `va
 ## Business Logic / Calculations
 
 None on this doctype itself. `max_amount` is the ceiling value consumed by:
-- `Employee Tax Exemption Sub Category` (validates its own `max_amount` does not exceed this category's `max_amount`, see that file).
-- `hrms.hr.utils.get_total_exemption_amount()` (caps aggregated declared/proof amounts per category at this `max_amount` — see `Employee Tax Exemption Declaration.md` and `Employee Tax Exemption Proof Submission.md` for the exact algorithm).
+- [[Employee Tax Exemption Sub Category]] (validates its own `max_amount` does not exceed this category's `max_amount`, see that file).
+- `hrms.hr.utils.get_total_exemption_amount()` (caps aggregated declared/proof amounts per category at this `max_amount` — see [[Employee Tax Exemption Declaration]] and [[Employee Tax Exemption Proof Submission]] for the exact algorithm).
 
 ## Lifecycle Hooks (exact)
 
@@ -48,11 +48,18 @@ None defined on this doctype's controller.
 | HR Manager | 1 | 1 | 1 | 1 | n/a | n/a | n/a | 1 | 1 | share, email, print also 1 |
 | HR User | 1 | 1 | 1 | 1 | n/a | n/a | n/a | 1 | 1 | share, email, print also 1 |
 
-No `if_owner` or `permlevel` restrictions. No `Employee` role access (unlike the Declaration/Proof Submission doctypes) — categories are HR-admin-managed master data only.
+No `if_owner` or `permlevel` restrictions (see [[Permission Model (RBAC)]]). No `Employee` role access (unlike the Declaration/Proof Submission doctypes) — categories are HR-admin-managed master data only.
 
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Tax Exemption Sub Category]] — `exemption_category` link references this doctype's `name`; validates its own `max_amount` does not exceed this category's `max_amount`.
+- [[Employee Tax Exemption Declaration Category]] — `exemption_category` link references this doctype's `name`.
+- [[Employee Tax Exemption Declaration]] — `hrms.hr.utils.get_total_exemption_amount()` caps aggregated declared amounts per category at this doctype's `max_amount`.
+- [[Employee Tax Exemption Proof Submission]] — same capping logic applies to aggregated proof-submission amounts.
 
 ## Port Notes
 

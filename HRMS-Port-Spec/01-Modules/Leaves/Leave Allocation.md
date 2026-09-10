@@ -1,7 +1,7 @@
 # Leave Allocation
 
 **Source:** `hrms/hr/doctype/leave_allocation/leave_allocation.json`, `leave_allocation.py`, `leave_allocation.js`, `leave_allocation_dashboard.py`
-**Submittable:** yes   **Tree:** no   **Naming:** `naming_series:` -> series `HR-LAL-.YYYY.-`
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `naming_series:` -> series `HR-LAL-.YYYY.-`
 **Module:** HR
 
 ## Schema
@@ -9,11 +9,11 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | naming_series | Series | Select | `HR-LAL-.YYYY.-` | yes | - | - | `set_only_once` |
-| employee | Employee | Link | Employee | yes | - | - | in_list_view, in_standard_filter, search_index |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | yes | - | - | in_list_view, in_standard_filter, search_index |
 | employee_name | Employee Name | Data | - | - | - | yes | `fetch_from: employee.employee_name` |
 | department | Department | Link | Department | - | - | yes | `fetch_from: employee.department` |
 | *(Column Break)* | | | | | | | |
-| leave_type | Leave Type | Link | Leave Type | yes | - | - | in_list_view, in_standard_filter |
+| leave_type | Leave Type | Link | [[Leave Type]] | yes | - | - | in_list_view, in_standard_filter |
 | from_date | From Date | Date | - | yes | - | - | |
 | to_date | To Date | Date | - | yes | - | - | |
 | *(Section Break: "Allocation")* | | | | | | | |
@@ -23,18 +23,18 @@
 | total_leaves_allocated | Total Leaves Allocated | Float | - | yes | - | yes | `allow_on_submit`; computed = unused_leaves + new_leaves_allocated |
 | total_leaves_encashed | Total Leaves Encashed | Float | - | - | - | yes | `depends_on: eval:doc.total_leaves_encashed>0`; set by `Leave Encashment` (see `Leave Encashment.md`) |
 | *(Column Break)* | | | | | | | |
-| compensatory_request | Compensatory Leave Request | Link | Compensatory Leave Request | - | - | yes | set when created from `Compensatory Leave Request` flow (Port Note: source shows this field exists in schema but the controller does not appear to set it directly — see Port Notes) |
-| leave_period | Leave Period | Link | Leave Period | - | - | yes | in_standard_filter |
-| leave_policy | Leave Policy | Link | Leave Policy | - | - | yes | hidden, `fetch_from: leave_policy_assignment.leave_policy`, in_standard_filter |
+| compensatory_request | Compensatory Leave Request | Link | [[Compensatory Leave Request]] | - | - | yes | set when created from `Compensatory Leave Request` flow (Port Note: source shows this field exists in schema but the controller does not appear to set it directly — see Port Notes) |
+| leave_period | Leave Period | Link | [[Leave Period]] | - | - | yes | in_standard_filter |
+| leave_policy | Leave Policy | Link | [[Leave Policy]] | - | - | yes | hidden, `fetch_from: leave_policy_assignment.leave_policy`, in_standard_filter |
 | expired | Expired | Check | - | - | 0 | yes | hidden, in_standard_filter; set to 1 by `expire_allocation()` |
-| amended_from | Amended From | Link | Leave Allocation | - | - | yes | standard amendment field |
+| amended_from | Amended From | Link | [[Leave Allocation]] | - | - | yes | standard amendment field |
 | *(Section Break: "Notes", collapsible)* | | | | | | | |
 | description | Description | Small Text | - | - | - | - | width 300px |
 | carry_forwarded_leaves_count | Carry Forwarded Leaves | Float | - | - | - | yes | `depends_on: carry_forwarded_leaves_count`; set on the *previous* allocation by `set_carry_forwarded_leaves_in_previous_allocation` |
-| leave_policy_assignment | Leave Policy Assignment | Link | Leave Policy Assignment | - | - | yes | |
+| leave_policy_assignment | Leave Policy Assignment | Link | [[Leave Policy Assignment]] | - | - | yes | |
 | company | Company | Link | Company | yes | - | yes | `fetch_from: employee.company` |
 | *(Section Break: "Earned Leave Schedule")* | | | | | | | `depends_on: eval:doc.earned_leave_schedule && doc.earned_leave_schedule.length;` |
-| earned_leave_schedule | Earned Leave Schedule | Table | Earned Leave Schedule | - | - | yes | child table, see below |
+| earned_leave_schedule | Earned Leave Schedule | Table | [[Earned Leave Schedule]] | - | - | yes | child table, see below |
 | retry_failed_allocations | Retry Failed Allocations | Button | - | - | - | - | hidden; shown client-side only when a schedule row has `attempted && failed` |
 
 ## Child Tables
@@ -409,7 +409,7 @@ FOR EACH allocation IN allocations:
 
 **Trigger note — `generate_leave_encashment()`** (`hrms/hr/utils.py`, also scheduled daily via `hooks.py` `scheduler_events.daily_long`): reads `Leave Allocation` rows expiring yesterday (`to_date == today - 1 day`) whose `leave_type.allow_encashment = 1`, only if `HR Settings.auto_leave_encashment` is enabled, and passes them to `create_leave_encashment()` to draft `Leave Encashment` documents. Leave Allocation itself is only a read source here — no writes happen to it. Full doctype spec (fields, validations, encashment amount calculation) is out of scope for this file — **see `Leave Encashment.md` for the full doctype spec** (owned by another module agent).
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -436,13 +436,27 @@ FOR EACH allocation IN allocations:
 | HR User | yes | yes | yes | yes | yes | yes | yes | yes | - | email, share, print all 1 |
 | HR Manager | yes | yes | yes | yes | yes | yes | yes | yes | yes | also `import`; email, share, print all 1 |
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 | Job (hooks.py bucket) | Frequency | Function | Effect on Leave Allocation |
 |---|---|---|---|
 | `daily_long` | daily | `hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation` | Sets `expired=1` and writes negative ledger entries for allocations whose `to_date` has passed. |
 | `daily_long` | daily | `hrms.hr.utils.generate_leave_encashment` | Reads allocations expiring yesterday to draft `Leave Encashment` docs (see `Leave Encashment.md`). No writes to Leave Allocation. |
 | `daily_long` | daily | `hrms.hr.utils.allocate_earned_leaves` | Adds `total_leaves_allocated`, writes ledger entries, updates `Earned Leave Schedule` child rows for earned-leave-type allocations. |
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee this allocation grants leave to; `employee` Link field.
+- [[Leave Type]] — `leave_type` Link field; governs carry-forward, max-allowed, earned-leave rules for this allocation.
+- [[Compensatory Leave Request]] — `compensatory_request` Link field (schema present, but not observed being set by the traced controller code — see Port Notes); reverse link is `Compensatory Leave Request.leave_allocation`, which extends/creates this allocation on approval.
+- [[Leave Period]] — `leave_period` Link field, scoping this allocation to a named date range.
+- [[Leave Policy]] — `leave_policy` Link field, fetched from the linked assignment.
+- [[Leave Policy Assignment]] — `leave_policy_assignment` Link field; the assignment that created this allocation and is the only supported entry point for earned-leave schedules.
+- [[Earned Leave Schedule]] — `earned_leave_schedule` child Table field, one row per scheduled earned-leave credit event.
+- [[Leave Allocation]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
+- [[Leave Ledger Entry]] — created on submit (new + carry-forward portions), deleted on cancel, and written by the scheduled expiry job against this allocation's balance.
+- [[Leave Adjustment]] — created (and submitted) by this doctype's whitelisted `create_leave_adjustment` method.
+- [[Leave Encashment]] — reads allocations expiring yesterday (via the `generate_leave_encashment` scheduled job) to draft encashment records; not written by this doctype.
 
 ## Port Notes
 

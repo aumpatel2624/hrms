@@ -21,23 +21,23 @@ own — `Holiday List` and `Holiday` — purely as read dependencies.
 
 | Doctype | Purpose |
 |---|---|
-| `Leave Type` | Defines a category of leave (e.g. Casual, Sick, Earned) and its rules: paid/unpaid, encashable, carry-forward, earned-leave accrual settings, max consecutive/applicable-after/applicable-before constraints. |
-| `Leave Period` | A named date range (e.g. a fiscal year) that leave policies and allocations can be scoped to. |
-| `Leave Policy` | A named bundle of `Leave Policy Detail` rows, each pairing a `Leave Type` with an annual allocation count. |
-| `Leave Policy Detail` | Child table row: one (Leave Type, annual_allocation) pair inside a `Leave Policy`. |
-| `Leave Policy Assignment` | Assigns a `Leave Policy` to an employee for a period (or from joining date), and is the trigger that creates the actual `Leave Allocation` record(s), including pro-rated/earned-leave setup. |
-| `Leave Control Panel` | Single (non-data-storing) doctype used as an admin bulk-action UI: create Leave Allocations or Leave Policy Assignments for many employees/departments at once. |
-| `Leave Allocation` | The actual per-employee, per-leave-type, per-period grant of N days, submittable, with carry-forward, expiry, and earned-leave-schedule support. |
-| `Earned Leave Schedule` | Child table of `Leave Allocation`; one row per scheduled earned-leave credit event (a date + number of leaves + whether it has been "attempted" by the scheduler). |
-| `Leave Adjustment` | A standalone submittable doctype that manually adds/deducts leave days against an existing `Leave Allocation`, writing a `Leave Ledger Entry`. |
-| `Compensatory Leave Request` | Employee-submitted request to convert a worked holiday/weekend day into extra leave balance; on approval, adds days to (or creates) a `Leave Allocation`. |
-| `Leave Application` | The core submittable leave request: employee picks a `Leave Type` and date range, balance/overlap/block-list validations run, and on submit/approval it writes `Leave Ledger Entry` rows and (if half-pay) affects payroll via `Leave Type` linkage. |
-| `Leave Encashment` | Submittable payout-in-lieu-of-leave record; created manually or by the daily scheduler for expiring allocations of encashable leave types. |
-| `Leave Ledger Entry` | Append-only (mostly) internal ledger: every allocation, application, adjustment, encashment, and expiry event writes a signed `leaves` delta row here; balance = SUM(leaves) as-of a date. |
-| `Leave Block List` | Names a set of blocked dates (optionally auto-populated from weekly offs) that certain roles cannot apply leave against, with an "allow list" of roles exempted. |
-| `Leave Block List Date` | Child table of `Leave Block List`: one blocked calendar date + reason. |
-| `Leave Block List Allow` | Child table of `Leave Block List`: one role exempted from that block list. |
-| `Holiday List Assignment` | Submittable record assigning a `Holiday List` (external/core doctype) to an employee or company for a `from_date` onward, used to resolve which holiday calendar applies to a given employee on a given date. |
+| [[Leave Type]] | Defines a category of leave (e.g. Casual, Sick, Earned) and its rules: paid/unpaid, encashable, carry-forward, earned-leave accrual settings, max consecutive/applicable-after/applicable-before constraints. |
+| [[Leave Period]] | A named date range (e.g. a fiscal year) that leave policies and allocations can be scoped to. |
+| [[Leave Policy]] | A named bundle of `Leave Policy Detail` rows, each pairing a `Leave Type` with an annual allocation count. |
+| [[Leave Policy Detail]] | Child table row: one (Leave Type, annual_allocation) pair inside a `Leave Policy`. |
+| [[Leave Policy Assignment]] | Assigns a `Leave Policy` to an employee for a period (or from joining date), and is the trigger that creates the actual `Leave Allocation` record(s), including pro-rated/earned-leave setup. |
+| [[Leave Control Panel]] | Single (non-data-storing) doctype used as an admin bulk-action UI: create Leave Allocations or Leave Policy Assignments for many employees/departments at once. |
+| [[Leave Allocation]] | The actual per-employee, per-leave-type, per-period grant of N days, submittable, with carry-forward, expiry, and earned-leave-schedule support. |
+| [[Earned Leave Schedule]] | Child table of `Leave Allocation`; one row per scheduled earned-leave credit event (a date + number of leaves + whether it has been "attempted" by the scheduler). |
+| [[Leave Adjustment]] | A standalone submittable doctype that manually adds/deducts leave days against an existing `Leave Allocation`, writing a `Leave Ledger Entry`. |
+| [[Compensatory Leave Request]] | Employee-submitted request to convert a worked holiday/weekend day into extra leave balance; on approval, adds days to (or creates) a `Leave Allocation`. |
+| [[Leave Application]] | The core submittable leave request: employee picks a `Leave Type` and date range, balance/overlap/block-list validations run, and on submit/approval it writes `Leave Ledger Entry` rows and (if half-pay) affects payroll via `Leave Type` linkage. |
+| [[Leave Encashment]] | Submittable payout-in-lieu-of-leave record; created manually or by the daily scheduler for expiring allocations of encashable leave types. |
+| [[Leave Ledger Entry]] | Append-only (mostly) internal ledger: every allocation, application, adjustment, encashment, and expiry event writes a signed `leaves` delta row here; balance = SUM(leaves) as-of a date. |
+| [[Leave Block List]] | Names a set of blocked dates (optionally auto-populated from weekly offs) that certain roles cannot apply leave against, with an "allow list" of roles exempted. |
+| [[Leave Block List Date]] | Child table of `Leave Block List`: one blocked calendar date + reason. |
+| [[Leave Block List Allow]] | Child table of `Leave Block List`: one role exempted from that block list. |
+| [[Holiday List Assignment]] | Submittable record assigning a `Holiday List` (external/core doctype) to an employee or company for a `from_date` onward, used to resolve which holiday calendar applies to a given employee on a given date. |
 
 ## External Dependencies (not in this repo)
 

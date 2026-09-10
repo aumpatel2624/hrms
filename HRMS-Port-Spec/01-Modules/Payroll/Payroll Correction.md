@@ -10,22 +10,22 @@ Reverses ("gives back") a specified number of Leave-Without-Pay (LWP) days from 
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| amended_from | Amended From | Link | Payroll Correction | no | | yes | |
-| employee | Employee | Link | Employee | yes | | no | |
+| amended_from | Amended From | Link | [[Payroll Correction]] | no | | yes | |
+| employee | Employee | Link | [[Employee Core Model]] | yes | | no | |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
 | company | Company | Link | Company | yes | | no | |
 | currency | Currency | Link | Currency | no | | no | `depends_on: eval: doc.company && doc.employee`; fetch_from `company.default_currency` (NOT `reqd`, unlike sibling doctypes) |
-| payroll_period | Payroll Period | Link | Payroll Period | yes | | no | |
+| payroll_period | Payroll Period | Link | [[Payroll Period]] | yes | | no | |
 | month_for_lwp_reversal | Select Month for LWP Reversal | Select | dynamic (client-populated list of month names with LWP, from `fetch_salary_slip_details`) | yes | | no | `depends_on: payroll_period`; drives client-side selection of `salary_slip_reference` |
-| salary_slip_reference | Salary Slip Reference | Link | Salary Slip | yes | | yes | `depends_on: month_for_lwp_reversal`; set client-side from the chosen month |
+| salary_slip_reference | Salary Slip Reference | Link | [[Salary Slip]] | yes | | yes | `depends_on: month_for_lwp_reversal`; set client-side from the chosen month |
 | working_days | Working Days | Float | | no | | yes | `depends_on: salary_slip_reference`; = `Salary Slip.total_working_days`, set server-side in `validate_days` |
 | lwp_days | Total Days Without Pay | Float | | no | | yes | `depends_on: salary_slip_reference`; = `max(working_days - payment_days, 0)`, set server-side |
 | days_to_reverse | Days to Reverse | Float | | yes | | no | `depends_on: salary_slip_reference`; description: "cannot exceed the total LWP days recorded for the selected month" |
 | payroll_date | Payroll Date | Date | | yes | | no | description: "Choose the date on which you want to create these components as arrears." |
 | payment_days | Payment Days | Float | | no | | yes | `depends_on: salary_slip_reference`; = `Salary Slip.payment_days` |
-| earning_arrears | Earning Arrears | Table | Payroll Correction Child | no | | yes | `depends_on: earning_arrears`; computed |
-| deduction_arrears | Deduction Arrears | Table | Payroll Correction Child | no | | yes | `depends_on: deduction_arrears`; computed |
-| accrual_arrears | Accrual Arrears | Table | Payroll Correction Child | no | | yes | `depends_on: accrual_arrears`; computed |
+| earning_arrears | Earning Arrears | Table | [[Payroll Correction Child]] | no | | yes | `depends_on: earning_arrears`; computed |
+| deduction_arrears | Deduction Arrears | Table | [[Payroll Correction Child]] | no | | yes | `depends_on: deduction_arrears`; computed |
+| accrual_arrears | Accrual Arrears | Table | [[Payroll Correction Child]] | no | | yes | `depends_on: accrual_arrears`; computed |
 
 Layout-only fields skipped: section_break_vvay, column_break_uuzk, section_break_xdag, column_break_uyjn, section_break_giud.
 
@@ -141,6 +141,16 @@ Note: no role in this doctype's permissions array has `cancel: 1` or `amend: 1` 
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Payroll Correction Child]] — child table shape used for all three arrear breakup tables (`earning_arrears`, `deduction_arrears`, `accrual_arrears`).
+- [[Salary Slip]] — the already-processed slip this correction reverses LWP days against; read for `total_working_days`, `payment_days`, `gross_pay` precision, and its earnings/deductions/accrued_benefits rows.
+- [[Salary Component]] — arrear-eligible components looked up (`arrear_component`, `variable_based_on_taxable_salary`, `disabled` flags).
+- [[Additional Salary]] — created and submitted on `on_submit()` for every earning/deduction arrear row.
+- [[Employee Benefit Ledger]] — accrual entries inserted on `on_submit()` and bulk-deleted on `on_cancel()`.
+- [[Payroll Period]] — scopes the cumulative-days-reversed cross-document guard alongside employee and salary slip reference.
+- [[Arrear]] — sibling doctype sharing the same `Payroll Correction Child` shape and a similar Additional-Salary-generation pattern.
 
 ## Port Notes
 

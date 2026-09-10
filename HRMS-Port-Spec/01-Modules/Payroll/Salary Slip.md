@@ -1,7 +1,7 @@
 # Salary Slip
 
 **Source:** `hrms/payroll/doctype/salary_slip/salary_slip.json`, `salary_slip.py`, `salary_slip.js`, `salary_slip_loan_utils.py`, `salary_slip_list.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `Sal Slip/<employee>/.#####` (hash-series autoname via `make_autoname` on `default_series` property), unless a custom Property Setter overrides `autoname` for this site
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `Sal Slip/<employee>/.#####` (hash-series autoname via `make_autoname` on `default_series` property, [[Naming and Autoname Rules]]), unless a custom Property Setter overrides `autoname` for this site
 **Module:** Payroll
 
 The payroll module's central computed document: one payslip for one employee for one payroll period, generated from a `Salary Structure` (via `Salary Structure Assignment`), attendance/leave data, additional salary, employee benefits, tax slabs, and (optionally) loan repayments.
@@ -14,7 +14,7 @@ Tab/Section/Column breaks are noted inline as group headers (no logic of their o
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes | — | No | `search_index`, `in_global_search` |
+| employee | Employee | Link | [[Employee Core Model]] | Yes | — | No | `search_index`, `in_global_search` |
 | employee_name | Employee Name | Read Only | — | Yes | — | Yes | `fetch_from: employee.employee_name` |
 | company | Company | Link | Company | Yes | — | No | `fetch_from: employee.company` |
 | department | Department | Link | Department | No | — | Yes | `fetch_from: employee.department` |
@@ -23,7 +23,7 @@ Tab/Section/Column breaks are noted inline as group headers (no logic of their o
 | posting_date | Posting Date | Date | — | Yes | Today | No | |
 | letter_head | Letter Head | Link | Letter Head | No | — | No | `allow_on_submit`, `ignore_user_permissions` |
 | status | Status | Select | Draft/Submitted/Cancelled/Withheld | No | — | Yes | set by `get_status()`, see State Machine |
-| salary_withholding | Salary Withholding | Link | Salary Withholding | No | — | Yes | `no_copy`; set by `check_salary_withholding()` |
+| salary_withholding | Salary Withholding | Link | [[Salary Withholding]] | No | — | Yes | `no_copy`; set by `check_salary_withholding()` |
 | salary_withholding_cycle | Salary Withholding Cycle | Data | — | No | — | Yes | `hidden`, `no_copy` |
 | currency | Currency | Link | Currency | Yes | — | Yes | `fetch_from: salary_structure.currency`; `depends_on: eval:(doc.docstatus==1 \|\| doc.salary_structure)` |
 | exchange_rate | Exchange Rate | Float | — | Yes | 1.0 | No | `hidden` |
@@ -35,9 +35,9 @@ Tab/Section/Column breaks are noted inline as group headers (no logic of their o
 | payroll_frequency | Payroll Frequency | Select | (blank)/Monthly/Fortnightly/Bimonthly/Weekly/Daily | No | — | No | |
 | start_date | Start Date | Date | — | No | — | No | `search_index` |
 | end_date | Date | Date | — | No | — | No | `search_index` |
-| salary_structure | Salary Structure | Link | Salary Structure | Yes | — | Yes | `search_index`, `in_standard_filter` |
-| payroll_entry | Payroll Entry | Link | Payroll Entry | No | — | Yes | `search_index` |
-| current_payroll_period | Current Payroll Period | Link | Payroll Period | No | — | Yes | `hidden`, `search_index` |
+| salary_structure | Salary Structure | Link | [[Salary Structure]] | Yes | — | Yes | `search_index`, `in_standard_filter` |
+| payroll_entry | Payroll Entry | Link | [[Payroll Entry]] | No | — | Yes | `search_index` |
+| current_payroll_period | Current Payroll Period | Link | [[Payroll Period]] | No | — | Yes | `hidden`, `search_index` |
 | mode_of_payment | Mode Of Payment | Select | (dynamic — Employee's salary mode options) | No | — | Yes | set from `Employee.salary_mode` in `pull_emp_details()` |
 | salary_slip_based_on_timesheet | Salary Slip Based on Timesheet | Check | — | No | 0 | Yes | |
 | deduct_tax_for_unsubmitted_tax_exemption_proof | Deduct Tax For Unsubmitted Tax Exemption Proof | Check | — | No | 0 | No | also force-set to 1 by `compute_taxable_earnings_for_year()` in the last period of a payroll period |
@@ -57,15 +57,15 @@ Tab/Section/Column breaks are noted inline as group headers (no logic of their o
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| timesheets | Salary Slip Timesheet | Table | Salary Slip Timesheet | No | — | No | `depends_on: eval:doc.salary_slip_based_on_timesheet`; see `Salary Slip Timesheet.md` |
+| timesheets | Salary Slip Timesheet | Table | [[Salary Slip Timesheet]] | No | — | No | `depends_on: eval:doc.salary_slip_based_on_timesheet`; see `Salary Slip Timesheet.md` |
 | total_working_hours | Total Working Hours | Float | — | No | — | No | `print_hide_if_no_value` |
 | hour_rate | Hour Rate | Currency | currency | No | — | No | `print_hide_if_no_value` |
 | base_hour_rate | Hour Rate (Company Currency) | Currency | Company default currency | No | — | No | `print_hide_if_no_value` |
-| earnings | Earnings | Table | Salary Detail | No | — | No | see `Salary Detail.md` |
-| deductions | Deductions | Table | Salary Detail | No | — | No | see `Salary Detail.md` |
-| accrued_benefits | Accrued Benefits | Table | Employee Benefit Detail | No | — | Yes | `print_hide`; populated for `statistical_component`/`accrual_component` earning rows and flexible-benefit accruals |
+| earnings | Earnings | Table | [[Salary Detail]] | No | — | No | see `Salary Detail.md` |
+| deductions | Deductions | Table | [[Salary Detail]] | No | — | No | see `Salary Detail.md` |
+| accrued_benefits | Accrued Benefits | Table | [[Employee Benefit Detail]] | No | — | Yes | `print_hide`; populated for `statistical_component`/`accrual_component` earning rows and flexible-benefit accruals |
 | employer_contributions_section | (Section, collapsible) | — | — | — | — | — | `depends_on: eval:doc.employer_contributions && doc.employer_contributions.length` |
-| employer_contributions | (no label) | Table | Salary Detail | No | — | No | `print_hide`; shown on slip but never included in gross/deduction/net pay |
+| employer_contributions | (no label) | Table | [[Salary Detail]] | No | — | No | `print_hide`; shown on slip but never included in gross/deduction/net pay |
 
 **Section: Totals**
 
@@ -115,7 +115,7 @@ Tab/Section/Column breaks are noted inline as group headers (no logic of their o
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | journal_entry | Journal Entry | Link | Journal Entry | No | — | No | |
-| amended_from | Amended From | Link | Salary Slip | No | — | Yes | `no_copy`, `ignore_user_permissions`, `print_hide` |
+| amended_from | Amended From | Link | [[Salary Slip]] | No | — | Yes | `no_copy`, `ignore_user_permissions`, `print_hide` |
 | bank_name | Bank Name | Data | — | No | — | No | set from `Employee.bank_name` |
 | bank_account_no | Bank Account No | Data | — | No | — | No | set from `Employee.bank_ac_no` |
 
@@ -123,17 +123,17 @@ Tab/Section/Column breaks are noted inline as group headers (no logic of their o
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| leave_details | Leave Details | Table | Salary Slip Leave | No | — | Yes | see `Salary Slip Leave.md` |
+| leave_details | Leave Details | Table | [[Salary Slip Leave]] | No | — | Yes | see `Salary Slip Leave.md` |
 
-**Undeclared fields referenced at runtime (not in `salary_slip.json`; injected by the external Lending app when installed):** `loans` (Table, `Salary Slip Loan`), `total_loan_repayment`, `total_interest_amount`, `total_principal_amount` (Currency). See `Salary Slip Loan.md` Port Notes.
+**Undeclared fields referenced at runtime (not in `salary_slip.json`; injected by the external Lending app when installed):** `loans` (Table, [[Salary Slip Loan]]), `total_loan_repayment`, `total_interest_amount`, `total_principal_amount` (Currency). See `Salary Slip Loan.md` Port Notes.
 
 ## Child Tables
 
-- `timesheets` -> `Salary Slip Timesheet` (see `Salary Slip Timesheet.md`)
-- `earnings`, `deductions`, `employer_contributions` -> `Salary Detail` (see `Salary Detail.md`)
-- `accrued_benefits` -> `Employee Benefit Detail` (owned by another doctype family — not in this agent's scope; referenced by name only)
-- `leave_details` -> `Salary Slip Leave` (see `Salary Slip Leave.md`)
-- `loans` (conditionally present) -> `Salary Slip Loan` (see `Salary Slip Loan.md`)
+- `timesheets` -> [[Salary Slip Timesheet]] (see `Salary Slip Timesheet.md`)
+- `earnings`, `deductions`, `employer_contributions` -> [[Salary Detail]] (see `Salary Detail.md`)
+- `accrued_benefits` -> [[Employee Benefit Detail]] (owned by another doctype family — not in this agent's scope; referenced by name only)
+- `leave_details` -> [[Salary Slip Leave]] (see `Salary Slip Leave.md`)
+- `loans` (conditionally present) -> [[Salary Slip Loan]] (see `Salary Slip Loan.md`)
 
 ## State Machine
 
@@ -475,7 +475,7 @@ Separately, `apply_regional_ctc_components(rows_by_type, data)` is a **different
 | `on_trash` | IF no custom naming series: `revert_series_if_last(default_series, name)` (returns the naming counter); `delete_employee_benefit_ledger_entry("salary_slip", name)` | Employee Benefit Ledger cleanup |
 | `on_discard` | `self.db_set("status", "Cancelled")` | none |
 
-Module-level hook (not a Document method): `unlink_ref_doc_from_salary_slip(doc, method=None)` — when a `Journal Entry` is cancelled/deleted, finds all non-cancelled Salary Slips referencing it via `journal_entry` and clears that field via `frappe.db.set_value`. (This is wired via `hrms/hooks.py`'s `doc_events` for `Journal Entry`, not shown in `salary_slip.py` itself, but defined in this file.)
+Module-level hook (not a Document method): `unlink_ref_doc_from_salary_slip(doc, method=None)` — when a `Journal Entry` is cancelled/deleted, finds all non-cancelled Salary Slips referencing it via `journal_entry` and clears that field via `frappe.db.set_value`. (This is wired via `hrms/hooks.py`'s [[Cross-Doctype Hooks (doc_events)]] for `Journal Entry`, not shown in `salary_slip.py` itself, but defined in this file.)
 
 ## Whitelisted / API Methods
 
@@ -493,13 +493,31 @@ Also referenced from the client script but defined as controller methods without
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
-| HR User | Yes | Yes | Yes | No | Yes | No | No | Yes | No | `email: 1`, `print: 1`, `share: 1` |
+| HR User ([[Permission Model (RBAC)]]) | Yes | Yes | Yes | No | Yes | No | No | Yes | No | `email: 1`, `print: 1`, `share: 1` |
 | HR Manager | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | No | `email: 1`, `print: 1`, `share: 1` |
 | Employee | Yes | No | No | No | No | No | No | No | No | `print: 1` — an employee can view/print their own slip (row-level scoping to "own record" is enforced elsewhere, e.g. via a permission query condition, not visible in this JSON's `permissions` array) |
 
 ## Scheduled Jobs Touching This Doctype
 
 No `scheduler_events` entries in `hrms/hooks.py` reference `Salary Slip` directly by name. (Bulk emailing is enqueued on-demand via `enqueue_email_salary_slips`, not on a recurring schedule.) Loan interest accrual (`process_loan_interest_accrual_and_demand`) runs synchronously as part of `get_emp_and_working_day_details`, not as a scheduled job, in this module — any recurring/scheduled loan-interest processing belongs to the external Lending app and is out of scope.
+
+## Related Doctypes
+
+- [[Salary Structure]] / [[Salary Structure Assignment]] — the template and per-employee assignment this slip's earning/deduction rows are generated from.
+- [[Salary Detail]] — shared child-row shape for `earnings`, `deductions`, and `employer_contributions`.
+- [[Salary Component]] / [[Salary Component Account]] — component master data and GL account resolution feeding component evaluation and tax-component detection.
+- [[Salary Slip Leave]] / [[Salary Slip Timesheet]] / [[Salary Slip Loan]] — child tables for leave-balance snapshot, linked timesheets, and loan repayment lines respectively.
+- [[Payroll Entry]] — the batch run that creates (and often submits) this slip; also resolves `payroll_payable_account` for loan repayment postings.
+- [[Payroll Period]] — scopes tax annualization (`get_period_factor`, previous/future taxable earnings) via `current_payroll_period`.
+- [[Payroll Settings]] — configures working-days basis, half-day fraction, rounding, email, and flexible-benefit gating consumed throughout calculation.
+- [[Payroll Correction]] — its `days_to_reverse` totals are cross-checked against this slip's `lwp_days_corrected` argument.
+- [[Salary Withholding]] / [[Salary Withholding Cycle]] — `check_salary_withholding()` sets `salary_withholding`/`salary_withholding_cycle` and forces the `Withheld` status.
+- [[Additional Salary]] — merged into earnings/deductions via `add_additional_salary_components()`; also drives tax-component overrides and annualized additional-income handling.
+- [[Employee Benefit Detail]] / [[Employee Benefit Application]] — flexible-benefit accrual/payout rows and mandatory-application gating.
+- [[Income Tax Slab]] / [[Taxable Salary Slab]] — resolved via the Salary Structure Assignment and used by `calculate_tax_by_tax_slab()` for marginal tax computation.
+- [[Employee Tax Exemption Declaration]] / [[Employee Tax Exemption Proof Submission]] — supply `total_exemption_amount`/`exemption_amount` consumed by `get_total_exemption_amount()`.
+- [[Employee Other Income]] — summed into `other_incomes` for the annual taxable-income figure.
+- [[Employee Core Model]] — the payslip's subject; many eval-context fields and employment-date-based validations are sourced from it.
 
 ## Port Notes
 

@@ -1,7 +1,7 @@
 # Additional Salary
 
 **Source:** `hrms/payroll/doctype/additional_salary/additional_salary.json`, `additional_salary.py`, `additional_salary.js`
-**Submittable:** yes   **Tree:** no   **Naming:** By "Naming Series" field — `naming_series` options `"HR-ADS-.YY.-.MM.-"` (user-visible series selector, but only one option defined)
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** By "Naming Series" field ([[Naming and Autoname Rules]]) — `naming_series` options `"HR-ADS-.YY.-.MM.-"` (user-visible series selector, but only one option defined)
 **Module:** Payroll
 
 Central mechanism for injecting one-off or recurring earning/deduction amounts into Salary Slips outside the base Salary Structure. Created directly by HR, or generated programmatically by `Employee Benefit Claim`, `Employee Incentive`, `Arrear`, `Payroll Correction`, Gratuity, Retention Bonus, Employee Referral bonus, and Employee Advance return flows (those doctypes are owned by other agents; only the interaction contract is documented here).
@@ -11,8 +11,8 @@ Central mechanism for injecting one-off or recurring earning/deduction amounts i
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | naming_series | Series | Select | `HR-ADS-.YY.-.MM.-` | yes | | no | |
-| employee | Employee | Link | Employee | yes | | no | `search_index: 1`; client-side query filters `company` + `status != Inactive` |
-| salary_component | Salary Component | Link | Salary Component | yes | | no | `search_index: 1`; client-side query filters `disabled: 0` |
+| employee | Employee | Link | [[Employee Core Model]] | yes | | no | `search_index: 1`; client-side query filters `company` + `status != Inactive` |
+| salary_component | Salary Component | Link | [[Salary Component]] | yes | | no | `search_index: 1`; client-side query filters `disabled: 0` |
 | amount | Amount | Currency | options: currency | yes | | no | must be >= 0 (server validation) |
 | overwrite_salary_structure_amount | Overwrite Salary Structure Amount | Check | | no | 1 (default checked) | no | forced to 0 server-side if component isn't part of employee's salary structure |
 | deduct_full_tax_on_selected_payroll_date | Deduct Full Tax on Selected Payroll Date | Check | | no | 0 | no | client-side auto-fetched from `Salary Component.deduct_full_tax_on_selected_payroll_date` via `frm.add_fetch` (UI convenience; not a `fetch_from` in JSON) |
@@ -21,7 +21,7 @@ Central mechanism for injecting one-off or recurring earning/deduction amounts i
 | department | Department | Link | Department | no | | yes | fetch_from `employee.department` |
 | company | Company | Link | Company | yes | | no | |
 | type | Salary Component Type | Data | | no | | yes | fetch_from `salary_component.type` (i.e. "Earning"/"Deduction") |
-| amended_from | Amended From | Link | Additional Salary | no | | yes | |
+| amended_from | Amended From | Link | [[Additional Salary]] | no | | yes | |
 | is_recurring | Is Recurring | Check | | no | 0 | no | |
 | from_date | From Date | Date | | conditionally (`mandatory_depends_on: eval:(doc.is_recurring==1)`) | | no | `depends_on: eval:(doc.is_recurring==1)`; cleared server-side when `is_recurring=0` |
 | to_date | To Date | Date | | conditionally (`mandatory_depends_on: eval:(doc.is_recurring==1)`) | | no | same as from_date |
@@ -139,7 +139,7 @@ This is THE mechanism by which Additional Salary records are pulled into a Salar
 
 This confirms the assignment note's overlap requirement: **the actual runtime overlap guard for overwrite-type conflicts across ANY additional salaries touching a given payroll window is enforced here**, in `get_additional_salaries`, at Salary Slip generation time — separate from (and in addition to) the doc-level `validate_duplicate_additional_salary` check (rule 6) which only guards overwrite-duplicates sharing the exact same `payroll_date`/date-range overlap pattern at save time for non-recurring vs itself. The Salary Slip-time check in step 4 is broader: it fires for ANY two qualifying Additional Salary rows (recurring or one-time) resolving to the same component with `overwrite=1` in the same slip window, regardless of whether their creation-time validations individually passed (e.g. one recurring + one one-time entry both overwriting the same component in the same slip period would each pass rule 6 individually at their own save time, since rule 6 doesn't check `is_recurring` combinations symmetric to rule 4, but would both surface here and throw at slip-generation time).
 
-## Lifecycle Hooks (exact)
+## Lifecycle Hooks (exact) ([[Cross-Doctype Hooks (doc_events)]])
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -153,7 +153,7 @@ This confirms the assignment note's overlap requirement: **the actual runtime ov
 
 None declared on this controller (`@frappe.whitelist()` not used in `additional_salary.py`). `get_additional_salaries` is a plain importable Python function (not whitelisted), called server-side from Salary Slip.
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -163,9 +163,19 @@ None declared on this controller (`@frappe.whitelist()` not used in `additional_
 
 Note: neither HR User nor HR Manager has `delete`, `cancel`, or `amend` rights per the JSON (only System Manager does) — this is narrower than most sibling doctypes in this module and should be reproduced exactly, not broadened.
 
-## Scheduled Jobs Touching This Doctype
+## Scheduled Jobs Touching This Doctype ([[Background Jobs (Scheduler Events)]])
 
 None found directly in `hrms/hooks.py` referencing "Additional Salary". (Recurring Additional Salary entries are pulled live at Salary Slip generation time via `get_additional_salaries`, not via a separate scheduled job that materializes anything on this doctype.)
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee this earning/deduction amount applies to; active-employee and joining/relieving-date checks read from it.
+- [[Salary Component]] — the earning/deduction component being injected; its `variable_based_on_taxable_salary` and `accrual_component` flags drive extra validation/warnings here.
+- [[Salary Structure]] / [[Salary Structure Assignment]] — read to resolve the employee's current structure and to check whether `salary_component` is part of it (for the overwrite-amount check).
+- [[Salary Slip]] — the consumer: `get_additional_salaries()` is called from Salary Slip generation to pull in matching Additional Salary rows and enforce the overwrite-duplicate guard at slip-generation time.
+- [[Employee Benefit Claim]], [[Employee Incentive]], [[Arrear]], [[Payroll Correction]], [[Gratuity]], [[Retention Bonus]] — other doctypes that generate Additional Salary records programmatically rather than HR creating them directly.
+- [[Employee Referral]] — set as `ref_doctype`/`ref_docname` for referral-bonus Additional Salary entries; `on_submit`/`on_cancel` flips its `referral_payment_status` between Paid/Unpaid.
+- Employee Advance (core ERPNext, not specified in this port-spec tree) — set as `ref_doctype`/`ref_docname` for advance-return deductions; validated against its `paid_amount`/`claimed_amount`/`return_amount`.
 
 ## Port Notes
 

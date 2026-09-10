@@ -1,7 +1,7 @@
 # Leave Block List
 
 **Source:** `hrms/hr/doctype/leave_block_list/leave_block_list.json`, `leave_block_list.py`, `leave_block_list.js`
-**Submittable:** no   **Tree:** no   **Naming:** `field:leave_block_list_name` (document name = value of the `leave_block_list_name` field, must be unique)
+**Submittable:** no   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `field:leave_block_list_name` (document name = value of the `leave_block_list_name` field, must be unique)
 **Module:** HR
 
 ## Schema
@@ -12,11 +12,11 @@
 | `company` | Company | Link | Company | Yes | — | No | `remember_last_selected_value: 1` |
 | `applies_to_all_departments` | Applies to Company | Check | — | No | `0` | No | Description: "If not checked, the list will have to be added to each Department where it has to be applied." |
 | *(Section Break: "Block Days")* `block_days` | Block Days | Section Break | — | — | — | — | Section heading only; description "Stop users from making Leave Applications on following days." groups the fields below |
-| `leave_block_list_dates` | Leave Block List Dates | Table | `Leave Block List Date` | Yes | — | No | Child table — see below |
+| `leave_block_list_dates` | Leave Block List Dates | Table | [[Leave Block List Date]] | Yes | — | No | Child table — see below |
 | *(Section Break: "Allow Users")* `allow_list` | Allow Users | Section Break | — | — | — | — | Section heading only; description "Allow the following users to approve Leave Applications for block days." groups the field below |
-| `leave_block_list_allowed` | Leave Block List Allowed | Table | `Leave Block List Allow` | No | — | No | Child table — see below |
+| `leave_block_list_allowed` | Leave Block List Allowed | Table | [[Leave Block List Allow]] | No | — | No | Child table — see below |
 | `column_break_4` | — | Column Break | — | — | — | — | Pure layout, skipped |
-| `leave_type` | Leave Type | Link | Leave Type | No | — | No | If set, this block list only applies to leave applications of this Leave Type (see cross-reference logic below) |
+| `leave_type` | Leave Type | Link | [[Leave Type]] | No | — | No | If set, this block list only applies to leave applications of this Leave Type (see cross-reference logic below) |
 | `add_day_wise_dates` | Add Day-wise Dates | Button | — | — | — | — | Client-only button; opens a dialog (see Lifecycle Hooks / Port Notes) that calls the `set_weekly_off_dates` whitelisted method |
 
 ## Child Tables
@@ -49,7 +49,7 @@ None (no totals/formulas computed on this doctype itself). However, this doctype
    a. IF `start_date` is NOT already in `existing_date_list` AND the weekday name of `start_date` (via `calendar.day_name[start_date.weekday()]`, e.g. `"Monday"`) is in the `days` list passed in, THEN append `start_date` to `date_list`.
 5. Return `date_list` (dates in chronological order, excluding both dates already present in the table and dates whose weekday isn't in `days`).
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -76,6 +76,13 @@ Client script (`leave_block_list.js`) — UI-only, no server equivalent exists f
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` scheduler_events referencing `Leave Block List`.
+
+## Related Doctypes
+
+- [[Leave Block List Date]] — `leave_block_list_dates` child Table field, one row per blocked calendar date.
+- [[Leave Block List Allow]] — `leave_block_list_allowed` child Table field, one row per role exempted from the block.
+- [[Leave Type]] — `leave_type` Link field; if set, restricts this block list to applications of that leave type.
+- [[Leave Application]] — reads this doctype (via `get_applicable_block_dates`/`get_applicable_block_lists`/`is_user_in_allow_list`) to block/warn on leave applications that fall on a block date.
 
 ## Port Notes
 

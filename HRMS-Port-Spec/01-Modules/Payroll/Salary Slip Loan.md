@@ -118,6 +118,12 @@ None on this child doctype. (`make_loan_repayment_entry`, `set_loan_repayment`, 
 
 None found in `hrms/hooks.py` directly referencing `Salary Slip Loan`. (Loan interest accrual scheduling, if any, is owned by the external Lending app, out of scope here.)
 
+## Related Doctypes
+
+- [[Salary Slip]] — parent doctype whose `loans` table field is injected only when the external Lending app is installed; drives `total_loan_repayment`/`total_interest_amount`/`total_principal_amount` at the parent level.
+- [[Payroll Entry]] — `get_payroll_payable_account()` falls back to `Payroll Entry.payroll_payable_account` when resolving the account for repayment postings.
+- [[Payroll Settings]] — `process_payroll_accounting_entry_based_on_employee` affects the accounting-party behavior of the created `Loan Repayment` entry.
+
 ## Port Notes
 
 - **The whole feature is conditional on an external app ("lending") being installed.** A port must decide: either (a) always support loan repayment as a first-class module (recommended for a clean port — remove the conditional), or (b) replicate the plugin-gate pattern (`if_lending_app_installed`) as a feature flag / optional module so the base Payroll module works standalone when loans aren't needed.

@@ -79,11 +79,16 @@ None defined on this doctype's controller.
 
 `"permissions": []` in the JSON — this doctype defines no permission rows of its own. As a child table, access is governed entirely by the parent `Leave Allocation` doctype's permissions (see `Leave Allocation.md` Permissions section); there is no independent ACL for `Earned Leave Schedule` rows.
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 | Job (hooks.py bucket) | Frequency | Function | Effect |
 |---|---|---|---|
 | `daily_long` | daily | `hrms.hr.utils.allocate_earned_leaves` | Reads pending rows (`attempted=0`, `allocation_date=today`) to determine what to allocate; writes `is_allocated`/`attempted`/`allocated_via`/`number_of_leaves` on success, or `attempted`/`failed`/`failure_reason` on failure via `log_allocation_error`. |
+
+## Related Doctypes
+
+- [[Leave Allocation]] — parent doctype; this table is embedded via its `earned_leave_schedule` Table field.
+- [[Leave Policy Assignment]] — pre-populates the schedule rows at assignment-creation time.
 
 ## Port Notes
 

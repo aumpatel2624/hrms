@@ -10,7 +10,7 @@ Child table of `Gratuity Rule` (field `applicable_earnings_component`, rendered 
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| salary_component | Salary Component | Link | Salary Component | yes | — | no | `in_list_view`; per JSON description on the parent field, "Salary components should be part of the Salary Structure." (advisory only — not enforced by code, see Port Notes) |
+| salary_component | Salary Component | Link | [[Salary Component]] | yes | — | no | `in_list_view`; per JSON description on the parent field, "Salary components should be part of the Salary Structure." (advisory only — not enforced by code, see Port Notes) |
 
 `quick_entry: 1`. `track_changes: 1`. `permissions: []` — inherits access from parent `Gratuity Rule`.
 
@@ -63,3 +63,10 @@ None.
 - **Modeled in Frappe as a "Table MultiSelect"** (the parent field `applicable_earnings_component` has `fieldtype: "Table MultiSelect"`), which the Frappe UI renders as tag-style multi-select input over a child table whose only meaningful field is a single Link. Functionally this is equivalent to a many-to-many join table between `Gratuity Rule` and `Salary Component`. In a relational port, this can be modeled either as (a) a true child-row table with `parent` FK + `idx`, matching the underlying Frappe storage exactly, or (b) simplified to a straightforward join table `gratuity_rule_salary_component(gratuity_rule_id, salary_component_id)` since no row possesses additional data or ordering-dependent behavior (unlike `Gratuity Rule Slab`, row order here is not consumed by any algorithm — `get_applicable_components` uses `pluck` with no `order_by`). Recommend option (b) for a clean generic-RDBMS design, but document that the source system stores it as an ordered child table.
 - **No enforcement of the "must be an Earning-type component that is part of the Salary Structure" description**: this is purely descriptive text in the parent doctype's JSON (`"description": "Salary components should be part of the Salary Structure."`) — no client or server code filters the `salary_component` Link's dropdown to Earning-type components, nor checks that the component is actually used on any Salary Structure. Contrast with `Gratuity.salary_component` and `Retention Bonus.salary_component`, both of which DO have client-side `frm.set_query` filters restricting to `type: "Earning"`. This asymmetry should be preserved (no filter here) unless the target system wants to proactively fix it — flag as a known gap rather than silently adding a filter.
 - **No duplicate-row prevention**: nothing stops the same `salary_component` being added twice to one Gratuity Rule; if duplicated, `get_total_component_amount` would still only sum each matching Salary Slip earning row once (the earnings loop is driven by the Salary Slip's rows, not by this list, and a Salary Slip typically has at most one row per component), so a duplicate here is functionally harmless but wastes a row — no need to add a uniqueness constraint to stay faithful, though a new implementation MAY add one without behavior change.
+
+## Related Doctypes
+
+- [[Gratuity Rule]] — parent doctype; this is its `applicable_earnings_component` Table MultiSelect child table, listing the components that count toward the gratuity earnings base.
+- [[Salary Component]] — linked via `salary_component`; each row names one component considered "applicable earnings" for gratuity purposes.
+- [[Gratuity]] — reads this table (`get_applicable_components()`) to filter which [[Salary Slip]] earning rows are summed into `total_component_amount`.
+- [[Retention Bonus]] — sibling doctype whose own `salary_component` field applies a client-side Earning-type filter that this doctype's field notably lacks (see Port Notes).

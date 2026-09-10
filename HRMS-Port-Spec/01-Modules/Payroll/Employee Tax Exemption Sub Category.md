@@ -8,7 +8,7 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| exemption_category | Tax Exemption Category | Link | `Employee Tax Exemption Category` | yes | — | no | `in_list_view`, `in_standard_filter`. Parent category this sub-category rolls up into. |
+| exemption_category | Tax Exemption Category | Link | [[Employee Tax Exemption Category]] | yes | — | no | `in_list_view`, `in_standard_filter`. Parent category this sub-category rolls up into. |
 | max_amount | Max Exemption Amount | Currency | — | no | — | no | `fetch_from: exemption_category.max_amount`, `fetch_if_empty: 1` — auto-populated from the parent category's `max_amount` only when this field is currently empty (does NOT auto-sync on every save once a value exists); `non_negative`. Validated server-side against the parent (see Validation Rules). |
 | is_active | Is Active | Check | — | no | `1` | no | Filters selectable sub-categories in `Employee Tax Exemption Declaration` and `Employee Tax Exemption Proof Submission` row pickers (client-side `frm.set_query` filter `is_active: 1`). |
 | description | Description | Small Text | — | no | — | no | |
@@ -60,3 +60,9 @@ None found in `hrms/hooks.py`.
 - The `fetch_if_empty` semantics matter: on first creation, if the user leaves `max_amount` blank, Frappe auto-copies the parent category's `max_amount` into this row at save time (client + server). If the user has ever set an explicit value (even later cleared and it was non-empty once), `fetch_if_empty` will re-populate only while the field reads as empty; a port must replicate "populate default from parent only if currently null/blank" rather than "always mirror parent."
 - As with the parent category, `autoname: Prompt` + `allow_rename: 1` means `name` is a free-text natural key that can be renamed with cascading Link updates — same porting consideration as `Employee Tax Exemption Category.md`.
 - The validation compares against the CURRENT value of the parent's `max_amount` at save time (a live `frappe.db.get_value` lookup, not a cached/fetched copy), so changing a category's `max_amount` after sub-categories exist does NOT retroactively re-validate existing sub-category rows — only the next save of a sub-category re-checks. Flag this for the port: no cascading re-validation on parent category edits.
+
+## Related Doctypes
+
+- [[Employee Tax Exemption Category]] — parent category this sub-category rolls up into; `max_amount` here is fetched-if-empty from, and validated against, the category's own `max_amount`.
+- [[Employee Tax Exemption Declaration Category]] — declaration-side child row that links to this sub-category via `exemption_sub_category` and fetches `exemption_category`/`max_amount` from it.
+- [[Employee Tax Exemption Proof Submission Detail]] — proof-side child row that likewise links to this sub-category and fetches the same values from it.

@@ -12,11 +12,11 @@
 | start_date | Start Date | Date | — | Yes | — | No | |
 | end_date | End Date | Date | — | Yes | — | No | |
 | *(Section: Payroll Periods — `section_break_5`, hidden)* | | | | | | | |
-| periods | Payroll Periods | Table | Payroll Period Date | No | — | No | see Child Tables; section is `hidden: 1` in the JSON (not shown by default in the standard form layout) |
+| periods | Payroll Periods | Table | [[Payroll Period Date]] | No | — | No | see Child Tables; section is `hidden: 1` in the JSON (not shown by default in the standard form layout) |
 
 ## Child Tables
 
-- `periods` (Table, options `Payroll Period Date`) — see `Payroll Period Date.md`. Its section (`section_break_5`) is marked `hidden: 1` in the doctype JSON, and **no controller code in `payroll_period.py` ever populates it** — there is no method in this repo that generates `Payroll Period Date` rows from `start_date`/`end_date` (e.g. splitting the period into monthly sub-periods). Port Note: this is a gap — the field exists in schema but the "period-date generation logic" a re-implementer might expect is **not present in this codebase**; if such rows are needed they must currently be entered manually by a user, or the generation logic was removed/never implemented in this version of HRMS.
+- `periods` (Table, options [[Payroll Period Date]]) — see `Payroll Period Date.md`. Its section (`section_break_5`) is marked `hidden: 1` in the doctype JSON, and **no controller code in `payroll_period.py` ever populates it** — there is no method in this repo that generates `Payroll Period Date` rows from `start_date`/`end_date` (e.g. splitting the period into monthly sub-periods). Port Note: this is a gap — the field exists in schema but the "period-date generation logic" a re-implementer might expect is **not present in this codebase**; if such rows are needed they must currently be entered manually by a user, or the generation logic was removed/never implemented in this version of HRMS.
 
 ## State Machine
 
@@ -87,6 +87,13 @@ None — no `@frappe.whitelist()` decorated methods in `payroll_period.py`.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`. (Payroll Period appears in the unrelated `company_data_to_be_ignored` list in `hooks.py`, which controls what gets wiped when a Company's transactional data is deleted — not a scheduled job.)
+
+## Related Doctypes
+
+- [[Payroll Period Date]] — unpopulated `periods` child table (schema shell only, no generation logic in this repo).
+- [[Salary Structure Assignment]] — resolves its effective Payroll Period via `get_payroll_period()` to decide tax-projection behavior.
+- [[Salary Slip]] — consumes `get_payroll_period_days()`/`get_period_factor()` for working-days and annualized-tax-projection calculations.
+- [[Payroll Settings]] — `include_holidays_in_total_working_days` toggle changes how `get_payroll_period_days()` computes working days.
 
 ## Port Notes
 

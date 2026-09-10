@@ -46,7 +46,7 @@ None — controller class body is `pass`.
 
 None.
 
-## Permissions
+## [[Permission Model (RBAC)|Permissions]]
 
 No doctype-level `permissions` array entries (`permissions: []` in JSON). Access control is entirely inherited from the parent `Gratuity Rule` document's permissions (standard Frappe child-table behavior: a user who can read/write the parent Gratuity Rule can read/write its slab rows).
 
@@ -54,9 +54,14 @@ No doctype-level `permissions` array entries (`permissions: []` in JSON). Access
 
 None.
 
+## Related Doctypes
+
+- [[Gratuity Rule]] — parent doctype; this child table's rows (`gratuity_rule_slabs`) belong to, and are ordered (`idx`) within, a single Gratuity Rule record.
+- [[Gratuity]] — reads these slab rows via `Gratuity Rule.get_gratuity_rule_slabs()` to compute the gratuity amount for an employee.
+
 ## Port Notes
 
 - **This is a genuine child table, not a lookup/reference table** — in a relational port it should be modeled as its own table with a foreign key to the parent `Gratuity Rule` (e.g. `gratuity_rule_id`), plus an explicit `idx`/`sort_order` integer column, since row order drives the calculation algorithm and Frappe's `idx` is exactly this ordering column.
 - **`from_year` is UI-read-only but not server-enforced**: the JSON marks `from_year` `"read_only": 1` — this is a form/UI convention (client script auto-fills it from the previous row's `to_year`) but nothing in the Python controller prevents a value being written directly via the API/import. A port should decide explicitly whether to enforce this server-side (current source does not).
 - **No server-side check that slabs are contiguous/non-overlapping/ascending** beyond the two checks living in the parent's `validate()` (`from_year > to_year` rejected; only one `0/0` "unlimited" slab allowed). Gaps between slabs (e.g. slab A `to_year=4`, slab B `from_year=6`) or overlaps are NOT rejected by any code found — they would silently produce whatever result the iteration order happens to yield (potentially "No applicable slab found" for years 4–6, or double-counting under overlap in "Sum of all previous slabs" mode). Flag this as a known gap rather than silently adding stricter validation.
-- Standard Frappe child-table framework behaviors to build explicitly in a new stack: auto-generated row `name` (a random 10-char hash-like ID in Frappe), `parent`/`parentfield`/`parenttype` linkage columns, and `idx` (1-based row position) — all must be modeled explicitly as columns on the new relational table.
+- [[Implicit Framework Behaviors|Standard Frappe child-table framework behaviors to build explicitly in a new stack]]: auto-generated row `name` (a random 10-char hash-like ID in Frappe), `parent`/`parentfield`/`parenttype` linkage columns, and `idx` (1-based row position) — all must be modeled explicitly as columns on the new relational table.

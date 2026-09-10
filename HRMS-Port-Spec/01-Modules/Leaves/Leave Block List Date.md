@@ -47,6 +47,10 @@ None.
 
 None.
 
+## Related Doctypes
+
+- [[Leave Block List]] — parent doctype; this table is embedded via its `leave_block_list_dates` Table field.
+
 ## Port Notes
 
 - As a child table, in a relational port this becomes an owned-rows table (e.g. `leave_block_list_date` with a `leave_block_list_id` FK, `ON DELETE CASCADE` when the parent is deleted) rather than a join table — there is no independent identity or reuse across parents.

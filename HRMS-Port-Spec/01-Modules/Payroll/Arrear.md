@@ -1,7 +1,7 @@
 # Arrear
 
 **Source:** `hrms/payroll/doctype/arrear/arrear.json`, `arrear.py`, `arrear.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `format:{Arrear}/{employee}/{#####}` (expression naming rule — literal string "Arrear" + employee id + sequence)
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `format:{Arrear}/{employee}/{#####}` (expression naming rule — literal string "Arrear" + employee id + sequence) ([[Naming and Autoname Rules]])
 **Module:** Payroll
 
 Computes and pays out retroactive salary differences ("arrears") when an employee's Salary Structure changes retroactively (e.g. a raise backdated to an earlier date), by diffing already-processed Salary Slip components against a preview of what they'd be under the new structure.
@@ -10,24 +10,24 @@ Computes and pays out retroactive salary differences ("arrears") when an employe
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | | no | |
+| employee | Employee | Link | [[Employee Core Model]] | yes | | no | |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
-| salary_structure | Salary Structure | Link | Salary Structure | yes | | no | `depends_on: eval:doc.payroll_period` — the NEW structure to diff against |
+| salary_structure | Salary Structure | Link | [[Salary Structure]] | yes | | no | `depends_on: eval:doc.payroll_period` — the NEW structure to diff against |
 | arrear_start_date | Arrear Start Date | Date | | yes | | no | `depends_on: eval:doc.salary_structure`; description: "Salary slips starting on or after this date will be considered for arrear calculations" |
 | company | Company | Link | Company | yes | | no | fetch_from `employee.company` |
 | currency | Currency | Link | Currency | yes | | yes | `depends_on: eval:doc.employee` |
-| payroll_period | Payroll Period | Link | Payroll Period | yes | | no | `depends_on: eval:doc.employee` |
+| payroll_period | Payroll Period | Link | [[Payroll Period]] | yes | | no | `depends_on: eval:doc.employee` |
 | payroll_date | Payroll Date | Date | | yes | | no | `depends_on: eval:doc.salary_structure`; the date the generated Additional Salary entries will use |
-| earning_arrears (tab: Arrears) | Earning Arrears | Table | Payroll Correction Child | no | | no | `depends_on: earning_arrears` (shows only if non-empty); computed by controller |
-| deduction_arrears | Deduction Arrears | Table | Payroll Correction Child | no | | no | `depends_on: deduction_arrears`; computed by controller |
-| accrual_arrears | Accrual Arrears | Table | Payroll Correction Child | no | | no | `depends_on: accrual_arrears`; computed by controller |
-| amended_from | Amended From | Link | Arrear | no | | yes | |
+| earning_arrears (tab: Arrears) | Earning Arrears | Table | [[Payroll Correction Child]] | no | | no | `depends_on: earning_arrears` (shows only if non-empty); computed by controller |
+| deduction_arrears | Deduction Arrears | Table | [[Payroll Correction Child]] | no | | no | `depends_on: deduction_arrears`; computed by controller |
+| accrual_arrears | Accrual Arrears | Table | [[Payroll Correction Child]] | no | | no | `depends_on: accrual_arrears`; computed by controller |
+| amended_from | Amended From | Link | [[Arrear]] | no | | yes | |
 
 Layout-only fields skipped: column_break_itzd, section_break_zegb, section_break_ubws, arrears_tab (Tab Break).
 
 ## Child Tables
 
-All three arrear tables reuse the same child doctype: **Payroll Correction Child** (see `Payroll Correction Child.md`) — fields `salary_component` (Link, Salary Component) and `amount` (Float, non_negative).
+All three arrear tables reuse the same child doctype: **[[Payroll Correction Child]]** (see `Payroll Correction Child.md`) — fields `salary_component` (Link, [[Salary Component]]) and `amount` (Float, non_negative).
 
 ## State Machine
 
@@ -117,11 +117,11 @@ flexible_benefit: is_flexible_benefit
 ### `on_cancel()`
 Calls `delete_employee_benefit_ledger_entry("reference_document", self.name)` — bulk-deletes all `Employee Benefit Ledger` rows where `reference_document == self.name` (i.e. the accrual entries created above). Note: this does NOT cancel or reverse the `Additional Salary` documents created on submit — they remain submitted/active after the Arrear is cancelled (same class of orphaning gap seen in other doctypes in this module).
 
-## Lifecycle Hooks (exact)
+## Lifecycle Hooks (exact) ([[Cross-Doctype Hooks (doc_events)]])
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
-| validate | `validate_dates`, `validate_salary_structure_assignment`, `validate_duplicate_doc`, `calculate_salary_structure_arrears` (recomputes arrear tables every save) | Reads Salary Slip, Salary Detail, Salary Component, Employee Benefit Detail, Payroll Correction (no writes) |
+| validate | `validate_dates`, `validate_salary_structure_assignment`, `validate_duplicate_doc`, `calculate_salary_structure_arrears` (recomputes arrear tables every save) | Reads [[Salary Slip]], [[Salary Detail]], [[Salary Component]], [[Employee Benefit Detail]], [[Payroll Correction]] (no writes) |
 | on_submit | `validate_arrear_details`, `create_additional_salary`, `create_benefit_ledger_entry` | Inserts + submits `Additional Salary` docs; inserts `Employee Benefit Ledger` docs |
 | on_cancel | `delete_employee_benefit_ledger_entry("reference_document", self.name)` | Bulk-deletes `Employee Benefit Ledger` rows referencing this Arrear (Additional Salary docs NOT reversed) |
 
@@ -129,7 +129,7 @@ Calls `delete_employee_benefit_ledger_entry("reference_document", self.name)` �
 
 None (`@frappe.whitelist()` not used in `arrear.py`).
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -138,9 +138,20 @@ None (`@frappe.whitelist()` not used in `arrear.py`).
 
 Only two roles have any access at all — no `HR User` or `Employee` rows exist in the permissions array for this doctype.
 
-## Scheduled Jobs Touching This Doctype
+## Scheduled Jobs Touching This Doctype ([[Background Jobs (Scheduler Events)]])
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee whose retroactive pay difference is being computed.
+- [[Salary Structure]] — the new structure the arrear diffs against; [[Salary Structure Assignment]] is looked up to confirm the employee was actually assigned it from the arrear start date.
+- [[Payroll Period]] — bounds the valid `arrear_start_date` range.
+- [[Salary Slip]] — the already-processed slips whose components form the "existing" baseline being diffed against the new-structure preview.
+- [[Salary Component]] — components are only eligible for arrear tracking when flagged `arrear_component` on this doctype.
+- [[Payroll Correction]] / [[Payroll Correction Child]] — prior LWP-reversal corrections are folded into the existing baseline; the three arrear child tables reuse Payroll Correction Child as their row shape.
+- [[Additional Salary]] — created and submitted on `on_submit` for every earning/deduction difference row.
+- [[Employee Benefit Ledger]] — accrual entries are created on `on_submit` for `accrual_arrears` rows and bulk-deleted on `on_cancel`.
 
 ## Port Notes
 

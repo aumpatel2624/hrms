@@ -1,7 +1,7 @@
 # Leave Application
 
 **Source:** `hrms/hr/doctype/leave_application/leave_application.json`, `leave_application.py`, `leave_application.js`
-**Submittable:** yes   **Tree:** no   **Naming:** naming_series `HR-LAP-.YYYY.-` (year-scoped auto-increment)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** naming_series `HR-LAP-.YYYY.-` (year-scoped auto-increment)
 **Module:** HR
 
 This is the most complex doctype in the Leaves module: it drives leave balance consumption, attendance marking, block-date enforcement, cross-allocation splitting, and ledger accounting. Its controller mixes in `PWANotificationsMixin` in addition to `Document`.
@@ -13,9 +13,9 @@ Full field table, in JSON `field_order`:
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | naming_series | Series | Select | `HR-LAP-.YYYY.-` | yes | - | no | `set_only_once: 1`, `print_hide: 1` |
-| employee | Employee | Link | Employee | yes | - | no | `in_global_search`, `in_standard_filter`, `search_index` |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | yes | - | no | `in_global_search`, `in_standard_filter`, `search_index` |
 | employee_name | Employee Name | Data | - | no | - | yes | fetch_from `employee.employee_name`, `in_global_search` |
-| leave_type | Leave Type | Link | Leave Type | yes | - | no | `in_standard_filter`, `search_index`, `ignore_user_permissions: 1` |
+| leave_type | Leave Type | Link | [[Leave Type]] | yes | - | no | `in_standard_filter`, `search_index`, `ignore_user_permissions: 1` |
 | department | Department | Link | Department | no | - | yes | fetch_from `employee.department` |
 | leave_balance | Leave Balance Before Application | Float | - | no | - | yes | `no_copy: 1`; set client-side via `get_leave_balance_on` call, used only for comparison in warning messages |
 | from_date | From Date | Date | - | yes | - | no | `in_list_view`, `search_index` |
@@ -30,10 +30,10 @@ Full field table, in JSON `field_order`:
 | posting_date | Posting Date | Date | - | yes | Today | no | `no_copy: 1` |
 | status | Status | Select | "Open\nApproved\nRejected\nCancelled" | yes | "Open" | no | `no_copy: 1`, `in_standard_filter`, `permlevel: 1` (only writable by roles with permlevel-1 write access) |
 | company | Company | Link | Company | yes | - | yes | fetch_from `employee.company`, `remember_last_selected_value: 1` |
-| salary_slip | Salary Slip | Link | Salary Slip | no | - | no | `print_hide: 1` |
+| salary_slip | Salary Slip | Link | [[Salary Slip]] | no | - | no | `print_hide: 1` |
 | letter_head | Letter Head | Link | Letter Head | no | - | no | `allow_on_submit: 1`, `ignore_user_permissions: 1`, `print_hide: 1` |
 | color | Color | Color | - | no | - | no | `allow_on_submit: 1`, `print_hide: 1` |
-| amended_from | Amended From | Link | Leave Application | no | - | yes | `no_copy: 1`, `print_hide: 1`, `ignore_user_permissions: 1` |
+| amended_from | Amended From | Link | [[Leave Application]] | no | - | yes | `no_copy: 1`, `print_hide: 1`, `ignore_user_permissions: 1` |
 | sb_other_details | Other Details | Section Break | - | - | - | - | collapsible section heading, groups salary_slip/color/letter_head/amended_from |
 
 Layout-only fields omitted from the table per instructions: `column_break_4`, `section_break_5` ("Dates & Reason" heading — groups from_date/to_date/half_day/half_day_date/total_leave_days/description/leave_balance), `column_break1`, `section_break_7` ("Approval" heading — groups leave_approver/leave_approver_name/follow_via_email/posting_date/status), `column_break_18`, `column_break_17`.
@@ -533,7 +533,7 @@ IF self.docstatus == 2:
     FOR each: force-set docstatus = 2 directly via db.set_value (bypasses normal cancel workflow/hooks)
 ```
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -577,11 +577,22 @@ Non-whitelisted module-level helper functions referenced throughout this spec (n
 | Leave Approver (permlevel 1) | 1 | 1 | - | - | - | - | - | 1 | - | separate row: `permlevel:1` for `status` field write access |
 | All (permlevel 1) | 1 | - | - | - | - | - | - | - | - | read-only at permlevel 1 for every role implicitly granted "All" |
 
-Port Notes: Frappe's `permlevel` mechanism restricts write access to specific fields (here, `status`, which is the only field with `"permlevel": 1` in the JSON) separately from row-level create/read/write. A relational/RBAC port needs an equivalent "field-level write permission" concept if it wants to reproduce this exactly (e.g. Employee role can create/edit the application body but cannot directly flip `status` to Approved/Rejected — that requires Leave Approver/HR User/HR Manager permlevel-1 write grant). Employee role notably has NO submit/cancel rights at all — an employee cannot self-submit their own leave application; that must be done by an approver/HR role.
+Port Notes: Frappe's [[Permission Model (RBAC)|`permlevel`]] mechanism restricts write access to specific fields (here, `status`, which is the only field with `"permlevel": 1` in the JSON) separately from row-level create/read/write. A relational/RBAC port needs an equivalent "field-level write permission" concept if it wants to reproduce this exactly (e.g. Employee role can create/edit the application body but cannot directly flip `status` to Approved/Rejected — that requires Leave Approver/HR User/HR Manager permlevel-1 write grant). Employee role notably has NO submit/cancel rights at all — an employee cannot self-submit their own leave application; that must be done by an approver/HR role.
 
 ## Scheduled Jobs Touching This Doctype
 
 None registered directly against `Leave Application` in `hrms/hooks.py` scheduler_events. (It is, however, read by `hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation` indirectly through the shared Leave Ledger Entry table, and by `hrms.hr.utils.generate_leave_encashment` / `allocate_earned_leaves` indirectly through leave balance calculations — see `Leave Ledger Entry.md` and `Leave Encashment.md`.)
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee filing the request; `employee` Link field, also read for active-status/joining-date validation.
+- [[Leave Type]] — `leave_type` Link field; nearly every validation defers to this type's configuration (LWP, optional leave, carry-forward, max consecutive days, etc.).
+- [[Leave Allocation]] — read to check balance and determine which allocation(s) the application's dates fall under; can span at most one allocation unless `allow_negative` is set.
+- [[Leave Ledger Entry]] — created (negative leave entries) on submit; reversed/deleted on cancel.
+- [[Salary Slip]] — `salary_slip` Link field, set once processed into payroll; also blocks LWP applications overlapping an already-processed payroll period.
+- [[Leave Block List]] — checked via `get_applicable_block_dates()`; approving on a block date is disallowed unless the approving user is on the list's allow-list.
+- [[Leave Period]] — used when the leave type is Optional Leave, to find the period's `optional_holiday_list`.
+- [[Leave Application]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 

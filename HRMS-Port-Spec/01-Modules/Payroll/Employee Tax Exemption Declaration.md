@@ -8,15 +8,15 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | `Employee` | yes | — | no | `in_list_view`. Client-side query restricts picker to `status: "Active"` (client-only convenience filter — see Port Notes on server-side equivalent). |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | `in_list_view`. Client-side query restricts picker to `status: "Active"` (client-only convenience filter — see Port Notes on server-side equivalent). |
 | employee_name | Employee Name | Data | — | no | — | yes | `fetch_from: employee.employee_name`. |
 | department | Department | Link | `Department` | no | — | yes | `fetch_from: employee.department`. |
 | *(column_break_2)* | — | Column Break | — | — | — | — | layout only |
-| payroll_period | Payroll Period | Link | `Payroll Period` | yes | — | no | `in_list_view`. Client-side query filters to the employee's `company`'s periods once `employee`+`company` are set. |
+| payroll_period | Payroll Period | Link | [[Payroll Period]] | yes | — | no | `in_list_view`. Client-side query filters to the employee's `company`'s periods once `employee`+`company` are set. |
 | company | Company | Link | `Company` | no | — | no | `fetch_from: employee.company`. |
-| amended_from | Amended From | Link | `Employee Tax Exemption Declaration` | no | — | yes | Standard amend-chain pointer. `no_copy`, `print_hide`. |
+| amended_from | Amended From | Link | [[Employee Tax Exemption Declaration]] | no | — | yes | Standard amend-chain pointer. `no_copy`, `print_hide`. |
 | *(section_break_8, "Tax Exemption Declaration")* | — | Tab Break | — | — | — | — | tab heading grouping `declarations` |
-| declarations | Declarations | Table | `Employee Tax Exemption Declaration Category` | no | — | no | The per-sub-category declared amounts — see `Employee Tax Exemption Declaration Category.md`. Not marked `reqd` at the field level (though `validate_tax_declaration`/aggregation logic tolerates an empty table, producing zero totals). |
+| declarations | Declarations | Table | [[Employee Tax Exemption Declaration Category]] | no | — | no | The per-sub-category declared amounts — see `Employee Tax Exemption Declaration Category.md`. Not marked `reqd` at the field level (though `validate_tax_declaration`/aggregation logic tolerates an empty table, producing zero totals). |
 | *(section_break_10)* | — | Section Break | — | — | — | — | layout only |
 | total_declared_amount | Total Declared Amount | Currency | `options: "currency"` (dynamic currency field, tied to the `currency` field) | no | — | yes | Computed server-side — sum of all `declarations` row `amount`s, unclamped by any cap (see Business Logic). |
 | *(column_break_12)* | — | Column Break | — | — | — | — | layout only |
@@ -40,7 +40,7 @@ stateDiagram-v2
 Plain list:
 - (none) -> submit -> Submitted — guard: all `validate()` checks below must pass (they run on every save, including the save-then-submit transaction); `employee`, `payroll_period`, `currency` must be set (`reqd: 1`).
 - Submitted -> cancel -> Cancelled — no doctype-specific cancel guard found beyond standard Frappe cancel permission.
-- Cancelled -> amend -> new Draft — standard Frappe amend; `amended_from` set on the new document.
+- Cancelled -> amend -> new Draft — [[Submittable Document Lifecycle|standard Frappe amend]]; `amended_from` set on the new document.
 
 No separate `status`/`workflow_state` field — only standard `docstatus`.
 
@@ -137,10 +137,19 @@ IF self.get("monthly_house_rent"):  # truthy check on a field NOT present in thi
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee this declaration is filed for; also drives `employee_name`, `department`, and `company` via `fetch_from`.
+- [[Payroll Period]] — the period this declaration applies to; at most one non-cancelled declaration may exist per (employee, payroll_period) pair.
+- [[Employee Tax Exemption Declaration Category]] — child table (`declarations`) holding the per-sub-category declared amounts this document aggregates.
+- [[Employee Tax Exemption Category]] — read (via sub-category rows) for per-category `max_amount` caps during `get_total_exemption_amount()`.
+- [[Employee Tax Exemption Proof Submission]] — created from this document via the whitelisted `make_proof_submission` mapper once submitted; later supersedes this document's `total_exemption_amount` for the final sub-period of the payroll period.
+- [[Employee Tax Exemption Declaration]] — self-referenced by `amended_from` on the amend chain.
+
 ## Port Notes
 
-- **`if_owner` is not set on the `Employee` role's permission row**, despite this being an employee self-service doctype (an employee declares their own tax exemptions). In stock Frappe HRMS, restricting an employee to only their own declarations is typically enforced elsewhere (e.g. a `permission_query_conditions` hook in `hooks.py`, or an HD/portal-layer restriction) rather than in the doctype's own `permissions` array — this repo's `hooks.py` was not found to register such a hook for this doctype in the search performed. Flag explicitly: a straightforward JSON-permissions-only port would give every `Employee`-role user full CRUD+submit+cancel+amend rights over every OTHER employee's tax declarations, which is almost certainly not the intended production behavior; the port should add an explicit ownership-scoping rule (e.g. "Employee role can only access records where `employee` maps to their own linked Employee record") even though it is not visible as an explicit rule inside this doctype's own files.
-- **Naming series behavior** (`HR-TAX-DEC-.YYYY.-.#####`) is a Frappe framework feature with no batteries-included equivalent in most other stacks: it auto-generates the primary key at insert time as `HR-TAX-DEC-<4-digit-year-of-creation>-<5-digit-zero-padded-sequence>`, where the sequence counter is scoped per literal prefix pattern (i.e., resets/starts fresh whenever the year segment changes) and is transactionally safe against concurrent inserts. A port must implement this as an explicit sequence-generation service/table (e.g., a `naming_series_counters` table keyed by `"HR-TAX-DEC-2026"` with a last-used integer, incremented atomically), not simply an autoincrement PK, since the visible `name` format must match.
+- **`if_owner` is not set on the `Employee` role's permission row** (see [[Permission Model (RBAC)]]), despite this being an employee self-service doctype (an employee declares their own tax exemptions). In stock Frappe HRMS, restricting an employee to only their own declarations is typically enforced elsewhere (e.g. a `permission_query_conditions` hook in `hooks.py`, or an HD/portal-layer restriction) rather than in the doctype's own `permissions` array — this repo's `hooks.py` was not found to register such a hook for this doctype in the search performed. Flag explicitly: a straightforward JSON-permissions-only port would give every `Employee`-role user full CRUD+submit+cancel+amend rights over every OTHER employee's tax declarations, which is almost certainly not the intended production behavior; the port should add an explicit ownership-scoping rule (e.g. "Employee role can only access records where `employee` maps to their own linked Employee record") even though it is not visible as an explicit rule inside this doctype's own files.
+- **[[Naming and Autoname Rules|Naming series behavior]]** (`HR-TAX-DEC-.YYYY.-.#####`) is a Frappe framework feature with no batteries-included equivalent in most other stacks: it auto-generates the primary key at insert time as `HR-TAX-DEC-<4-digit-year-of-creation>-<5-digit-zero-padded-sequence>`, where the sequence counter is scoped per literal prefix pattern (i.e., resets/starts fresh whenever the year segment changes) and is transactionally safe against concurrent inserts. A port must implement this as an explicit sequence-generation service/table (e.g., a `naming_series_counters` table keyed by `"HR-TAX-DEC-2026"` with a last-used integer, incremented atomically), not simply an autoincrement PK, since the visible `name` format must match.
 - The client-side `employee` picker filter (`status: "Active"`) is UI-only — there is NO server-side equivalent check that `employee` must be Active on this doctype (the only Active/Inactive check present is `validate_active_employee`, which throws only for `Inactive`, catching the same case from a different angle, but note it does not check any OTHER non-Active status values if the Employee doctype has more than the two-state Active/Inactive model — confirm against `Employee`'s actual status options, owned by another module).
 - `total_declared_amount` and `total_exemption_amount` are both `read_only: 1` fields recomputed on every `validate()` — a port must ensure these are always server-computed on write and never accepted as client input (Frappe enforces `read_only` fields cannot be set via the standard save API from a non-privileged client, but a port's API layer must replicate this refusal explicitly).
 - The HRA-exemption code path (`calculate_hra_exemption`) and the `field_no_map` entries referencing `monthly_house_rent`/`monthly_hra_exemption` in `make_proof_submission` are retained despite those fields not existing in the current schema — this is very likely legacy/regional-extension scaffolding. Do not port `monthly_house_rent`, `salary_structure_hra`, `annual_hra_exemption`, or `monthly_hra_exemption` as real schema fields unless the target system separately decides to implement India-specific HRA exemption; document their absence as an explicit, deliberate scope exclusion rather than silently dropping them without comment.

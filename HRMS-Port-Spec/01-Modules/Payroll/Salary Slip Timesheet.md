@@ -69,6 +69,10 @@ None on this child doctype. (Relevant parent whitelisted methods — `get_emp_an
 
 None found.
 
+## Related Doctypes
+
+- [[Salary Slip]] — sole parent doctype (`timesheets` field); populates this table via `set_time_sheet()` and reads it to compute timesheet-based wages and to sync linked Timesheet status on submit/cancel.
+
 ## Port Notes
 
 - The Frappe `fetch_from` mechanism on `working_hours` (auto-copies `Timesheet.total_hours` into the child row whenever `time_sheet` is set/changed, purely client-side unless the row is saved) has no automatic equivalent in most other stacks — a port must explicitly copy `total_hours` from the referenced Timesheet at the moment the row is created/updated, both server- and client-side, and decide whether to keep it in sync if the Timesheet's hours change later (Frappe's `fetch_from` does NOT auto-resync existing rows on the source document's later edits either — it only fires on the link field's own change event).

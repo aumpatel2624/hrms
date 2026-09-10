@@ -28,6 +28,12 @@ Also referenced by `Salary Slip.salary_withholding_cycle` (a Data field on Salar
 
 None defined (`"permissions": []`) — inherited from parent (`Salary Withholding`).
 
+## Related Doctypes
+
+- [[Salary Withholding]] — sole parent doctype (`cycles` field); generates all rows via `set_withholding_cycles_and_to_date()`.
+- [[Salary Slip]] — its `salary_withholding_cycle` Data field stores a specific row's name; status flips between Withheld/Submitted based on this cycle's release state.
+- [[Payroll Employee Detail]] — `is_salary_released` release events also toggle `is_salary_withheld` on the matching Payroll Entry employee row.
+
 ## Port Notes
 
 - `Salary Slip.salary_withholding_cycle` (owned by another module) stores this row's NAME (a child-table row identifier) as a plain string/Data reference rather than a Link — in Frappe, child-table row names are typically system-generated hashes; a port must ensure cycle rows have a stable, referenceable identifier even though they're modeled as child/owned rows, since another top-level doctype (Salary Slip) holds a dangling reference to a specific cycle row by that identifier. This is effectively a child-row acting as a pseudo-independent entity referenced across doctypes — worth flagging as an RDBMS design consideration (the `salary_withholding_cycle` table needs a stable primary key referenceable from `salary_slip.salary_withholding_cycle_id`, not just an ordinal position within its parent).

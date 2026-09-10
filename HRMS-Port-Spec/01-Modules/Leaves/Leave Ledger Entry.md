@@ -1,7 +1,7 @@
 # Leave Ledger Entry
 
 **Source:** `hrms/hr/doctype/leave_ledger_entry/leave_ledger_entry.json`, `leave_ledger_entry.py`, `leave_ledger_entry.js`, `leave_ledger_entry_list.js`
-**Submittable:** yes   **Tree:** no   **Naming:** Default (hash-based auto-generated `name`, no `autoname` key present in JSON — Frappe falls back to the default `hash` naming rule since `naming_rule` is not set in this JSON, unlike other doctypes in the module)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** Default (hash-based auto-generated `name`, no `autoname` key present in JSON — Frappe falls back to the default `hash` naming rule since `naming_rule` is not set in this JSON, unlike other doctypes in the module)
 **Module:** HR
 
 ## Purpose
@@ -14,9 +14,9 @@ Full field table, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | no (no `reqd` flag) | - | no | `in_list_view`, `in_standard_filter`, `search_index` |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | no (no `reqd` flag) | - | no | `in_list_view`, `in_standard_filter`, `search_index` |
 | employee_name | Employee Name | Data | - | no | - | no | fetch_from `employee.employee_name` |
-| leave_type | Leave Type | Link | Leave Type | no | - | no | `in_list_view`, `in_standard_filter`, `search_index` |
+| leave_type | Leave Type | Link | [[Leave Type]] | no | - | no | `in_list_view`, `in_standard_filter`, `search_index` |
 | transaction_type | Transaction Type | Link | DocType | no | - | no | `in_standard_filter`, `search_index`. Values used in practice: "Leave Allocation", "Leave Application", "Leave Encashment", "Leave Adjustment" |
 | transaction_name | Transaction Name | Dynamic Link | dynamic on `transaction_type` | no | - | no | `search_index`; points to the source document (e.g. the Leave Application name) |
 | company | Company | Link | Company | yes | - | yes | fetch_from `employee.company` |
@@ -27,7 +27,7 @@ Full field table, in JSON `field_order`:
 | is_carry_forward | Is Carry Forward | Check | - | no | 0 | no | |
 | is_expired | Is Expired | Check | - | no | 0 | no | marks an entry created to expire a previous allocation |
 | is_lwp | Is Leave Without Pay | Check | - | no | 0 | no | |
-| amended_from | Amended From | Link | Leave Ledger Entry | no | - | yes | standard amendment field |
+| amended_from | Amended From | Link | [[Leave Ledger Entry]] | no | - | yes | standard amendment field |
 
 ## Child Tables
 
@@ -107,7 +107,7 @@ For each allocation row: IF `allocation.is_carry_forward` THEN call `expire_carr
 ### `get_remaining_leaves(allocation)`
 Returns `SUM(leaves)` from Leave Ledger Entry where `employee`, `leave_type` match, `to_date <= allocation.to_date`, `docstatus=1`.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -140,13 +140,23 @@ Raw JSON permission rows (verbatim booleans, for exactness):
 
 Port Notes: no role in the source JSON has `amend: 1`, and only HR Manager has explicit `cancel: 1` — despite that, `Document.cancel()` for System Manager/HR User/All roles is governed by Frappe's implicit rule that any role able to `submit` a doctype can also `cancel` unless the framework version enforces the JSON flag strictly; a from-scratch port MUST decide explicitly whether cancel requires a separate permission bit (safer: require it explicitly, matching HR Manager only, and grant System Manager admin override).
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 | Frequency | Function | What it does |
 |---|---|---|
 | daily_long | `hrms.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation` | Finds Leave Allocation ledger rows whose `to_date` is in the past with no existing expiry sibling, and creates expiry ledger entries (see Business Logic above) |
 
 (`hrms.hr.utils.generate_leave_encashment` and `hrms.hr.utils.allocate_earned_leaves` also run `daily_long` and interact with allocations/encashments that write to this ledger, but they are not defined in this doctype's own files — see `Leave Encashment.md` for `generate_leave_encashment`.)
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee this ledger row's balance movement belongs to; `employee` Link field.
+- [[Leave Type]] — `leave_type` Link field.
+- [[Leave Allocation]] — primary source/target of allocation, carry-forward, and expiry entries; `transaction_type`/`transaction_name` Dynamic Link when the source is an allocation, and this doctype writes back `Leave Allocation.expired`.
+- [[Leave Application]] — a common source doctype for consumption (debit) entries; also supplies `get_leaves_for_period` used by the expiry algorithms.
+- [[Leave Encashment]] — a source doctype for encashment (debit) entries.
+- [[Leave Adjustment]] — a source doctype for signed adjustment entries.
+- [[Leave Ledger Entry]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 

@@ -1,7 +1,7 @@
 # Leave Encashment
 
 **Source:** `hrms/hr/doctype/leave_encashment/leave_encashment.json`, `leave_encashment.py`, `leave_encashment.js`
-**Submittable:** yes   **Tree:** no   **Naming:** Expression (old style), pattern `HR-ENC-.YYYY.-.#####` (year-scoped, 5-digit auto-increment; `allow_rename: 1`)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** Expression (old style), pattern `HR-ENC-.YYYY.-.#####` (year-scoped, 5-digit auto-increment; `allow_rename: 1`)
 **Module:** HR
 
 Controller base class: `AccountsController` (from `erpnext.controllers.accounts_controller`) — NOT plain `Document`. This gives it accounting-dimension handling, GL-entry helpers (`get_gl_dict`), and advance-payment-ledger integration for free.
@@ -12,13 +12,13 @@ Full field table, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | - | no | `in_list_view` |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | yes | - | no | `in_list_view` |
 | employee_name | Employee Name | Data | - | no | - | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | no | - | yes | fetch_from `employee.department` |
 | company | Company | Link | Company | yes | - | no | fetch_from `employee.company` |
-| leave_period | Leave Period | Link | Leave Period | yes | - | no | `in_list_view` |
-| leave_type | Leave Type | Link | Leave Type | yes | - | no | `in_list_view` |
-| leave_allocation | Leave Allocation | Link | Leave Allocation | no | - | yes | set on submit if not already set |
+| leave_period | Leave Period | Link | [[Leave Period]] | yes | - | no | `in_list_view` |
+| leave_type | Leave Type | Link | [[Leave Type]] | yes | - | no | `in_list_view` |
+| leave_allocation | Leave Allocation | Link | [[Leave Allocation]] | no | - | yes | set on submit if not already set |
 | leave_balance | Leave Balance | Float | - | no | - | yes | computed in `set_leave_balance` |
 | actual_encashable_days | Actual Encashable Days | Float | - | no | - | yes | "Number of leaves eligible for encashment based on leave type settings" |
 | encashment_days | Encashment Days | Float | - | no | - | no | `non_negative: 1`; user-overridable but capped by `actual_encashable_days` |
@@ -34,8 +34,8 @@ Full field table, in JSON `field_order`:
 | cost_center | Cost Center | Link | Cost Center | mandatory_depends_on `pay_via_payment_entry` | - | no | |
 | payroll | Payroll | Section Break | - | - | - | - | depends_on `eval:doc.pay_via_payment_entry==0;` |
 | encashment_date | Encashment Date | Date | - | no | Today | no | |
-| additional_salary | Additional Salary | Link | Additional Salary | no | - | yes | set when paid via Salary Slip route |
-| amended_from | Amended From | Link | Leave Encashment | no | - | yes | standard amendment field |
+| additional_salary | Additional Salary | Link | [[Additional Salary]] | no | - | yes | set when paid via Salary Slip route |
+| amended_from | Amended From | Link | [[Leave Encashment]] | no | - | yes | standard amendment field |
 | status | Status | Select | "Draft\nUnpaid\nPaid\nSubmitted\nCancelled" | no | - | yes | computed in `set_status`; NOTE: "Submitted" is a listed option but is never actually assigned by `set_status` (see Port Notes) |
 
 `track_changes: 1` is set on this doctype (unlike Leave Ledger Entry) — full field-level audit history is recorded automatically by the framework.
@@ -161,7 +161,7 @@ For each `allocation` in the input list:
 4. `can_expire = not Leave Type.is_carry_forward` (i.e. reverse-entry logic only applies if the leave type is NOT itself a carry-forward type).
 5. IF `to_date < getdate()` AND `can_expire`: create a second, offsetting ledger entry with `args = {leaves: encashment_days (positive, i.e. reversing the debit), from_date: to_date, to_date: to_date, is_carry_forward: 0}` — this restores the encashed days back into the (already-expired) allocation's ledger balance for backdated/expired-allocation encashments, mirroring the equivalent logic in `Leave Application.on_submit`.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -188,11 +188,23 @@ Other functions used by this doctype (`create_additional_salary`, `create_gl_ent
 | HR User | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | share=1, email=1, print=1 |
 | Employee | 1 | 1 | 1 | 1 | - | - | - | 1 | 1 | share=1, email=1, print=1; no submit/cancel/amend granted |
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 | Frequency | Function | What it does |
 |---|---|---|
 | daily_long | `hrms.hr.utils.generate_leave_encashment` | IF `HR Settings.auto_leave_encashment` is enabled: finds all `Leave Type` names with `allow_encashment=1`; finds all `Leave Allocation` rows whose `to_date == yesterday` (`add_days(getdate(), -1)`) and `leave_type in <that list>`; calls `create_leave_encashment(leave_allocation=<those rows>)` (see Business Logic above — this creates one Draft Leave Encashment per matching allocation, skipping employees with no assigned Salary Structure on that date) |
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee being paid out; `employee` Link field.
+- [[Leave Period]] — `leave_period` Link field.
+- [[Leave Type]] — `leave_type` Link field; governs encashment eligibility, thresholds, and earning component.
+- [[Leave Allocation]] — `leave_allocation` Link field; read for balance, and its `total_leaves_encashed` is incremented/decremented on submit/cancel.
+- [[Additional Salary]] — `additional_salary` Link field; created+submitted when NOT `pay_via_payment_entry`, cancelled on this doc's cancel.
+- [[Leave Ledger Entry]] — created on submit (debit + possible reversing entry for expired allocations), deleted on cancel.
+- [[Salary Structure Assignment]] — read for the per-day encashment rate (`leave_encashment_amount_per_day`) and to resolve the assigned salary structure.
+- [[Salary Structure]] — fallback source for `leave_encashment_amount_per_day` when not set on the assignment.
+- [[Leave Encashment]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 

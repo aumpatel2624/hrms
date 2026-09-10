@@ -1,22 +1,22 @@
 # Employee Benefit Application
 
 **Source:** `hrms/payroll/doctype/employee_benefit_application/employee_benefit_application.json`, `employee_benefit_application.py`, `employee_benefit_application.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `HR-BEN-APP-.YY.-.MM.-.#####` (expression-based autoname, resets yearly/monthly)
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `HR-BEN-APP-.YY.-.MM.-.#####` (expression-based autoname, resets yearly/monthly) ([[Naming and Autoname Rules]])
 **Module:** Payroll
 
 ## Schema
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | | no | |
+| employee | Employee | Link | [[Employee Core Model]] | yes | | no | |
 | employee_name | Employee Name | Data | | no | | yes | fetch_from `employee.employee_name` |
 | max_benefits | Max Benefits (Yearly) | Currency | options: `currency` (uses `currency` field for precision) | no | | yes | set programmatically from Salary Structure Assignment via `set_benefit_components_and_currency` |
 | remaining_benefit | Remaining Benefits (Yearly) | Currency | options: `currency` | no | | yes | client-side only: computed in JS as `max_benefits - total_amount`; not persisted server-side |
 | date | Date | Date | | yes | Today | no | drives salary structure assignment lookup |
-| payroll_period | Payroll Period | Link | Payroll Period | yes | | no | |
+| payroll_period | Payroll Period | Link | [[Payroll Period]] | yes | | no | |
 | department | Department | Link | Department | no | | yes | fetch_from `employee.department` |
-| amended_from | Amended From | Link | Employee Benefit Application | no | | yes | standard amendment field |
-| employee_benefits | Flexible Benefits (section: Benefits) | Table | Employee Benefit Application Detail | yes | | no | see Child Tables |
+| amended_from | Amended From | Link | [[Employee Benefit Application]] | no | | yes | standard amendment field |
+| employee_benefits | Flexible Benefits (section: Benefits) | Table | [[Employee Benefit Application Detail]] | yes | | no | see Child Tables |
 | total_amount | Total Amount (section: Totals) | Currency | options: `currency` | no | | yes | client-side sum of `employee_benefits.amount`; NOT recomputed server-side in `validate()` (see Port Notes) |
 | currency | Currency | Link | Currency | yes | | yes | `depends_on: eval:(doc.docstatus==1 || doc.employee)`; set programmatically |
 | company | Company | Link | Company | yes | | no | fetch_from `employee.company` |
@@ -25,12 +25,12 @@ Layout-only fields skipped: column_break_2, column_break_11, column_break_13, co
 
 ## Child Tables
 
-### Employee Benefit Application Detail (`employee_benefits`)
+### [[Employee Benefit Application Detail]] (`employee_benefits`)
 See `Employee Benefit Application Detail.md`. istable=1, no own permissions, track_changes=1.
 
 | Field | Label | Type | Options | Required | Read-Only | Notes |
 |---|---|---|---|---|---|---|
-| salary_component | Earning Component | Link | Salary Component | yes | yes | |
+| salary_component | Earning Component | Link | [[Salary Component]] | yes | yes | |
 | max_benefit_amount | Max Benefit Amount | Currency | options: currency | yes | yes | copied from Salary Structure Assignment's `Employee Benefit Detail.amount` |
 | amount | Amount | Currency | options: currency | yes | no | `non_negative: 1`; user-entered claim allocation, capped by `max_benefit_amount` |
 
@@ -87,13 +87,13 @@ This is a pro-rata *ceiling* setup, not a pro-rata amount computation — the ma
 3. Set `doc.remaining_benefit = doc.max_benefits - total_amount`.
 A server-side equivalent must be implemented in the port since `remaining_benefit`/`total_amount` are not recalculated by Python `validate()`.
 
-## Lifecycle Hooks (exact)
+## Lifecycle Hooks (exact) ([[Cross-Doctype Hooks (doc_events)]])
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
 | validate | `validate_active_employee`, `validate_duplicate_on_payroll_period`, `validate_max_benefit` (or throw if no benefits) | none |
 
-No `on_submit`, `on_cancel`, `before_insert`, or other lifecycle methods are defined on this controller. Submission has no side effect on other doctypes (unlike Employee Benefit Claim, which creates an Additional Salary on submit) — this application only records intent/allocation; the actual accrual/payout ledger entries are created later during Salary Slip processing (see `Employee Benefit Ledger` and `Salary Slip` — owned by another agent — for how `Employee Benefit Application` rows feed into benefit payout during payroll run via `get_benefits_details_parent`).
+No `on_submit`, `on_cancel`, `before_insert`, or other lifecycle methods are defined on this controller. Submission has no side effect on other doctypes (unlike [[Employee Benefit Claim]], which creates an Additional Salary on submit) — this application only records intent/allocation; the actual accrual/payout ledger entries are created later during Salary Slip processing (see [[Employee Benefit Ledger]] and [[Salary Slip]] — owned by another agent — for how `Employee Benefit Application` rows feed into benefit payout during payroll run via `get_benefits_details_parent`).
 
 ## Whitelisted / API Methods
 
@@ -101,7 +101,7 @@ No `on_submit`, `on_cancel`, `before_insert`, or other lifecycle methods are def
 |---|---|---|---|---|
 | `set_benefit_components_and_currency` | POST (form doc method call) | none (uses `self.employee`, `self.date`) | None (mutates doc in place) | Populates `employee_benefits` child rows from the employee's active Salary Structure Assignment's `Employee Benefit Detail` rows, and sets `max_benefits`/`currency`. Throws if no assignment found. |
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -110,9 +110,20 @@ No `on_submit`, `on_cancel`, `before_insert`, or other lifecycle methods are def
 | HR User | yes | yes | yes | yes | yes | yes | yes | yes | yes | share/email/print also 1 |
 | Employee | yes | yes | yes | yes | no | no | no | yes | yes | no submit/cancel/amend rights; share/email/print also 1 |
 
-## Scheduled Jobs Touching This Doctype
+## Scheduled Jobs Touching This Doctype ([[Background Jobs (Scheduler Events)]])
 
 None found in `hrms/hooks.py` referencing this doctype directly.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee applying for flexible benefit allocation.
+- [[Payroll Period]] — the period this application is unique against (one application per employee per period).
+- [[Employee Benefit Application Detail]] — the child table (`employee_benefits`) holding one row per claimable salary component and its allocated amount.
+- [[Salary Component]] — the flexible-benefit component each detail row is allocated against.
+- [[Salary Structure Assignment]] — read via `set_benefit_components_and_currency()`/`get_salary_structure_assignment()` to source the [[Employee Benefit Detail]] rows that seed this application's max-benefit ceilings.
+- [[Employee Benefit Claim]] — the doctype that later consumes this application's allocations when computing how much of a benefit is still claimable.
+- [[Employee Benefit Ledger]] — accrual/payout entries that, together with this application, determine remaining claimable benefit during payroll processing.
+- [[Salary Slip]] — reads this application's rows during payroll run via `get_benefits_details_parent` to resolve benefit payout.
 
 ## Port Notes
 

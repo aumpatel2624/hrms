@@ -1,7 +1,7 @@
 # Leave Period
 
 **Source:** `hrms/hr/doctype/leave_period/leave_period.json`, `leave_period.py`, `leave_period.js`
-**Submittable:** no   **Tree:** no   **Naming:** `HR-LPR-.YYYY.-.#####` (naming series: prefix `HR-LPR-`, current 4-digit year, then a 5-digit auto-incrementing counter reset per series key, e.g. `HR-LPR-2026-00001`)
+**Submittable:** no   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `HR-LPR-.YYYY.-.#####` (naming series: prefix `HR-LPR-`, current 4-digit year, then a 5-digit auto-incrementing counter reset per series key, e.g. `HR-LPR-2026-00001`)
 **Module:** HR
 
 ## Schema
@@ -42,7 +42,7 @@ Not submittable — no docstatus workflow. No custom `status`/`workflow_state` f
 
 None — this doctype stores a date range plus scoping fields; no numeric computation.
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -67,6 +67,14 @@ None defined on this controller or a dedicated module file for Leave Period.
 ## Scheduled Jobs Touching This Doctype
 
 None found referencing `Leave Period` in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Leave Policy Assignment]] — `leave_period` Link field on that doctype; client-side link-query restricts selection to `is_active: 1` and matching `company`.
+- [[Leave Application]] — used when the leave type is Optional Leave, to find the period's `optional_holiday_list`.
+- [[Leave Allocation]] — `leave_period` Link field; scopes an allocation to this date range.
+- [[Leave Encashment]] — `leave_period` Link field.
+- [[Leave Control Panel]] — `leave_period` Link field, one of its date-resolution modes.
 
 ## Port Notes
 

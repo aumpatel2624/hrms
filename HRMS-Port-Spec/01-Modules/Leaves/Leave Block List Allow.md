@@ -46,6 +46,10 @@ None.
 
 None.
 
+## Related Doctypes
+
+- [[Leave Block List]] — parent doctype; this table is embedded via its `leave_block_list_allowed` Table field.
+
 ## Port Notes
 
 - As a child table, in a relational port this becomes an owned-rows table (e.g. `leave_block_list_allow` with a `leave_block_list_id` FK, `ON DELETE CASCADE` when the parent is deleted) rather than a join table in the strict sense, though functionally it behaves like a many-to-many mapping between `Leave Block List` and `User` (one block list can allow many users; a user can appear on many block lists' allow lists). Model it either as an owned-rows table (matching Frappe's structure exactly) or as a proper `leave_block_list_allowed_users` join table with a unique `(leave_block_list_id, user_id)` constraint — the latter also closes the missing-dedupe gap noted above, which the source code does not enforce.

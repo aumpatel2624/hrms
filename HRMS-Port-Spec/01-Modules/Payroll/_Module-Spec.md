@@ -17,51 +17,57 @@ or to record something that feeds into it.
 
 ## Doctype List
 
+> [!note] Tax & Benefits doctypes live here too
+> The `Income Tax Slab`, `Employee Tax Exemption *`, and `Employee Other Income` rows
+> below are conceptually grouped as "Tax & Benefits" elsewhere in this vault, but their
+> full port specs are written here since they physically ship under `hrms/payroll/doctype/`
+> in source. See `Tax-Benefits/_Module-Spec.md` for that navigational grouping.
+
 | Doctype | Purpose |
 |---|---|
-| `Salary Component` | Master: a single earning/deduction type (name, abbr, type, tax behavior, GL accounts). |
-| `Salary Component Account` | Child of Salary Component: per-company default GL account mapping. |
-| `Salary Detail` | Child row (used by both Salary Structure and Salary Slip): one component's amount/formula/condition for a structure or a slip. |
-| `Salary Structure` | Master: named set of earning/deduction `Salary Detail` rows + CTC/base formula config. |
-| `Salary Structure Assignment` | Links an Employee to a Salary Structure + base/CTC + income tax slab, effective from a date. |
-| `Bulk Salary Structure Assignment` | Non-persistent tool doctype: bulk-creates Salary Structure Assignment records for many employees. |
-| `Salary Slip` | Submittable: one employee's computed pay statement for one payroll period/date range. |
-| `Salary Slip Leave` | Child of Salary Slip: per-leave-type LWP/leave balance snapshot. |
-| `Salary Slip Loan` | Child of Salary Slip: loan repayment lines (populated only if the external "lending" app is installed). |
-| `Salary Slip Timesheet` | Child of Salary Slip: linked Timesheet(s) and hours, for timesheet-based salary. |
-| `Payroll Entry` | Submittable: batch payroll run — selects employees, creates/submits their Salary Slips, posts GL. |
-| `Payroll Employee Detail` | Child of Payroll Entry: one selected employee row. |
-| `Payroll Period` | Master: a fiscal year-like window used for tax annualization and structure assignment scoping. |
-| `Payroll Period Date` | Child of Payroll Period: sub-period date rows (schema exists; no controller code populates it in this repo — see file). |
-| `Payroll Settings` | Single: global payroll configuration switches (email behavior, working-hour thresholds, etc). |
-| `Employee Benefit Application` | Submittable: employee's flexible-benefit allocation request against a benefit-plan structure. |
-| `Employee Benefit Application Detail` | Child of Employee Benefit Application: per-component requested amount. |
-| `Employee Benefit Claim` | Submittable: employee's claim against a benefit allocation. |
-| `Employee Benefit Detail` | Shared child table: per-component max-benefit config referenced by Salary Structure. |
-| `Employee Benefit Ledger` | Ledger record of benefit claims/applications consumed, for running-balance tracking. |
-| `Employee Cost Center` | Child table (used in Salary Structure Assignment): % split of an employee's pay across cost centers. |
-| `Employee Incentive` | Submittable: one-off incentive payout, feeds Salary Slip via Additional Salary-style linkage. |
-| `Employee Other Income` | Submittable: employee-declared other income used in tax computation. |
-| `Employee Tax Exemption Category` | Master: a tax-exemption category with a max claimable amount. |
-| `Employee Tax Exemption Sub Category` | Master: a sub-category under a category (specific exemption instrument). |
-| `Employee Tax Exemption Declaration` | Submittable: employee's declared exemption amounts per sub-category for a payroll period. |
-| `Employee Tax Exemption Declaration Category` | Child of Declaration: one sub-category + declared amount row. |
-| `Employee Tax Exemption Proof Submission` | Submittable: employee's proof-backed (actual) exemption amounts, supersedes declaration late in the period. |
-| `Employee Tax Exemption Proof Submission Detail` | Child of Proof Submission: one sub-category + proven amount row. |
-| `Income Tax Slab` | Master: tax bracket set (`Taxable Salary Slab` rows) + config, assigned via Salary Structure Assignment. |
-| `Income Tax Slab Other Charges` | Child of Income Tax Slab: sequential surcharge/cess-style charges applied on top of slab tax. |
-| `Taxable Salary Slab` | Child of Income Tax Slab: one bracket (from/to amount, percent deduction). |
-| `Gratuity` | Submittable: end-of-service gratuity payout computation and payment record. |
-| `Gratuity Rule` | Master: gratuity calculation method + slab set for a jurisdiction/policy. |
-| `Gratuity Rule Slab` | Child of Gratuity Rule: years-of-service bracket + fraction/percentage. |
-| `Gratuity Applicable Component` | Child of Gratuity Rule: which Salary Component(s) count toward the gratuity base salary. |
-| `Retention Bonus` | Submittable: scheduled retention bonus, paid out via a linked Additional Salary. |
-| `Additional Salary` | Submittable: one-off or recurring extra earning/deduction applied to future Salary Slips. |
-| `Arrear` | Submittable: back-pay adjustment, diffs old vs new structure/assignment and generates Additional Salary rows. |
-| `Payroll Correction` | Submittable: correction tool that recomputes and generates adjusting Additional Salary rows after a slip was already processed. |
-| `Payroll Correction Child` | Child of Payroll Correction: per-component correction breakup row. |
-| `Salary Withholding` | Submittable: withholds an employee's pay for N cycles (e.g. pending investigation) then releases it. |
-| `Salary Withholding Cycle` | Child of Salary Withholding: one withheld cycle's date range + release status. |
+| [[Salary Component]] | Master: a single earning/deduction type (name, abbr, type, tax behavior, GL accounts). |
+| [[Salary Component Account]] | Child of Salary Component: per-company default GL account mapping. |
+| [[Salary Detail]] | Child row (used by both Salary Structure and Salary Slip): one component's amount/formula/condition for a structure or a slip. |
+| [[Salary Structure]] | Master: named set of earning/deduction `Salary Detail` rows + CTC/base formula config. |
+| [[Salary Structure Assignment]] | Links an Employee to a Salary Structure + base/CTC + income tax slab, effective from a date. |
+| [[Bulk Salary Structure Assignment]] | Non-persistent tool doctype: bulk-creates Salary Structure Assignment records for many employees. |
+| [[Salary Slip]] | Submittable: one employee's computed pay statement for one payroll period/date range. |
+| [[Salary Slip Leave]] | Child of Salary Slip: per-leave-type LWP/leave balance snapshot. |
+| [[Salary Slip Loan]] | Child of Salary Slip: loan repayment lines (populated only if the external "lending" app is installed). |
+| [[Salary Slip Timesheet]] | Child of Salary Slip: linked Timesheet(s) and hours, for timesheet-based salary. |
+| [[Payroll Entry]] | Submittable: batch payroll run — selects employees, creates/submits their Salary Slips, posts GL. |
+| [[Payroll Employee Detail]] | Child of Payroll Entry: one selected employee row. |
+| [[Payroll Period]] | Master: a fiscal year-like window used for tax annualization and structure assignment scoping. |
+| [[Payroll Period Date]] | Child of Payroll Period: sub-period date rows (schema exists; no controller code populates it in this repo — see file). |
+| [[Payroll Settings]] | Single: global payroll configuration switches (email behavior, working-hour thresholds, etc). |
+| [[Employee Benefit Application]] | Submittable: employee's flexible-benefit allocation request against a benefit-plan structure. |
+| [[Employee Benefit Application Detail]] | Child of Employee Benefit Application: per-component requested amount. |
+| [[Employee Benefit Claim]] | Submittable: employee's claim against a benefit allocation. |
+| [[Employee Benefit Detail]] | Shared child table: per-component max-benefit config referenced by Salary Structure. |
+| [[Employee Benefit Ledger]] | Ledger record of benefit claims/applications consumed, for running-balance tracking. |
+| [[Employee Cost Center]] | Child table (used in Salary Structure Assignment): % split of an employee's pay across cost centers. |
+| [[Employee Incentive]] | Submittable: one-off incentive payout, feeds Salary Slip via Additional Salary-style linkage. |
+| [[Employee Other Income]] | Submittable: employee-declared other income used in tax computation. |
+| [[Employee Tax Exemption Category]] | Master: a tax-exemption category with a max claimable amount. |
+| [[Employee Tax Exemption Sub Category]] | Master: a sub-category under a category (specific exemption instrument). |
+| [[Employee Tax Exemption Declaration]] | Submittable: employee's declared exemption amounts per sub-category for a payroll period. |
+| [[Employee Tax Exemption Declaration Category]] | Child of Declaration: one sub-category + declared amount row. |
+| [[Employee Tax Exemption Proof Submission]] | Submittable: employee's proof-backed (actual) exemption amounts, supersedes declaration late in the period. |
+| [[Employee Tax Exemption Proof Submission Detail]] | Child of Proof Submission: one sub-category + proven amount row. |
+| [[Income Tax Slab]] | Master: tax bracket set (`Taxable Salary Slab` rows) + config, assigned via Salary Structure Assignment. |
+| [[Income Tax Slab Other Charges]] | Child of Income Tax Slab: sequential surcharge/cess-style charges applied on top of slab tax. |
+| [[Taxable Salary Slab]] | Child of Income Tax Slab: one bracket (from/to amount, percent deduction). |
+| [[Gratuity]] | Submittable: end-of-service gratuity payout computation and payment record. |
+| [[Gratuity Rule]] | Master: gratuity calculation method + slab set for a jurisdiction/policy. |
+| [[Gratuity Rule Slab]] | Child of Gratuity Rule: years-of-service bracket + fraction/percentage. |
+| [[Gratuity Applicable Component]] | Child of Gratuity Rule: which Salary Component(s) count toward the gratuity base salary. |
+| [[Retention Bonus]] | Submittable: scheduled retention bonus, paid out via a linked Additional Salary. |
+| [[Additional Salary]] | Submittable: one-off or recurring extra earning/deduction applied to future Salary Slips. |
+| [[Arrear]] | Submittable: back-pay adjustment, diffs old vs new structure/assignment and generates Additional Salary rows. |
+| [[Payroll Correction]] | Submittable: correction tool that recomputes and generates adjusting Additional Salary rows after a slip was already processed. |
+| [[Payroll Correction Child]] | Child of Payroll Correction: per-component correction breakup row. |
+| [[Salary Withholding]] | Submittable: withholds an employee's pay for N cycles (e.g. pending investigation) then releases it. |
+| [[Salary Withholding Cycle]] | Child of Salary Withholding: one withheld cycle's date range + release status. |
 
 ## Recommended Target Schema Shape
 

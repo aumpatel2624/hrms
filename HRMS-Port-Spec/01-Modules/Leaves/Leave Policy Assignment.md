@@ -1,7 +1,7 @@
 # Leave Policy Assignment
 
 **Source:** `hrms/hr/doctype/leave_policy_assignment/leave_policy_assignment.json`, `leave_policy_assignment.py`, `leave_policy_assignment.js`, `leave_policy_assignment_list.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `HR-LPOL-ASSGN-.#####` (naming series: literal prefix `HR-LPOL-ASSGN-` + auto-incrementing 5-digit counter, e.g. `HR-LPOL-ASSGN-00001`; no year token, unlike `Leave Policy`/`Leave Period`)
+**[[Submittable Document Lifecycle|Submittable]]:** yes   **Tree:** no   **[[Naming and Autoname Rules|Naming]]:** `HR-LPOL-ASSGN-.#####` (naming series: literal prefix `HR-LPOL-ASSGN-` + auto-incrementing 5-digit counter, e.g. `HR-LPOL-ASSGN-00001`; no year token, unlike `Leave Policy`/`Leave Period`)
 **Module:** HR
 
 This doctype is the trigger point for actual leave allocation creation: submitting it creates one or more `Leave Allocation` documents (out of this module agent's scope to fully document, but its creation contract is captured below since this controller builds and submits it directly).
@@ -12,17 +12,17 @@ Full field table, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes (`reqd`) | — | No | `in_list_view: 1`, `in_standard_filter: 1` |
+| employee | Employee | Link | [[Employee Core Model\|Employee]] | Yes (`reqd`) | — | No | `in_list_view: 1`, `in_standard_filter: 1` |
 | employee_name | Employee name | Data | — | No | — | Yes | `fetch_from: employee.employee_name` |
 | company | Company | Link | Company | No | — | Yes | `fetch_from: employee.company`; `in_standard_filter: 1`. Note: JSON field order places this after `assignment_based_on`/dates but it is documented here near `employee` for grouping — actual JSON order is preserved in the diagram/list below |
-| leave_policy | Leave Policy | Link | Leave Policy | Yes (`reqd`) | — | No | `in_list_view: 1`, `in_standard_filter: 1`; client script restricts link-query to `docstatus: 1` (submitted policies only) |
+| leave_policy | Leave Policy | Link | [[Leave Policy]] | Yes (`reqd`) | — | No | `in_list_view: 1`, `in_standard_filter: 1`; client script restricts link-query to `docstatus: 1` (submitted policies only) |
 | assignment_based_on | Assignment based on | Select | "" / Leave Period / Joining Date | No | — | No | `allow_in_quick_entry: 1` |
-| leave_period | Leave Period | Link | Leave Period | Conditionally (`mandatory_depends_on: eval:doc.assignment_based_on == "Leave Period"`) | — | No | `depends_on` same condition; `allow_in_quick_entry: 1`; client script restricts link-query to `is_active: 1` AND `company == frm.doc.company` |
+| leave_period | Leave Period | Link | [[Leave Period]] | Conditionally (`mandatory_depends_on: eval:doc.assignment_based_on == "Leave Period"`) | — | No | `depends_on` same condition; `allow_in_quick_entry: 1`; client script restricts link-query to `is_active: 1` AND `company == frm.doc.company` |
 | effective_from | Effective From | Date | — | Yes (`reqd`) | — | Conditionally (`read_only_depends_on: eval:doc.assignment_based_on`, i.e. read-only in UI whenever `assignment_based_on` has any truthy value) | Auto-set server-side by `set_dates()` when `assignment_based_on` is "Leave Period" or "Joining Date" (see Validation Rules) |
 | effective_to | Effective To | Date | — | Yes (`reqd`) | — | Conditionally (`read_only_depends_on: eval:doc.assignment_based_on == "Leave Period"`) | Auto-set server-side by `set_dates()` when `assignment_based_on` is "Leave Period"; for "Joining Date" it defaults to `date_of_joining + 12 months` (last day) only if not already provided |
 | carry_forward | Add unused leaves from previous allocations | Check | — | No | 0 | No | `allow_in_quick_entry: 1` |
 | leaves_allocated | Leaves Allocated | Check | — | No | 0 | No | `hidden: 1`, `no_copy: 1`, `print_hide: 1` — internal flag set to 1 by `grant_leave_alloc_for_employee()` after allocation creation, used as an idempotency/re-entry guard |
-| amended_from | Amended From | Link | Leave Policy Assignment | No | — | Yes | `no_copy: 1`, `print_hide: 1`; standard amendment-chain pointer |
+| amended_from | Amended From | Link | [[Leave Policy Assignment]] | No | — | Yes | `no_copy: 1`, `print_hide: 1`; standard amendment-chain pointer |
 
 `title_field: "employee_name"`, `track_changes: 1`.
 
@@ -161,7 +161,7 @@ Determines whether the CURRENT sub-period (as of `frappe.flags.current_date or t
 
 `get_complete_month_count(date, effective_from)`: `month_count = (date.year - effective_from.year)*12 + (date.month - effective_from.month)`; IF `date.day < effective_from.day` AND `date` is NOT the last day of its own month THEN `month_count -= 1` (handles short months, e.g. joining on the 31st compared against a 28/29/30-day month, without under/over-counting when `date` itself IS a month-end).
 
-## Lifecycle Hooks (exact)
+## [[Cross-Doctype Hooks (doc_events)|Lifecycle Hooks]] (exact)
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -187,9 +187,20 @@ Both are decorated `@frappe.whitelist()` on the module (not the class), i.e. cal
 
 Note: `amend` is `0`/absent for ALL three roles in the JSON permissions array, despite `is_submittable: 1` and the presence of an `amended_from` field — meaning, per the JSON alone, **no role can amend a cancelled Leave Policy Assignment** through the standard permission-gated amend action. Flagged explicitly per ground rules — this may be an oversight in the source but must be ported byte-for-byte unless the target product intentionally wants to enable amend.
 
-## Scheduled Jobs Touching This Doctype
+## [[Background Jobs (Scheduler Events)|Scheduled Jobs]] Touching This Doctype
 
 None directly in `scheduler_events` reference `Leave Policy Assignment` by name. However, the `daily_long` job `hrms.hr.utils.allocate_earned_leaves` reads `Leave Allocation` rows that carry a `leave_policy_assignment` foreign key (via `get_leave_allocations`, which filters `leave_allocation.leave_policy_assignment.isnotnull()`) to find ongoing earned-leave allocations to top up — it reads through this doctype's FK on `Leave Allocation` but does not read/write `Leave Policy Assignment` rows directly. See algorithm reference: `hrms.hr.utils.allocate_earned_leaves` -> `get_annual_allocation_from_policy` -> reads `Leave Policy Detail` (see that file) -> `update_previous_leave_allocation` (writes `Leave Allocation.total_leaves_allocated` and inserts a `Leave Ledger Entry`, and updates the `Earned Leave Schedule` child row's `is_allocated`/`attempted`/`allocated_via`/`number_of_leaves` fields for that date) -- out of this module agent's Leave-Policy-Assignment scope but documented here since it is the direct continuation of the allocation flow this doctype starts.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the employee being assigned a policy; `employee` Link field.
+- [[Leave Policy]] — `leave_policy` Link field; its `leave_policy_details` rows drive per-leave-type allocation creation.
+- [[Leave Period]] — `leave_period` Link field, used when `assignment_based_on == "Leave Period"`.
+- [[Leave Type]] — read (via `get_leave_type_details`) for each policy row's flags (LWP, earned leave, carry-forward, etc.).
+- [[Leave Policy Detail]] — child rows of the linked `Leave Policy`, iterated to create allocations.
+- [[Leave Allocation]] — created and submitted (one per non-LWP `Leave Policy Detail` row) by `on_submit` -> `grant_leave_alloc_for_employee`.
+- [[Earned Leave Schedule]] — schedule rows generated and attached to each created earned-leave `Leave Allocation`.
+- [[Leave Policy Assignment]] — `amended_from` self-referencing Link field, standard Frappe amend-chain pointer.
 
 ## Port Notes
 
