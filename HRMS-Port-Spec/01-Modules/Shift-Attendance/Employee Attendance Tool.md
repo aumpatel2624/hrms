@@ -9,7 +9,7 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | date | Date | Date | — | no | "Today" | no | |
-| shift | Shift | Link | Shift Type | conditionally (`mandatory_depends_on: filter_by_shift`) | — | no | |
+| shift | Shift | Link | [[Shift Type]] | conditionally (`mandatory_depends_on: filter_by_shift`) | — | no | |
 | column_break_gmhs | (Column) | Column Break | — | — | — | — | |
 | late_entry | Late Entry | Check | — | no | 0 | no | passed through to created Attendance records |
 | early_exit | Early Exit | Check | — | no | 0 | no | passed through to created Attendance records |
@@ -19,9 +19,9 @@
 | department | Department | Link | Department | no | — | no | filter |
 | filter_by_shift | Filter by Shift | Check | — | no | 0 | no | |
 | column_break_bhny | (Column) | Column Break | — | — | — | — | |
-| employment_type | Employment Type | Link | Employment Type | no | — | no | filter |
+| employment_type | Employment Type | Link | [[Employment Type]] | no | — | no | filter |
 | designation | Designation | Link | Designation | no | — | no | filter |
-| employee_grade | Employee Grade | Link | Employee Grade | no | — | no | filter |
+| employee_grade | Employee Grade | Link | [[Employee Grade]] | no | — | no | filter |
 | get_employees | Get Employees | Button | — | — | — | — | client trigger to fetch employee lists |
 | select_employees_section | Select Employees (label) | Section Break | — | — | — | — | collapsible |
 | unmarked_employee_header | (HTML: "Unmarked Employees" heading) | HTML | — | — | — | — | |
@@ -52,11 +52,11 @@ No `validate()` method on the controller — this doctype has no persisted recor
 
 1. Build Employee filter: `status="Active"`, `date_of_joining <= date`, plus any of `department, branch, company, employment_type, designation, grade` (mapped from `employee_grade`) that are provided.
 2. `employee_list` = all matching Employees (`employee, employee_name`), ordered by name.
-3. `attendance_list` = Attendance records for `attendance_date=date, docstatus=1, modify_half_day_status=0` (fields: employee, employee_name, status, shift, leave_type) — i.e. "fully resolved" marked attendance.
+3. `attendance_list` = [[Attendance]] records for `attendance_date=date, docstatus=1, modify_half_day_status=0` (fields: employee, employee_name, status, shift, leave_type) — i.e. "fully resolved" marked attendance.
 4. `half_day_attendance_list` = Attendance records for `attendance_date=date, docstatus=1, modify_half_day_status=1, leave_type is set` — i.e. Half Day records still pending resolution of the "other half".
 5. `unmarked_attendance = _get_unmarked_attendance(employee_list, attendance_list + half_day_attendance_list)` — employees in `employee_list` whose `employee` id does not appear in either marked list.
 6. IF `filter_by_shift` THEN `unmarked_attendance = _get_unmarked_attendance_with_shift(unmarked_attendance, shift, date)`:
-   - Fetch employees with a Shift Assignment where `shift_type=shift, start_date <= date` (note: does NOT filter by `docstatus`/`status`/`end_date` — any assignment row, submitted or not, active or not, matches as long as its `start_date` is on/before the queried date).
+   - Fetch employees with a [[Shift Assignment]] where `shift_type=shift, start_date <= date` (note: does NOT filter by `docstatus`/`status`/`end_date` — any assignment row, submitted or not, active or not, matches as long as its `start_date` is on/before the queried date).
    - Fetch employees whose `default_shift == shift`.
    - Keep only `unmarked_attendance` entries whose employee is in the union of those two sets.
 7. Return `{"marked": attendance_list, "half_day_marked": half_day_attendance_list, "unmarked": unmarked_attendance}`.
@@ -123,3 +123,11 @@ None.
 - **This is a "virtual" single doctype used purely as an interactive tool/RPC surface**, not a persisted record — a port does not need a database table for it at all; the two whitelisted functions can be ported as plain application-service/controller endpoints without any backing entity.
 - **Half-day resolution bypasses Attendance's own `validate()`** (direct SQL UPDATE via query builder) — same caveat as noted in `Attendance Request.md`: any business rules enforced in `Attendance.validate()` do NOT re-run for this path.
 - **`_get_unmarked_attendance_with_shift`'s Shift Assignment query has no `docstatus`/`status`/`end_date` filter** — this could surface employees whose Shift Assignment is a Draft, Cancelled, Inactive, or already-ended record as if they were currently assigned to that shift, purely because `start_date <= date`. This looks like a likely oversight relative to how shift-assignment filtering is done elsewhere in this module (e.g. `Shift Type.get_assigned_employees` explicitly filters `docstatus=1, status=Active`). Flag as a "missing check you'd expect but don't find" per spec ground rules — do not silently add the filter; note it as a Port Notes callout for product/dev sign-off.
+
+## Related Doctypes
+
+- [[Attendance]] — this tool bulk-creates and bulk-resolves Attendance records.
+- [[Shift Assignment]] — consulted to filter unmarked employees by shift.
+- [[Shift Type]] — `shift` field scopes employee fetch and marking by shift.
+- [[Employment Type]] — optional employee filter.
+- [[Employee Grade]] — optional employee filter (`employee_grade` -> Employee's `grade`).

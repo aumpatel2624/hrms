@@ -8,12 +8,12 @@ The Expenses module lets employees submit out-of-pocket expense claims for appro
 
 | Doctype | Purpose |
 |---|---|
-| `Expense Claim` | The submittable parent document: one employee's claim for a set of expenses, taxes, and advance offsets, with approval workflow and GL posting. |
-| `Expense Claim Type` | Master/setup data: named categories of expense (e.g. "Travel", "Meals") with a default GL account per company. |
-| `Expense Claim Account` | Child table of `Expense Claim Type`: one (Company, Default Account) pair per row. |
-| `Expense Claim Detail` | Child table of `Expense Claim`: individual expense line items (date, type, claimed vs sanctioned amount). |
-| `Expense Claim Advance` | Child table of `Expense Claim`: links a paid Employee Advance and the amount of it being allocated/claimed against this claim. |
-| `Expense Taxes and Charges` | Child table of `Expense Claim`: tax/charge lines computed against the claim's sanctioned total. |
+| [[Expense Claim]] | The submittable parent document: one employee's claim for a set of expenses, taxes, and advance offsets, with approval workflow and GL posting. |
+| [[Expense Claim Type]] | Master/setup data: named categories of expense (e.g. "Travel", "Meals") with a default GL account per company. |
+| [[Expense Claim Account]] | Child table of `Expense Claim Type`: one (Company, Default Account) pair per row. |
+| [[Expense Claim Detail]] | Child table of `Expense Claim`: individual expense line items (date, type, claimed vs sanctioned amount). |
+| [[Expense Claim Advance]] | Child table of `Expense Claim`: links a paid Employee Advance and the amount of it being allocated/claimed against this claim. |
+| [[Expense Taxes and Charges]] | Child table of `Expense Claim`: tax/charge lines computed against the claim's sanctioned total. |
 
 Not covered here (owned by other agents, referenced by name only): `Employee Advance` (Payroll/Tax-Benefits agent).
 

@@ -68,8 +68,8 @@ flowchart LR
 - **Solid arrows** are direct document links (a Link field, or one doctype explicitly
   creating another).
 - **Dotted arrows** are cross-module *logic* couplings — no direct Link field, but one
-  module's controller code reads or writes the other's data (e.g. Attendance feeding
-  Salary Slip's payable-days calculation, or a Regional override patching into core
+  module's controller code reads or writes the other's data (e.g. [[Attendance]] feeding
+  [[Salary Slip]]'s payable-days calculation, or a Regional override patching into core
   Payroll/HR-Core logic via `erpnext.allow_regional`).
 
 ## Per-Module Detail

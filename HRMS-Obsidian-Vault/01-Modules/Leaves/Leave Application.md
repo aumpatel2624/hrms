@@ -33,7 +33,7 @@ The employee-facing request to take time off — the single most-used document i
 - [[Leave Block List]] / [[Leave Block List Date]] — checked via `get_applicable_block_dates()`; approving on a block date is disallowed unless the approving user is on the list's allow-list.
 - [[Leave Period]] — used when the leave type is Optional Leave, to find the period's `optional_holiday_list`.
 - Attendance (Employee module) — created/updated/cancelled directly by this doctype's `update_attendance()`/`cancel_attendance()`.
-- Salary Slip (Payroll module) — blocks LWP applications overlapping an already-processed payroll period.
+- [[Salary Slip]] (Payroll module) — blocks LWP applications overlapping an already-processed payroll period.
 - Holiday List / Holiday (external, ERPNext core — see [[_Overview]]) — used throughout to exclude holidays from leave-day counts and to populate the leave calendar.
 
 ## Logic — What Happens and Why
@@ -68,10 +68,10 @@ A large set of module-level whitelisted helpers (`get_leave_balance_on`, `get_nu
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | create/write/read | Files their own requests; cannot submit/cancel/delete |
-| HR Manager | full incl. submit/cancel/delete/amend | Approves for any employee |
-| HR User | full incl. submit/cancel/delete/amend | Same operational rights as HR Manager |
-| Leave Approver | read/write/submit/cancel/delete | Approves assigned applications (submitting = approving/rejecting) |
+| [[Employee]] | create/write/read | Files their own requests; cannot submit/cancel/delete |
+| [[HR Manager]] | full incl. submit/cancel/delete/amend | Approves for any employee |
+| [[HR User]] | full incl. submit/cancel/delete/amend | Same operational rights as HR Manager |
+| [[Leave Approver]] | read/write/submit/cancel/delete | Approves assigned applications (submitting = approving/rejecting) |
 | All | read (permlevel 1) | Read-only visibility at the restricted field level (e.g. status) |
 
 ## Mermaid: State/Flow

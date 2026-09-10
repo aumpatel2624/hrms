@@ -7,7 +7,7 @@ tags: [hrms, doctype]
 
 # Skill Assessment
 
-A child-table row recording a rating given to a specific [[Skill]] during an interview assessment — used on the Interview Feedback doctype (Recruitment module, outside this vault section) to score a candidate against expected skills.
+A child-table row recording a rating given to a specific [[Skill]] during an interview assessment — used on the [[Interview Feedback]] doctype (Recruitment module) to score a candidate against expected skills.
 
 ## Key Fields
 
@@ -19,8 +19,8 @@ A child-table row recording a rating given to a specific [[Skill]] during an int
 ## Relationships
 
 - [[Skill]] — linked from, via `skill`.
-- Interview Feedback (Recruitment module, outside this vault section) — parent doctype; the `skill_assessment` table field there uses this child doctype.
-- Interview / Interview Type / Interview Round (Recruitment module) — indirectly related: the interview's `expected_skill_set` seeds which skills appear here (via `get_expected_skill_set`).
+- [[Interview Feedback]] (Recruitment module) — parent doctype; the `skill_assessment` table field there uses this child doctype.
+- [[Interview]] / [[Interview Type]] / Interview Round (Recruitment module) — indirectly related: the interview's `expected_skill_set` seeds which skills appear here (via `get_expected_skill_set`).
 
 ## Logic — What Happens and Why
 
@@ -28,7 +28,7 @@ The `SkillAssessment(Document)` controller is a `pass`-only class with no valida
 
 ## Roles & Permissions
 
-Child table — no own `permissions` array (empty). Access is governed entirely by its parent doctype's permissions (Interview Feedback, in the Recruitment module).
+Child table — no own `permissions` array (empty). Access is governed entirely by its parent doctype's permissions ([[Interview Feedback]], in the Recruitment module).
 
 ## Mermaid: State/Flow
 

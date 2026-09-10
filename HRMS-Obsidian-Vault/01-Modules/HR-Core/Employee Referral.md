@@ -26,9 +26,9 @@ Employee Referral captures an employee-submitted candidate referral for an open 
 
 ## Relationships
 
-- Job Applicant — linked to (outside assigned doctype set); created from this referral via `create_job_applicant`, carrying `employee_referral` back-reference.
+- [[Job Applicant]] — linked to; created from this referral via `create_job_applicant`, carrying `employee_referral` back-reference.
 - Additional Salary — linked to (outside assigned doctype set); created via `create_additional_salary` to pay the referrer their bonus.
-- Employee — linked to (outside assigned doctype set) via `referrer`.
+- [[Employee]] — linked to via `referrer`.
 
 ## Logic — What Happens and Why
 
@@ -46,10 +46,10 @@ Controller: `EmployeeReferral(Document)` in `employee_referral.py`.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete, submit, cancel, amend | Full control. |
-| HR Manager | Read, write, create, delete, submit, cancel, amend (base) + delete/write at permlevel 1 | Full control including the read-only `status` field (permlevel 1). |
-| HR User | Read, write, create, delete, submit, cancel, amend (base) + delete/write at permlevel 1 | Same level of control as HR Manager for this doctype. |
-| Employee | Read, create, submit, amend (base) + read at permlevel 1 | Can submit their own referrals but cannot edit the permlevel-1 `status` field. |
+| [[System Manager]] | Read, write, create, delete, submit, cancel, amend | Full control. |
+| [[HR Manager]] | Read, write, create, delete, submit, cancel, amend (base) + delete/write at permlevel 1 | Full control including the read-only `status` field (permlevel 1). |
+| [[HR User]] | Read, write, create, delete, submit, cancel, amend (base) + delete/write at permlevel 1 | Same level of control as HR Manager for this doctype. |
+| [[Employee]] | Read, create, submit, amend (base) + read at permlevel 1 | Can submit their own referrals but cannot edit the permlevel-1 `status` field. |
 
 ## Mermaid: State/Flow
 

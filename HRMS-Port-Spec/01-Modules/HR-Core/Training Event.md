@@ -9,7 +9,7 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | event_name | Event Name | Data | — | Yes (reqd) | — | No | `unique`, `no_copy`; shown in list view; used as document name and title_field |
-| training_program | Training Program | Link | Training Program | No | — | No | |
+| training_program | Training Program | Link | [[Training Program]] | No | — | No | |
 | event_status | Event Status | Select | `Scheduled`, `Completed`, `Cancelled` | Yes (reqd) | — | No | `allow_on_submit`; shown in list view and standard filter |
 | has_certificate | Has Certificate | Check | — | No | `0` | No | `depends_on: eval:doc.type == 'Seminar' \|\| doc.type == 'Workshop' \|\| doc.type == 'Conference' \|\| doc.type == 'Exam'` (UI-only visibility condition; value can still be set/stored even if not shown) |
 | column_break_2 | — | Column Break | — | — | — | — | layout only |
@@ -31,8 +31,8 @@
 | section_break_15 | — | Section Break | — | — | — | — | layout only |
 | introduction | Introduction | Text Editor | — | Yes (reqd) | — | No | rich text |
 | section_break_18 (label "Attendees") | Attendees | Section Break | — | — | — | — | groups the `employees` child table |
-| employees | Employees | Table | `Training Event Employee` | No | — | No | `allow_on_submit` — rows may be added/edited after submission |
-| amended_from | Amended From | Link | Training Event | No | — | Yes | `no_copy`, `print_hide`; standard amendment field |
+| employees | Employees | Table | [[Training Event Employee]] | No | — | No | `allow_on_submit` — rows may be added/edited after submission |
+| amended_from | Amended From | Link | [[Training Event]] | No | — | Yes | `no_copy`, `print_hide`; standard amendment field |
 | employee_emails | Employee Emails | Small Text | (options: `Email`, i.e. holds email-formatted text) | No | — | No | `hidden`; computed field — set by controller from the emails of every employee currently in the `employees` child table (see Business Logic) |
 
 ## Child Tables
@@ -41,7 +41,7 @@
 
 ## State Machine
 
-Submittable doctype. Standard Frappe docstatus lifecycle (Draft=0, Submitted=1, Cancelled=2) applies on top of the independent business field `event_status` (`Scheduled` / `Completed` / `Cancelled`).
+Submittable doctype (see [[Submittable Document Lifecycle]]). Standard Frappe docstatus lifecycle (Draft=0, Submitted=1, Cancelled=2) applies on top of the independent business field `event_status` (`Scheduled` / `Completed` / `Cancelled`).
 
 - `event_status` is set purely by direct user edit on the form (no controller code sets it based on other events, other than the interaction below).
 - After submission, editing `event_status` on the submitted document (`allow_on_submit`) triggers `on_update_after_submit`, which cascades into the child table's `status`/`attendance` fields:
@@ -124,6 +124,11 @@ None found in `hrms/hooks.py` (`doc_events`/`scheduler_events`). No cron-based r
 - Subject: `Training Scheduled: {{ doc.name }}`.
 - Body template renders: `doc.introduction`, `Event Location: doc.location`, a same-day-formatted or separate start/end date+time block (computed from `doc.start_time`/`doc.end_time` via Jinja, comparing `.date()`), a link back to the Training Event form, and — if `doc.is_mandatory` is truthy — an extra line "Note: This Training Event is mandatory". **Port Note:** the template references `doc.is_mandatory`, but no such field exists on Training Event's schema (the mandatory flag actually lives per-attendee as `Training Event Employee.is_mandatory`) — this Jinja expression will always evaluate falsy/undefined on this doctype as currently modeled; treat the "mandatory" line as effectively dead in production and flag as a possible source-repo inconsistency rather than inventing a fix.
 - This must be reproduced as an application-level "on submit, send email" side effect in a port, not literally as a generic notification-template engine unless the target stack has an equivalent.
+
+## Related Doctypes
+
+- [[Training Program]] — via `training_program`: linked via `training_program`.
+- [[Training Event Employee]] — via `employees`: `allow_on_submit` — rows may be added/edited after submission
 
 ## Port Notes
 

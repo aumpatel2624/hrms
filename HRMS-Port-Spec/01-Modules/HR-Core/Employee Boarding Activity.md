@@ -60,6 +60,13 @@ None on this doctype directly. It is read via the shared whitelisted function `g
 
 None.
 
+## Related Doctypes
+
+- [[Employee Onboarding]] — parent via `activities` table.
+- [[Employee Onboarding Template]] — parent via `activities` table.
+- [[Employee Separation]] — parent via `activities` table.
+- [[Employee Separation Template]] — parent via `activities` table.
+
 ## Port Notes
 
 - **Client-only validation needing a server-side equivalent:** the `depends_on` mutual-exclusivity between `user` and `role` (`eval:!doc.role` / `eval:!doc.user`) is purely a UI show/hide condition — it does NOT prevent both `user` and `role` from being set simultaneously, nor does it prevent both being empty, at the server/database level. Neither `employee_boarding_activity.py` nor the parent controllers enforce this. If a port wants server-side enforcement (e.g., "exactly one of user/role must be set"), that would be a new validation not present in the original — call this out as a deliberate deviation if added; per ground rules do NOT silently add it.

@@ -28,9 +28,9 @@ No controller logic (`EmployeeFeedbackCriteria(Document): pass`). It is a pure l
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read, write, create, delete, export | Full control. |
-| HR Manager | read, write, create, delete, export | Full control. |
-| HR User | read, write, create, delete, export | Full control. |
+| [[System Manager]] | read, write, create, delete, export | Full control. |
+| [[HR Manager]] | read, write, create, delete, export | Full control. |
+| [[HR User]] | read, write, create, delete, export | Full control. |
 
 ## Mermaid: State/Flow
 

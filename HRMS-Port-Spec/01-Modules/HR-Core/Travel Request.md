@@ -16,30 +16,30 @@ Full field table in JSON `field_order` sequence (Section/Column Break rows noted
 | travel_funding | Travel Funding | Select | `"", "Require Full Funding", "Fully Sponsored", "Partially Sponsored, Require Partial Funding"` | No | — | No | — |
 | travel_proof | Copy of Invitation/Announcement | Attach | — | No | — | No | File attachment. |
 | *(column_break_2)* | — | Column Break | — | — | — | — | Layout only. |
-| purpose_of_travel | Purpose of Travel | Link | Purpose of Travel | Yes | — | No | In list view. |
+| purpose_of_travel | Purpose of Travel | Link | [[Purpose of Travel]] | Yes | — | No | In list view. |
 | details_of_sponsor | Details of Sponsor (Name, Location) | Data | — | No | — | No | — |
 | *(section_break_4 — "Description", collapsible)* | — | Section Break | — | — | — | — | Groups: description. |
 | description | Any other details | Small Text | — | No | — | No | — |
 | *(employee_details — "Employee Details", collapsible)* | — | Section Break | — | — | — | — | Groups: employee, employee_name, cell_number, prefered_email, date_of_birth, personal_id_type, personal_id_number, passport_number. |
-| employee | Employee | Link | Employee | Yes | — | No | In list view. |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | Yes | — | No | In list view. |
 | employee_name | Employee Name | Data | — | No | — | Yes | `fetch_from: "employee.employee_name"`. |
 | cell_number | Contact Number | Data | — | No | — | No | `fetch_from: "employee.cell_number"` (not marked read-only, so user can override the fetched value). |
 | prefered_email | Contact Email | Data | — | No | — | No | `fetch_from: "employee.prefered_email"` (not marked read-only). |
 | *(column_break_7)* | — | Column Break | — | — | — | — | Layout only. |
 | date_of_birth | Date of Birth | Date | — | No | — | Yes | `fetch_from: "employee.date_of_birth"`. |
-| personal_id_type | Identification Document Type | Link | Identification Document Type | No | — | No | — |
+| personal_id_type | Identification Document Type | Link | [[Identification Document Type]] | No | — | No | — |
 | personal_id_number | Identification Document Number | Data | — | No | — | No | — |
 | passport_number | Passport Number | Data | — | No | — | No | `fetch_from: "employee.passport_number"` (not marked read-only). |
 | *(travel_itinerary — "Travel Itinerary" section)* | — | Section Break | — | — | — | — | Groups: itinerary. |
-| itinerary | — | Table | Travel Itinerary | No | — | No | See `Travel Itinerary.md`. |
+| itinerary | — | Table | [[Travel Itinerary]] | No | — | No | See `Travel Itinerary.md`. |
 | *(costing_details — "Costing Details" section)* | — | Section Break | — | — | — | — | Groups: cost_center, costings. |
 | cost_center | Cost Center | Link | Cost Center | No | — | No | — |
-| costings | Costing | Table | Travel Request Costing | No | — | No | See `Travel Request Costing.md`. |
+| costings | Costing | Table | [[Travel Request Costing]] | No | — | No | See `Travel Request Costing.md`. |
 | *(event_details — "Event Details" section, collapsible)* | — | Section Break | — | — | — | — | Groups: name_of_organizer, address_of_organizer, other_details. |
 | name_of_organizer | Name of Organizer | Data | — | No | — | No | — |
 | address_of_organizer | Address of Organizer | Data | — | No | — | No | — |
 | other_details | Other Details | Text | — | No | — | No | — |
-| amended_from | Amended From | Link | Travel Request | No | — | Yes | `no_copy: 1`, `print_hide: 1`. Standard amendment-chain pointer. |
+| amended_from | Amended From | Link | [[Travel Request]] | No | — | Yes | `no_copy: 1`, `print_hide: 1`. Standard amendment-chain pointer. |
 | *(accounting_dimensions_section — "Accounting Dimensions", collapsible)* | — | Section Break | — | — | — | — | Groups: company (via dimension_col_break). |
 | *(dimension_col_break)* | — | Column Break | — | — | — | — | Layout only. |
 | company | Company | Link | Company | No | — | Yes | `fetch_from: "employee.company"`. |
@@ -50,6 +50,8 @@ Full field table in JSON `field_order` sequence (Section/Column Break rows noted
 - `costings` (Table, options `Travel Request Costing`) — see `Travel Request Costing.md` for full schema.
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]).
 
 ```mermaid
 stateDiagram-v2
@@ -106,6 +108,14 @@ None defined on this doctype's controller or module file.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Purpose of Travel]] — via `purpose_of_travel`: In list view.
+- [[Employee Core Model|Employee]] — via `employee`: In list view.
+- [[Identification Document Type]] — via `personal_id_type`: linked via `personal_id_type`.
+- [[Travel Itinerary]] — via `itinerary`: See `Travel Itinerary.md`.
+- [[Travel Request Costing]] — via `costings`: See `Travel Request Costing.md`.
 
 ## Port Notes
 

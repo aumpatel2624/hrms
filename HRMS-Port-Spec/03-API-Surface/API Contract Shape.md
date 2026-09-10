@@ -71,7 +71,7 @@ in this app requires an authenticated session.
 
 `GET /jobs` and its supporting AJAX calls (`hrms/www/jobs/index.py`) — the public job
 board. See `01-Modules/Recruitment/_Module-Spec.md` for exactly what fields of
-`Job Opening` are exposed publicly (this must NOT leak internal-only fields like
+[[Job Opening]] are exposed publicly (this must NOT leak internal-only fields like
 salary band or internal notes — check that file's Port Notes for the exact field
 allowlist used).
 

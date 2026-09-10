@@ -32,7 +32,7 @@ A child-table row representing one earning, deduction, or employer-contribution 
 - [[Salary Component]] — links to: `salary_component`; several fields are `fetch_from` it.
 - [[Salary Structure]] — parent/child: rows live in the `earnings`, `deductions`, and `employer_contributions` tables of Salary Structure (as the default template).
 - [[Salary Slip]] — parent/child: rows live in the equivalent tables of Salary Slip (as the computed payslip lines); Salary Slip's `process_salary_structure` evaluates each row's condition/formula against the slip's period context.
-- Additional Salary — linked from: rows created because of a one-off/recurring Additional Salary entry carry that link.
+- [[Additional Salary]] — linked from: rows created because of a one-off/recurring Additional Salary entry carry that link.
 
 ## Logic — What Happens and Why
 

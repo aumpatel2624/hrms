@@ -8,7 +8,7 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | — | no | in_list_view |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | in_list_view |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | no | — | yes | fetch_from `employee.department` |
 | company | Company | Link | Company | yes | — | no | fetch_from `employee.company`; `remember_last_selected_value` |
@@ -18,7 +18,7 @@
 | half_day | Half Day | Check | — | no | 0 | no | |
 | half_day_date | Half Day Date | Date | — | conditionally (`mandatory_depends_on: half_day`) | — | no | `depends_on: half_day` |
 | include_holidays | Include Holidays | Check | — | no | 0 | no | "Select if any of the days selected for request are holidays" |
-| shift | Shift | Link | Shift Type | no | — | no | description: "Note: Shift will not be overwritten in existing attendance records" |
+| shift | Shift | Link | [[Shift Type]] | no | — | no | description: "Note: Shift will not be overwritten in existing attendance records" |
 | reason_section | Reason | Section Break | — | — | — | — | |
 | reason | Reason | Select | Work From Home / On Duty | yes | — | no | in_list_view |
 | column_break_4 | (Column) | Column Break | — | — | — | — | |
@@ -86,7 +86,7 @@ Plain list:
 
 ### `create_or_update_attendance(date)`
 
-1. `doc = get_attendance_doc(date)` — existing non-cancelled Attendance for this employee+date+`self.shift` (exact match including shift, even if `None`).
+1. `doc = get_attendance_doc(date)` — existing non-cancelled [[Attendance]] for this employee+date+`self.shift` (exact match including shift, even if `None`).
 2. `status = get_attendance_status(date)`.
 3. IF `doc` exists:
    a. `old_status = doc.status`.
@@ -148,3 +148,9 @@ None found in `hrms/hooks.py` scheduler_events.
 - **`create_or_update_attendance` uses `doc.db_set(...)` for updates** (direct DB write bypassing `validate()`) but `frappe.new_doc(...).insert()` + `.submit()` for creates (full validation pipeline) — this asymmetry must be preserved: updates to existing Attendance via this path do NOT re-run Attendance's own validation rules (duplicate/overlap/leave checks).
 - **`half_day` resolution to "Present" only happens when the Attendance's current `half_day_status` is exactly `"Absent"`** (see `create_or_update_attendance` step 3c) — a Half Day attendance that's already "Present" for the other half is left untouched even if this Attendance Request also targets Half Day.
 - **`validate_no_attendance_to_create` can block submission entirely** via `raise_exception=True` inside `frappe.msgprint` — this is an unusual Frappe pattern (msgprint-as-exception) that a port needs to translate into a standard validation error with the same tabular message content (Date/Reason/Action).
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the request is filed for this employee.
+- [[Attendance]] — this doctype creates, updates, and cancels Attendance records for each day covered by the request.
+- [[Shift Type]] — `shift` optionally scopes the request/attendance to a specific shift; also used to resolve overlapping shift assignments.

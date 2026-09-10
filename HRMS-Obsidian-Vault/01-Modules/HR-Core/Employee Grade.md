@@ -21,7 +21,7 @@ A master record defining a compensation grade/band that can be assigned to emplo
 
 - links to Salary Structure — via `default_salary_structure`, and its currency is fetched onto this record.
 - linked from [[Employee]] — Employee records reference a grade to inherit default pay/structure (link runs from Employee's side; dashboard also shows Employee and Leave Period, Employee Onboarding/Separation Template transactions related to grade-driven flows).
-- linked from Leave Period, Employee Onboarding Template, Employee Separation Template — shown on this doctype's dashboard as related transactions (per `employee_grade_dashboard.py`), though there is no direct field/logic coupling in this doctype's own controller.
+- linked from Leave Period, [[Employee Onboarding Template]], [[Employee Separation Template]] — shown on this doctype's dashboard as related transactions (per `employee_grade_dashboard.py`), though there is no direct field/logic coupling in this doctype's own controller.
 
 ## Logic — What Happens and Why
 
@@ -31,9 +31,9 @@ Pure master/setup data — the Python controller (`EmployeeGrade`) contains no l
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, Write, Create, Delete | Full access. |
-| HR Manager | Read, Write, Create, Delete | Full access. |
-| HR User | Read, Write, Create, Delete | Full access — unusually permissive for an HR User role compared to most other setup doctypes in this module. |
+| [[System Manager]] | Read, Write, Create, Delete | Full access. |
+| [[HR Manager]] | Read, Write, Create, Delete | Full access. |
+| [[HR User]] | Read, Write, Create, Delete | Full access — unusually permissive for an HR User role compared to most other setup doctypes in this module. |
 
 ## Mermaid: State/Flow
 

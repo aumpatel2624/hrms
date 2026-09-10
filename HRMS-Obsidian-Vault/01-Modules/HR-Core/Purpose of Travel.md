@@ -27,7 +27,7 @@ No custom logic at all: the `.py` file is an empty `Document` subclass (`pass`).
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, Write, Create, Delete, Email, Print, Export, Report, Share | Only role defined in the doctype's own permissions; maintaining this master (adding new travel purposes) is restricted to System Manager. |
+| [[System Manager]] | Read, Write, Create, Delete, Email, Print, Export, Report, Share | Only role defined in the doctype's own permissions; maintaining this master (adding new travel purposes) is restricted to System Manager. |
 
 ## Mermaid: State/Flow
 

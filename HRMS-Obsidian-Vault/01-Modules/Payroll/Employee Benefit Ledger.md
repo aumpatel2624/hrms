@@ -79,11 +79,11 @@ amount − paid.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/report/print/email/export/share | No write/create/delete — system-generated only |
-| HR Manager | read/report/print/email/export/share | Same restriction |
+| [[System Manager]] | read/report/print/email/export/share | No write/create/delete — system-generated only |
+| [[HR Manager]] | read/report/print/email/export/share | Same restriction |
 | Administrator | read/report/print/email/export/share | Same restriction |
-| Employee | read/report/print/email/export/share | Can view their own ledger (row-level visibility governed by standard employee self-permission elsewhere) |
-| HR User | read/report | No print/email/export/share, most restricted of the listed roles |
+| [[Employee]] | read/report/print/email/export/share | Can view their own ledger (row-level visibility governed by standard employee self-permission elsewhere) |
+| [[HR User]] | read/report | No print/email/export/share, most restricted of the listed roles |
 
 ## Mermaid: State/Flow
 

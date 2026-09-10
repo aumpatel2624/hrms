@@ -31,7 +31,7 @@ The submittable record that converts an employee's unused leave balance into a c
 - [[Leave Allocation]] — links to; reads balance figures and is updated (`total_leaves_encashed`) on submit/cancel.
 - [[Leave Ledger Entry]] — triggers creation of; encashed days post as a negative leave entry, with a reversing entry if the allocation had already expired by the encashment date.
 - [[Leave Period]] — required field; the encashment is scoped to a period.
-- Additional Salary / Salary Structure Assignment (Payroll module) — created on submit when not `pay_via_payment_entry`; requires an assigned salary structure and the leave type's `earning_component`.
+- [[Additional Salary]] / [[Salary Structure Assignment]] (Payroll module) — created on submit when not `pay_via_payment_entry`; requires an assigned salary structure and the leave type's `earning_component`.
 - GL Entry (Accounting, via `AccountsController`) — created on submit when `pay_via_payment_entry` is set.
 
 ## Logic — What Happens and Why
@@ -57,10 +57,10 @@ The submittable record that converts an employee's unused leave balance into a c
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | full incl. submit/cancel/amend | Full |
-| HR Manager | full incl. submit/cancel/amend | Full |
-| HR User | full incl. submit/cancel/amend | Full |
-| Employee | read/write/create/delete | No submit/cancel — cannot finalize their own encashment |
+| [[System Manager]] | full incl. submit/cancel/amend | Full |
+| [[HR Manager]] | full incl. submit/cancel/amend | Full |
+| [[HR User]] | full incl. submit/cancel/amend | Full |
+| [[Employee]] | read/write/create/delete | No submit/cancel — cannot finalize their own encashment |
 
 ## Mermaid: State/Flow
 

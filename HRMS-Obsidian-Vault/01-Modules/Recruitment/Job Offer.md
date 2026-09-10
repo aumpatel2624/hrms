@@ -35,7 +35,7 @@ submit/cancel/amend lifecycle since it represents a financial and legal commitme
 - [[Designation]], [[Company]] — used together with `offer_date` for the Staffing Plan vacancy check.
 - [[Staffing Plan]] — `validate_vacancies()` checks remaining vacancies for this designation/company/period before allowing the offer.
 - [[Employee]] — `make_employee()` maps this offer into a new Employee; `Employee.after_insert` (`update_job_applicant_and_offer`) later force-accepts this offer once the Employee is actually created.
-- `HR Settings` — `check_vacancies` toggle controls whether the staffing-plan guard is enforced at all.
+- [[HR Settings]] — `check_vacancies` toggle controls whether the staffing-plan guard is enforced at all.
 
 ## Logic — What Happens and Why
 **`validate()`** runs `validate_vacancies()` then checks for a duplicate active offer:
@@ -86,9 +86,9 @@ analytics only, no business logic).
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + submit/cancel/amend/export/print/report/share/email | — |
-| HR User | Read/Write/Create/Submit/Print/Report/Share/Email | No delete, no cancel, no amend — can create and submit offers but cannot retract a submitted one. |
-| HR Manager | Full CRUD + submit/cancel/amend/export/print/report/share/email | Only role able to cancel/amend a submitted offer. |
+| [[System Manager]] | Full CRUD + submit/cancel/amend/export/print/report/share/email | — |
+| [[HR User]] | Read/Write/Create/Submit/Print/Report/Share/Email | No delete, no cancel, no amend — can create and submit offers but cannot retract a submitted one. |
+| [[HR Manager]] | Full CRUD + submit/cancel/amend/export/print/report/share/email | Only role able to cancel/amend a submitted offer. |
 
 ## Mermaid: State/Flow
 ```mermaid

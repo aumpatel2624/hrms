@@ -30,9 +30,9 @@ offer terms instead of opening fields.
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + email/export/print/report/share | — |
-| HR Manager | Full CRUD + email/export/print/report/share | — |
-| HR User | Read/Write/Create | No delete. |
+| [[System Manager]] | Full CRUD + email/export/print/report/share | — |
+| [[HR Manager]] | Full CRUD + email/export/print/report/share | — |
+| [[HR User]] | Read/Write/Create | No delete. |
 
 ## Mermaid: State/Flow
 ```mermaid

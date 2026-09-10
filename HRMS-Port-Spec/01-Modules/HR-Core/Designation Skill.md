@@ -8,7 +8,7 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| skill | Skill | Link | Skill | no (`reqd` key absent → not required at the JSON/schema level) | — | no | `in_list_view: 1` |
+| skill | Skill | Link | [[Skill]] | no (`reqd` key absent → not required at the JSON/schema level) | — | no | `in_list_view: 1` |
 
 `field_order`: `["skill"]` — single-field child table.
 
@@ -49,6 +49,10 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Skill]] — via `skill`: `in_list_view: 1`
 
 ## Port Notes
 

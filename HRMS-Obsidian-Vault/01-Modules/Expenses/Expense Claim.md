@@ -82,10 +82,10 @@ An employee's request for reimbursement of money spent on the company's behalf (
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Full (create/write/submit/cancel/amend/delete) + permlevel-1 read/write | Can approve for any employee. |
-| HR User | Full (create/write/submit/cancel/amend/delete) + permlevel-1 read/write | Same broad rights as HR Manager. |
-| Expense Approver | Full incl. submit/cancel/amend/delete, plus permlevel-1 read/write/delete | Distinct role specifically for approving; not restricted to a particular employee in the JSON — approver assignment is via the `expense_approver` field per-document with sharing (`share_doc_with_approver`). |
-| Employee | create/write/read (no submit/cancel/delete at permlevel 0) | Employees can create/edit their own claims but cannot submit/approve — approval requires Expense Approver/HR Manager/HR User. Self-approval additionally blocked by `validate_for_self_approval()` when HR Settings' `prevent_self_expense_approval` is on and no workflow exists. |
+| [[HR Manager]] | Full (create/write/submit/cancel/amend/delete) + permlevel-1 read/write | Can approve for any employee. |
+| [[HR User]] | Full (create/write/submit/cancel/amend/delete) + permlevel-1 read/write | Same broad rights as HR Manager. |
+| [[Expense Approver]] | Full incl. submit/cancel/amend/delete, plus permlevel-1 read/write/delete | Distinct role specifically for approving; not restricted to a particular employee in the JSON — approver assignment is via the `expense_approver` field per-document with sharing (`share_doc_with_approver`). |
+| [[Employee]] | create/write/read (no submit/cancel/delete at permlevel 0) | Employees can create/edit their own claims but cannot submit/approve — approval requires Expense Approver/HR Manager/HR User. Self-approval additionally blocked by `validate_for_self_approval()` when HR Settings' `prevent_self_expense_approval` is on and no workflow exists. |
 | All | permlevel-1 read/print/email/export/share | Baseline read access at the restricted field level. |
 
 ## Mermaid: State/Flow

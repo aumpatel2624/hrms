@@ -82,9 +82,9 @@ plain field writes.
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read/Write/Create/Delete/Export/Print/Report/Share/Email | Full access. |
-| HR User | Read only | Cannot create or edit requisitions — visibility without the ability to raise/approve. |
-| HR Manager | Read/Write/Create/Delete/Export/Print/Report/Share/Email | Full access — approval authority implicitly rests here since HR User is read-only. |
+| [[System Manager]] | Read/Write/Create/Delete/Export/Print/Report/Share/Email | Full access. |
+| [[HR User]] | Read only | Cannot create or edit requisitions — visibility without the ability to raise/approve. |
+| [[HR Manager]] | Read/Write/Create/Delete/Export/Print/Report/Share/Email | Full access — approval authority implicitly rests here since HR User is read-only. |
 
 Not enforced in code: no role restricts who can move `status` to `Open & Approved` beyond
 generic write permission — there is no separate "approver" role or workflow guard.

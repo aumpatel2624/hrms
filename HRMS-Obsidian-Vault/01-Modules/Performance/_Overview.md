@@ -57,3 +57,7 @@ Performance management needs a process that is both structured (so scores are co
 - [[Employee Performance Feedback]] — submittable multi-rater feedback record scored and averaged into an Appraisal.
 - [[Employee Feedback Criteria]] — master list of named rating criteria reused across templates, appraisals, and feedback.
 - [[Employee Feedback Rating]] — generic child table pairing criteria, weightage, and rating, reused across three parent doctypes.
+
+## See Also
+
+- [[Performance Appraisal Cycle]] — end-to-end flow from cycle setup through goal tracking, feedback, and final-score aggregation.

@@ -27,6 +27,7 @@ All value fields are `read_only` and `no_copy` — they are computed and stamped
 - [[Salary Slip]] — parent doctype; this table is the `leave_details` field on Salary Slip.
 - [[Leave Type]] — linked via `leave_type`.
 - [[Leave Application]] — indirectly, the source of `used_leaves`/`pending_leaves` figures.
+- [[Leave Allocation]] — indirectly, the source of `total_allocated_leaves`/`expired_leaves`/`available_leaves` figures for the leave type.
 
 ## Logic — What Happens and Why
 

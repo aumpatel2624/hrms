@@ -24,7 +24,7 @@ Salary Structure Assignment) versus the amount the employee actually elects.
 
 - [[Employee Benefit Application]] — parent doctype (`employee_benefits` table field).
 - [[Salary Component]] — each row links to one flexible-benefit earning component.
-- [[Salary Structure Assignment]] — indirectly, since `max_benefit_amount` is sourced from that document's Employee Benefit Detail child rows.
+- [[Salary Structure Assignment]] — indirectly, since `max_benefit_amount` is sourced from that document's [[Employee Benefit Detail]] child rows.
 
 ## Logic — What Happens and Why
 

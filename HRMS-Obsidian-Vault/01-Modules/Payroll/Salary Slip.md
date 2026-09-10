@@ -105,9 +105,9 @@ The pay statement issued to an employee for one payroll period: it is the docume
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | create, read, write, submit, print, email, share, report | Cannot cancel, delete, or amend — can generate and submit slips but not reverse them |
-| HR Manager | create, read, write, submit, cancel, amend, delete, print, email, share, report | Full lifecycle control including cancel/amend/delete |
-| Employee | read, print | Self-service viewing of own payslip only (row-level restriction to own record is enforced by standard Frappe user-permission/employee linkage, not explicit code in this controller) |
+| [[HR User]] | create, read, write, submit, print, email, share, report | Cannot cancel, delete, or amend — can generate and submit slips but not reverse them |
+| [[HR Manager]] | create, read, write, submit, cancel, amend, delete, print, email, share, report | Full lifecycle control including cancel/amend/delete |
+| [[Employee]] | read, print | Self-service viewing of own payslip only (row-level restriction to own record is enforced by standard Frappe user-permission/employee linkage, not explicit code in this controller) |
 
 ## Mermaid: State/Flow
 

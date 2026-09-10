@@ -12,9 +12,9 @@ key, since exports, print formats, and cross-references key off it.
 ## Strategies Used Across HRMS Doctypes
 
 1. **Naming series** (most common) — a prefix + zero-padded auto-incrementing number,
-   e.g. `HR-ONB-.YYYY.-.#####` renders as `HR-ONB-2026-00042`. The counter resets or
-   continues based on the series key (often per-year via the `.YYYY.` token). Check
-   each doctype's `**Naming:**` line for its exact series pattern.
+   e.g. `HR-ONB-.YYYY.-.#####` renders as `HR-ONB-2026-00042` (see [[Employee Onboarding]]).
+   The counter resets or continues based on the series key (often per-year via the
+   `.YYYY.` token). Check each doctype's `**Naming:**` line for its exact series pattern.
 2. **Field-based** (`autoname: "field:fieldname"`) — the document's `name` IS the
    value of a specific field (e.g. a code field), must be unique.
 3. **Hash-based** (`autoname: "hash"`) — random unique string, used for child-table-
@@ -22,8 +22,10 @@ key, since exports, print formats, and cross-references key off it.
 4. **`prompt`** — user types the name manually on create (rare in this app).
 5. **Format string with linked fields** (e.g. `{employee}-{leave_type}-{posting_date}`)
    — composite, must stay unique; check the doctype's own spec for exact examples
-   (e.g. Salary Slip's tie to `employee` + `start_date`/`end_date`, Leave Allocation's
-   tie to `employee` + `leave_type` + period).
+   (e.g. [[Salary Slip]]'s tie to `employee` + `start_date`/`end_date`, [[Leave Allocation]]'s
+   tie to `employee` + `leave_type` + period — `employee` here is the
+   [[Employee Core Model|Employee]] Link field common to almost every naming format string
+   in this app).
 
 ## Port Equivalent
 
@@ -32,7 +34,9 @@ strategy, called at insert time, enforced unique at the DB level regardless of
 strategy (unique constraint on the resulting name/business-key column). For naming
 series specifically, maintain a `naming_series_counters(series_key) -> last_number`
 table with an atomic increment (equivalent to Frappe's own `tabSeries` table) to avoid
-race conditions under concurrent inserts.
+race conditions under concurrent inserts. For submittable doctypes, a `name` must
+already be assigned before submit is allowed — see [[Submittable Document Lifecycle]]
+rule 2.
 
 ## Child Tables Never Have Independently Meaningful Names
 

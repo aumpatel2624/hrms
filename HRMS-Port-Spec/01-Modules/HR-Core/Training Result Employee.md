@@ -10,7 +10,7 @@ Child doctype of `Training Result` (field `employees`).
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | No (not `reqd`) | — | No | shown in list view (grid column) |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | No (not `reqd`) | — | No | shown in list view (grid column) |
 | column_break_2 | — | Column Break | — | — | — | — | layout only |
 | employee_name | Employee Name | Read Only | — | No | — | Yes | `fetch_from: employee.employee_name` |
 | department | Department | Link | Department | No | — | Yes | `fetch_from: employee.department` |
@@ -55,6 +55,10 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: shown in list view (grid column)
 
 ## Port Notes
 

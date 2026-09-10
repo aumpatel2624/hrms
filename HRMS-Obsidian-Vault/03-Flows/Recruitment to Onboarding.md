@@ -33,7 +33,7 @@ flowchart TD
 
 | Step | Role |
 |---|---|
-| Approve headcount, create Job Requisition | [[HR Manager]] |
+| Approve headcount, create [[Job Requisition]] | [[HR Manager]] |
 | Publish [[Job Opening]] | [[HR User]] |
 | Refer a candidate | [[Employee]] (via [[Employee Referral]]) |
 | Screen and schedule [[Interview]] | [[HR User]] |
@@ -44,15 +44,15 @@ flowchart TD
 
 ## Why This Sequence, Not a Simpler One
 
-- **Staffing Plan gates Job Requisition** so headcount growth is tied to an approved
-  budget/vacancy count, not created ad hoc — `Staffing Plan Detail` tracks how many of
+- **[[Staffing Plan]] gates Job Requisition** so headcount growth is tied to an approved
+  budget/vacancy count, not created ad hoc — [[Staffing Plan Detail]] tracks how many of
   each designation are still open, and Job Requisition/Job Opening creation checks
   against that remaining count.
 - **Interview feedback is per-Interviewer, aggregated, not a single decision field** —
   this is deliberate: it forces the hiring decision to be based on recorded, individual
   panel input rather than one person's unrecorded judgment, useful for both hiring
   quality and for defending the decision later if challenged.
-- **Job Offer is a separate doctype from Employee**, not a status flag on Job Applicant —
+- **Job Offer is a separate doctype from Employee**, not a status flag on [[Job Applicant]] —
   because an offer has its own lifecycle (drafted, sent, accepted/declined, expired) and
   its own terms ([[Job Offer Term]]) that must be preserved as a record independent of
   whether the candidate ultimately joins.

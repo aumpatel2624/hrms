@@ -36,7 +36,7 @@ The submittable template that defines an employee's pay composition — its earn
 - [[Bulk Salary Structure Assignment]] — linked from: a single-instance tool that calls `create_salary_structure_assignment()` (imported from this module) to bulk-create assignments referencing this structure.
 - [[Salary Slip]] — triggers: `make_salary_slip()` / `_make_salary_slip()` map this structure onto a new Salary Slip (`get_mapped_doc`), copying `total_earning → gross_pay`, `name → salary_structure`, `currency`; the slip then calls back into `process_salary_structure` to evaluate the component tables per payroll period.
 - Employee — linked from: `get_employees()` finds active employees matching structure/company/branch/department/designation/grade filters for assignment.
-- Income Tax Slab — linked from: assignment flow (`assign_salary_structure`) can pass through an income tax slab required by tax-variable deduction components.
+- [[Income Tax Slab]] — linked from: assignment flow (`assign_salary_structure`) can pass through an income tax slab required by tax-variable deduction components.
 
 ## Logic — What Happens and Why
 
@@ -74,8 +74,8 @@ The submittable template that defines an employee's pay composition — its earn
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create/delete/submit/cancel/amend/print/report/share/email | Full lifecycle access. |
-| HR Manager | read/write/create/delete/submit/cancel/amend/print/report/share/email/export/import | Same as HR User plus export/import. |
+| [[HR User]] | read/write/create/delete/submit/cancel/amend/print/report/share/email | Full lifecycle access. |
+| [[HR Manager]] | read/write/create/delete/submit/cancel/amend/print/report/share/email/export/import | Same as HR User plus export/import. |
 
 ## Mermaid: State/Flow
 

@@ -42,3 +42,7 @@ An employee spending money on the company's behalf needs: (1) a way to itemize w
 - [[Expense Claim Detail]] — one itemized expense line (date, type, claimed vs. sanctioned amount) inside a claim.
 - [[Expense Claim Advance]] — one Employee Advance being netted against a claim.
 - [[Expense Taxes and Charges]] — one tax/charge row applied on top of the claim's sanctioned amount.
+
+## See Also
+
+- [[Expense Claim Lifecycle]] — end-to-end flow from claim submission through approval, tax/advance adjustment, GL posting, and payment.

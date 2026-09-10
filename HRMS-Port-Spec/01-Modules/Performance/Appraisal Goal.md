@@ -45,13 +45,17 @@ None on this child doctype directly. Its rows are read/written entirely from the
 
 None.
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 Empty `permissions` array in the JSON — governed by parent (`Appraisal`); a user's ability to read/write rows in this table is entirely determined by their permissions on the parent Appraisal document.
 
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Appraisal]] — parent doctype; this child table is `Appraisal.goals`, used only when `rate_goals_manually = 1`.
 
 ## Port Notes
 

@@ -7,6 +7,13 @@ mechanism**: generic HR/Payroll code calls a small, fixed set of "regional hook 
 per-country module can swap in a country-specific implementation. India and UAE are the only two
 countries with active overrides in this codebase.
 
+## Contents
+
+- [[India Gratuity Rule Setup + Custom Fields]]
+- [[India HRA Exemption]]
+- [[India Marginal Relief Tax]]
+- [[UAE Gratuity Rules]]
+
 ## Purpose
 
 Frappe/ERPNext HR logic is written generically (e.g. "calculate HRA exemption", "apply marginal
@@ -60,17 +67,17 @@ Only 3 hook points are overridden in this codebase, all for `"India"`, all point
 | `hrms.hr.utils.calculate_tax_with_marginal_relief` | `calculate_tax_with_marginal_relief` |
 
 UAE has **no calculation overrides** — it only contributes one-time fixture data via `setup()`
-(see `UAE Gratuity Rules.md`). There is no `regional_overrides["United Arab Emirates"]` entry in
+(see [[UAE Gratuity Rules]]). There is no `regional_overrides["United Arab Emirates"]` entry in
 `hooks.py`.
 
 ## Doctype-ish list (fixture data seeded, not new doctypes)
 
 - **Gratuity Rule** (existing core doctype, not defined in this module) — India seeds 1 record
-  (`Indian Standard Gratuity Rule`), UAE seeds 3 records. See `India Gratuity Rule Setup +
-  Custom Fields.md` and `UAE Gratuity Rules.md`.
+  (`Indian Standard Gratuity Rule`), UAE seeds 3 records. See
+  [[India Gratuity Rule Setup + Custom Fields]] and [[UAE Gratuity Rules]].
 - **Custom Field** records added by India's `setup.py` onto `Salary Component`, `Employee`,
   `Company`, `Employee Tax Exemption Declaration`, `Employee Tax Exemption Proof Submission`,
-  `Income Tax Slab` — see `India Gratuity Rule Setup + Custom Fields.md`.
+  `Income Tax Slab` — see [[India Gratuity Rule Setup + Custom Fields]].
 - **Custom Role** records added onto 3 standard reports — see the same file.
 
 There are no country-specific doctypes; everything here either (a) overrides a calculation
@@ -88,7 +95,7 @@ dispatch, not persisted data. What must be modeled:
   exact values) — no schema change required, only seed data.
 - **`income_tax_slabs`** table needs a `marginal_relief_limit` column/field (India-only,
   conditionally shown when `tax_relief_limit > 0` and `currency == 'INR'`) — see
-  `India Marginal Relief Tax.md`.
+  [[India Marginal Relief Tax]].
 - **`companies`** needs `basic_component_id` and `hra_component_id` FK columns (+ optional
   `arrear_component_id`) pointing at `salary_components` — used by the HRA exemption calculation.
 - **`employees`** needs `pan_number`, `provident_fund_account`, `ifsc_code`, `micr_code` fields
@@ -98,7 +105,7 @@ dispatch, not persisted data. What must be modeled:
   Provident Fund`, `Provident Fund Loan`, `Professional Tax`, or empty), shown only when
   `type == "Deduction"`.
 - **`employee_tax_exemption_declarations`** and **`employee_tax_exemption_proof_submissions`**
-  need the HRA fields listed in `India HRA Exemption.md`.
+  need the HRA fields listed in [[India HRA Exemption]].
 
 ## Module-wide invariant / design guidance for a port
 
@@ -114,8 +121,8 @@ dispatch, not persisted data. What must be modeled:
   ```
   A `DefaultRegionalStrategy` implements every method as a no-op (returns `null`/`{}`, matching
   the core `allow_regional` stubs' behavior of doing nothing for unhandled countries). An
-  `IndiaRegionalStrategy` implements the real logic from `India HRA Exemption.md` /
-  `India Marginal Relief Tax.md`. A registry resolves `country -> strategy instance` (e.g. a map
+  `IndiaRegionalStrategy` implements the real logic from [[India HRA Exemption]] /
+  [[India Marginal Relief Tax]]. A registry resolves `country -> strategy instance` (e.g. a map
   or DI-container binding keyed by the company's/tenant's country code), looked up once per
   request/company context — analogous to how Frappe resolves `regional_overrides` once per site
   boot. UAE needs no strategy class since it has no calculation overrides — its gratuity presets

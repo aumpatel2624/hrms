@@ -9,21 +9,21 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | employee_details_section | Employee Details | Section Break | — | — | — | — | |
-| employee | Employee | Link | Employee | yes | — | no | in_standard_filter, search_index |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | in_standard_filter, search_index |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | column_break_3 | (Column) | Column Break | — | — | — | — | |
 | company | Company | Link | Company | yes | — | no | fetch_from `employee.company` |
 | department | Department | Link | Department | no | — | yes | fetch_from `employee.department` |
 | shift_details_section | Shift Details | Section Break | — | — | — | — | |
-| shift_type | Shift Type | Link | Shift Type | yes | — | no | in_list_view, in_standard_filter, search_index |
-| shift_location | Shift Location | Link | Shift Location | no | — | no | |
+| shift_type | Shift Type | Link | [[Shift Type]] | yes | — | no | in_list_view, in_standard_filter, search_index |
+| shift_location | Shift Location | Link | [[Shift Location]] | no | — | no | |
 | status | Status | Select | Active/Inactive | no | Active | no | `allow_on_submit` |
 | overtime_type | Overtime Type | Link | Overtime Type | no | — | no | fetch_from `shift_type.overtime_type`, `fetch_if_empty: 1` |
 | column_break_brkq | (Column) | Column Break | — | — | — | — | |
 | start_date | Start Date | Date | — | yes | — | no | in_list_view |
 | end_date | End Date | Date | — | no | — | no | `allow_on_submit` |
-| shift_request | Shift Request | Link | Shift Request | no | — | yes | set when created via Shift Request approval |
-| shift_schedule_assignment | Shift Schedule Assignment | Link | Shift Schedule Assignment | no | — | yes | set when created via auto shift-schedule creation |
+| shift_request | Shift Request | Link | [[Shift Request]] | no | — | yes | set when created via Shift Request approval |
+| shift_schedule_assignment | Shift Schedule Assignment | Link | [[Shift Schedule Assignment]] | no | — | yes | set when created via auto shift-schedule creation |
 | amended_from | Amended From | Link | Shift Assignment | no | — | yes | no_copy |
 
 ## Child Tables
@@ -65,7 +65,7 @@ Plain list (status field, distinct from docstatus):
 
 ## Business Logic / Calculations
 
-This doctype hosts the **core shift-window resolution engine** used throughout the module (by `Employee Checkin.fetch_shift`, `Shift Type` absence sweeps, calendar views, etc.). Full algorithms:
+This doctype hosts the **core shift-window resolution engine** used throughout the module (by [[Employee Checkin]]`.fetch_shift`, `Shift Type` absence sweeps, calendar views, etc.). Full algorithms:
 
 ### `has_overlapping_timings(shift_1, shift_2)` — module-level
 
@@ -170,7 +170,7 @@ From `hrms/hooks.py`, `scheduler_events["daily"]`:
   2. Find all submitted (`docstatus=1`), `status="Active"` Shift Assignments where `end_date` is set AND `end_date < yesterday`.
   3. FOR EACH: `frappe.db.set_value("Shift Assignment", name, "status", "Inactive")` — direct DB write, no re-validation, no comment/notification.
 
-Also indirectly read (not written) extensively by the `hourly_long` auto-attendance pipeline documented in `Shift Type.md` (via `get_employee_shift`, `get_shift_details`, `get_assigned_employees`).
+Also indirectly read (not written) extensively by the `hourly_long` auto-attendance pipeline documented in [[Shift Type]] (via `get_employee_shift`, `get_shift_details`, `get_assigned_employees`).
 
 ## Port Notes
 
@@ -179,3 +179,12 @@ Also indirectly read (not written) extensively by the `hourly_long` auto-attenda
 - **`allow_multiple_shift_assignments` (HR Settings, site-wide)** changes overlap-validation from hard error to soft warning — this is a global toggle a port needs, not a per-document setting.
 - **Cancellation of a Shift Assignment is blocked if any Employee Checkin or Attendance references it within its date range** — a port must implement this as a referential-integrity-style guard at the application layer (not just an FK constraint) since the linkage is by `employee + shift_type + date range`, not a direct foreign key to the Shift Assignment record itself.
 - **`frappe.get_cached_value`/`frappe.get_cached_doc`** used throughout this module for Shift Type lookups — a port should cache Shift Type metadata (start_time, end_time, margins) at least per-batch to match performance characteristics, though this is a performance concern, not a correctness one.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the assignment is filed against this employee.
+- [[Shift Type]] — `shift_type` defines the shift's timing window; this doctype's module functions are the shared shift-window resolution engine used by Shift Type/Employee Checkin/Attendance.
+- [[Shift Location]] — optional geofence location for the assigned shift.
+- [[Shift Request]] — `shift_request` is set when this assignment was created via an approved Shift Request.
+- [[Shift Schedule Assignment]] — `shift_schedule_assignment` is set when this assignment was auto-created by a recurring shift schedule.
+- [[Employee Checkin]] — resolves the exact shift occurrence for a checkin via this doctype's `get_actual_start_end_datetime_of_shift`.

@@ -35,13 +35,17 @@ None on this child doctype directly.
 
 None.
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 Empty `permissions` array in the JSON — governed by parent (`Appraisal Template`).
 
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Appraisal Template]] — parent doctype; this child table is `Appraisal Template.goals`.
 
 ## Port Notes
 

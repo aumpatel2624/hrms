@@ -10,7 +10,7 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| expense_type | Expense Type | Link | Expense Claim Type | No | — | No | In list view. |
+| expense_type | Expense Type | Link | [[Expense Claim Type]] | No | — | No | In list view. |
 | *(column_break_2)* | — | Column Break | — | — | — | — | Layout only. |
 | sponsored_amount | Sponsored Amount | Currency | `options: "Company:company:default_currency"` (dynamic currency resolved via the row's — actually the *parent transaction's* — `company` field, per Frappe's `DocType:fieldname:default_currency`-style dynamic currency-options convention) | No | — | No | In list view. `non_negative: 1`. |
 | funded_amount | Funded Amount | Currency | `options: "Company:company:default_currency"` | No | — | No | In list view. `non_negative: 1`. |
@@ -53,6 +53,10 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Expense Claim Type]] — via `expense_type`: In list view.
 
 ## Port Notes
 

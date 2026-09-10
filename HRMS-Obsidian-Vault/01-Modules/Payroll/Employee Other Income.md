@@ -44,9 +44,9 @@ income tax computation) as "not enforced in code" rather than assumed.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | read/write/create/submit/cancel/delete/amend | Full control |
-| HR User | read/write/create/submit/cancel/delete/amend | Full control |
-| Employee | read/write/create/submit/cancel/delete/amend | Full control — unlike Employee Benefit Claim/Incentive, employees can self-submit their own Other Income declarations |
+| [[HR Manager]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[HR User]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[Employee]] | read/write/create/submit/cancel/delete/amend | Full control — unlike Employee Benefit Claim/Incentive, employees can self-submit their own Other Income declarations |
 
 ## Mermaid: State/Flow
 

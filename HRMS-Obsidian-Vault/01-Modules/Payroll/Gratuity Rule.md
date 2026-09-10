@@ -27,7 +27,7 @@ A named, reusable policy definition for how gratuity is calculated — the calcu
 - [[Gratuity]] — linked from; a Gratuity record's entire calculation is driven by the referenced rule (`gratuity_settings` property, `get_gratuity_rule_slabs`, `get_applicable_components`).
 - [[Gratuity Rule Slab]] — parent/child (Table field `gratuity_rule_slabs`).
 - [[Gratuity Applicable Component]] — parent/child (Table MultiSelect field `applicable_earnings_component`); duplicated conceptually as its own child rows queried directly by parent name in Gratuity's `get_applicable_components`.
-- [[Salary Component]] — indirectly, through Gratuity Applicable Component rows (must be part of the employee's Salary Structure per the field description).
+- [[Salary Component]] — indirectly, through Gratuity Applicable Component rows (must be part of the employee's [[Salary Structure]] per the field description).
 - Regional setup — hrms/regional/india/setup.py `create_gratuity_rule_for_india()` (~line 262) creates "Indian Standard Gratuity Rule" with `minimum_year_for_gratuity=5`, "Current Slab" basis. hrms/regional/united_arab_emirates/setup.py `create_gratuity_rules_for_uae()` (~line 11) creates several UAE-specific rules with `minimum_year_for_gratuity=1` and mixed calculation bases. Regional override exists — full deep-dive owned by another agent.
 
 ## Logic — What Happens and Why
@@ -44,8 +44,8 @@ There is no submit/cancel lifecycle — this is a plain (non-submittable) config
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | read/write/create/delete | Configuration-level access. |
-| HR User | read/write/create/delete | Same as HR Manager per JSON — no differentiation. |
+| [[HR Manager]] | read/write/create/delete | Configuration-level access. |
+| [[HR User]] | read/write/create/delete | Same as HR Manager per JSON — no differentiation. |
 
 ## Mermaid: State/Flow
 

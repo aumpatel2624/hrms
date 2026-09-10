@@ -77,8 +77,8 @@ picking estimate or actual.
 
 **Single source of truth** — [[Employee]] as the hub every module Links to, plus the
 several doc_events in `hrms/hooks.py` that sync one doctype's state into another on
-submit/cancel (Leave → Attendance, Journal Entry → Expense Claim/Salary Slip/Full and
-Final Statement/Salary Withholding), exist so that two different views of "has this
+submit/cancel (Leave → [[Attendance]], Journal Entry → [[Expense Claim]]/[[Salary Slip]]/
+[[Full and Final Statement]]/[[Salary Withholding]]), exist so that two different views of "has this
 happened yet" (HR's view and Accounting's view, or Leave's view and Attendance's view)
 never quietly drift apart.
 

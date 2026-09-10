@@ -42,8 +42,8 @@ Controller: `TrainingResult(Document)` in `training_result.py`.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, write, create, delete, submit, cancel, amend | Full lifecycle control. |
-| HR User | Read, write, create | Cannot delete or submit. |
+| [[HR Manager]] | Read, write, create, delete, submit, cancel, amend | Full lifecycle control. |
+| [[HR User]] | Read, write, create | Cannot delete or submit. |
 
 ## Mermaid: State/Flow
 

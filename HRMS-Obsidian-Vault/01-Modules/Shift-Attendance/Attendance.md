@@ -63,10 +63,10 @@ The system of record for whether an employee was present, absent, on leave, half
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read/Write/Create/Delete/Submit/Cancel | Full admin control. |
-| HR User | Read/Write/Create/Delete/Submit/Cancel/Import/Export | Same operational rights as HR Manager, no title role. |
-| HR Manager | Read/Write/Create/Delete/Submit/Cancel | Standard HR administration of attendance. |
-| Employee | Read/Export/Print/Select | Not enforced further in code beyond the standard role permission; `select` lets employees pick their own Attendance as a link target elsewhere. No create/write in the DocType permissions — self-service attendance marking (if any) happens via a different whitelisted endpoint, not direct doc creation. |
+| [[System Manager]] | Read/Write/Create/Delete/Submit/Cancel | Full admin control. |
+| [[HR User]] | Read/Write/Create/Delete/Submit/Cancel/Import/Export | Same operational rights as HR Manager, no title role. |
+| [[HR Manager]] | Read/Write/Create/Delete/Submit/Cancel | Standard HR administration of attendance. |
+| [[Employee]] | Read/Export/Print/Select | Not enforced further in code beyond the standard role permission; `select` lets employees pick their own Attendance as a link target elsewhere. No create/write in the DocType permissions — self-service attendance marking (if any) happens via a different whitelisted endpoint, not direct doc creation. |
 
 ## Mermaid: State/Flow
 

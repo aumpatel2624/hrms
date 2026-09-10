@@ -27,8 +27,8 @@ Pure master/setup data — the Python controller (`EmployeeHealthInsurance`) con
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, Write, Create, Delete | Full management of the insurance plan list. |
-| HR User | Read only | Can view/report/export/print/email but not create, edit, or delete plans. |
+| [[HR Manager]] | Read, Write, Create, Delete | Full management of the insurance plan list. |
+| [[HR User]] | Read only | Can view/report/export/print/email but not create, edit, or delete plans. |
 
 ## Mermaid: State/Flow
 

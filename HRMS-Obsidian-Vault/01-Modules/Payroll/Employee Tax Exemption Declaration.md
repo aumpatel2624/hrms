@@ -52,10 +52,10 @@ Why this structure exists: income tax withholding during the year must be estima
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
-| HR Manager | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
-| HR User | create/read/write/delete/submit/cancel/amend | Full lifecycle control, same as HR Manager. |
-| Employee | create/read/write/delete/submit/cancel/amend | Full rights per the DocType permission row — restriction to "only for self" is not enforced in this doctype's JSON (no `if_owner` flag present); if such a restriction exists it would be via a separate permission rule/user-permission setup not visible in this file. |
+| [[System Manager]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
+| [[HR Manager]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
+| [[HR User]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control, same as HR Manager. |
+| [[Employee]] | create/read/write/delete/submit/cancel/amend | Full rights per the DocType permission row — restriction to "only for self" is not enforced in this doctype's JSON (no `if_owner` flag present); if such a restriction exists it would be via a separate permission rule/user-permission setup not visible in this file. |
 
 ## Mermaid: State/Flow
 

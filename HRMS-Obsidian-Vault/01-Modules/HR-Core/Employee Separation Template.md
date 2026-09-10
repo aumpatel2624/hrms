@@ -33,9 +33,9 @@ Employee Separation Template is a reusable offboarding checklist master — a na
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete | Full control. |
-| HR Manager | Read, write, create, delete | Full control. |
-| HR User | Read only | No create/write/delete — not enforced beyond read in code/permissions. |
+| [[System Manager]] | Read, write, create, delete | Full control. |
+| [[HR Manager]] | Read, write, create, delete | Full control. |
+| [[HR User]] | Read only | No create/write/delete — not enforced beyond read in code/permissions. |
 
 ## Mermaid: State/Flow
 

@@ -82,3 +82,7 @@ Two background jobs (registered in `hooks.py` under `scheduler_events.daily_long
 - [[Leave Block List Date]] — child row: one blocked date + reason.
 - [[Leave Block List Allow]] — child row: one user exempted from a block list.
 - [[Holiday List Assignment]] — date-effective binding of an Employee or Company to a Holiday List.
+
+## Related Flow
+
+See [[Leave Request Lifecycle]] for the end-to-end sequence from Leave Allocation through Leave Application to ledger posting.

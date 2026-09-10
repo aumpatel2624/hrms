@@ -10,14 +10,14 @@
 |---|---|---|---|---|---|---|---|
 | expense_type | Expense Claim Type | Data | - | yes | - | - | `unique`; used as document name (`autoname: field:expense_type`) |
 | description | Description | Small Text | - | - | - | - | |
-| accounts | Accounts | Table | `Expense Claim Account` | - | - | - | child table, per-company default account mapping |
+| accounts | Accounts | Table | `[[Expense Claim Account]]` | - | - | - | child table, per-company default account mapping |
 | deferred_expense_account | Deferred Expense Account | Check | - | - | 0 | - | |
 
 `allow_rename: 1` — renaming this doctype's document (i.e. changing the type name) is permitted.
 
 ## Child Tables
 
-- `accounts` -> `Expense Claim Account` (see `Expense Claim Account.md`)
+- `accounts` -> `Expense Claim Account` (see [[Expense Claim Account]])
 
 ## State Machine
 
@@ -44,7 +44,7 @@ Client script (`expense_claim_type.js`) only wires `Account` field query filters
 
 ## Whitelisted / API Methods
 
-None on this doctype's controller. (Consumed by `Expense Claim`'s `get_expense_claim_account` / `get_expense_claim_account_and_cost_center`, documented in `Expense Claim.md`.)
+None on this doctype's controller. (Consumed by [[Expense Claim]]'s `get_expense_claim_account` / `get_expense_claim_account_and_cost_center`, documented in `Expense Claim.md`.)
 
 ## Permissions
 
@@ -61,4 +61,10 @@ None.
 ## Port Notes
 
 - `allow_import: 1` — bulk import via Frappe's Data Import tool is enabled; a port should provide an equivalent bulk-load path if needed.
-- Naming by field value (`autoname: field:expense_type`) means the primary key IS the human-entered type name; renaming the type name renames the record (and Frappe auto-updates all `Link` references elsewhere, e.g. on `Expense Claim Detail.expense_type`) — a new stack must either use a surrogate key with a unique constraint on the name and cascade renames explicitly, or preserve name-as-PK semantics.
+- Naming by field value (`autoname: field:expense_type`) means the primary key IS the human-entered type name; renaming the type name renames the record (and Frappe auto-updates all `Link` references elsewhere, e.g. on [[Expense Claim Detail]]`.expense_type`) — a new stack must either use a surrogate key with a unique constraint on the name and cascade renames explicitly, or preserve name-as-PK semantics.
+
+## Related Doctypes
+
+- [[Expense Claim Account]] — child table mapping one default GL account per company for this expense type.
+- [[Expense Claim]] — consumes this doctype via `get_expense_claim_account`/`get_expense_claim_account_and_cost_center` to resolve the default account for a claim line.
+- [[Expense Claim Detail]] — each row's `expense_type` field links to this doctype.

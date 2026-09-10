@@ -54,9 +54,9 @@ Why this structure exists: tax law changes yearly and differs by jurisdiction/co
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
-| HR Manager | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
-| HR User | create/read/write/delete/submit/cancel/amend | Full lifecycle control, same as HR Manager. |
+| [[System Manager]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
+| [[HR Manager]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
+| [[HR User]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control, same as HR Manager. |
 
 No `Employee` role — employees never directly interact with tax slab configuration.
 

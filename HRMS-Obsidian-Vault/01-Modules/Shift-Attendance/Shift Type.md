@@ -57,9 +57,9 @@ The master definition of a work shift — its timings, grace periods, and (criti
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read/Write/Create/Delete | Full control of shift definitions and their auto-attendance rules. |
-| HR User | Read/Write/Create | No delete — can configure but not remove shift types. |
-| Employee | Read | View-only; cannot see/modify auto-attendance configuration. |
+| [[HR Manager]] | Read/Write/Create/Delete | Full control of shift definitions and their auto-attendance rules. |
+| [[HR User]] | Read/Write/Create | No delete — can configure but not remove shift types. |
+| [[Employee]] | Read | View-only; cannot see/modify auto-attendance configuration. |
 
 ## Mermaid: State/Flow
 

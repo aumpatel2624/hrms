@@ -23,8 +23,8 @@ Employee Promotion records a promotion event for an employee — a set of proper
 ## Relationships
 
 - [[Employee Transfer]] — sibling doctype sharing the same Employee Property History change-tracking pattern.
-- Employee Property History — child table (outside assigned doctype set), holds the before/after property values.
-- Employee — linked to (outside assigned doctype set); this doc reads and mutates the Employee's fields and `ctc`.
+- [[Employee Property History]] — child table, holds the before/after property values.
+- [[Employee]] — linked to; this doc reads and mutates the Employee's fields and `ctc`.
 
 ## Logic — What Happens and Why
 
@@ -42,9 +42,9 @@ Controller: `EmployeePromotion(Document)` in `employee_promotion.py`.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | Read | View-only, presumably to see their own promotion record. |
-| HR User | Read, write, create, submit | No cancel/delete/amend. |
-| HR Manager | Read, write, create, submit, cancel, delete, amend | Full control. |
+| [[Employee]] | Read | View-only, presumably to see their own promotion record. |
+| [[HR User]] | Read, write, create, submit | No cancel/delete/amend. |
+| [[HR Manager]] | Read, write, create, submit, cancel, delete, amend | Full control. |
 
 ## Mermaid: State/Flow
 

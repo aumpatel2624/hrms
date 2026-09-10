@@ -28,10 +28,10 @@ Grievance Type is a simple master list categorizing the kinds of grievances an e
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete | Full control. |
-| HR Manager | Read, write, create, delete | Full control. |
-| HR User | Read, write, create, delete | Full control. |
-| Employee | Read | View-only, to select a category when raising a grievance. |
+| [[System Manager]] | Read, write, create, delete | Full control. |
+| [[HR Manager]] | Read, write, create, delete | Full control. |
+| [[HR User]] | Read, write, create, delete | Full control. |
+| [[Employee]] | Read | View-only, to select a category when raising a grievance. |
 
 ## Mermaid: State/Flow
 

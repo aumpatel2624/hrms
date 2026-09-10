@@ -42,7 +42,8 @@ A master record for one line item that can appear on a payslip — an earning (B
 - [[Salary Component Account]] — parent/child: `accounts` child table, one row per company's GL account for this component.
 - [[Salary Detail]] — linked from: every earnings/deductions/employer_contributions row on a [[Salary Structure]] or [[Salary Slip]] links back via `salary_component`, and several Salary Detail fields (`is_tax_applicable`, `depends_on_payment_days`, `do_not_include_in_total`, `accrual_component`, etc.) are `fetch_from` this doctype.
 - [[Salary Structure]] — linked from: `earnings`, `deductions`, `employer_contributions` tables reference this component; `set_missing_values()` on Salary Structure re-syncs several flags from here on save.
-- Employee Benefit Detail — linked from: flexible-benefit selections reference this component and respect `max_benefit_amount`.
+- [[Employee Benefit Detail]] — linked from: flexible-benefit selections reference this component and respect `max_benefit_amount`.
+- [[Leave Type]] (Leaves module) — linked from: a leave type's `earning_component` field points to the Salary Component used to pay out [[Leave Encashment]].
 
 ## Logic — What Happens and Why
 
@@ -67,9 +68,9 @@ A master record for one line item that can appear on a payslip — an earning (B
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create/export/print/report/share | Full functional access, no delete. |
-| HR Manager | read/write/create/delete/export/print/report/share | Full access including delete. |
-| Employee | read | View-only, e.g. to see component names on their own payslip. |
+| [[HR User]] | read/write/create/export/print/report/share | Full functional access, no delete. |
+| [[HR Manager]] | read/write/create/delete/export/print/report/share | Full access including delete. |
+| [[Employee]] | read | View-only, e.g. to see component names on their own payslip. |
 
 ## Mermaid: State/Flow
 

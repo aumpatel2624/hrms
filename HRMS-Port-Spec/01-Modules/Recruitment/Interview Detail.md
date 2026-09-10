@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** Child table (`istable: 1`) — standard child-row identity (`parent`/`parentfield`/`parenttype` + auto `name`), no custom autoname.
 **Module:** HR
 
-This is a child (table) doctype, used exclusively as the row type for `Interview.interview_details` (a Table field — see `Interview.md`). It represents one interviewer assigned to one specific, scheduled `Interview`.
+This is a child (table) doctype, used exclusively as the row type for `Interview.interview_details` (a Table field — see [[Interview]]). It represents one interviewer assigned to one specific, scheduled `Interview`.
 
 ## Schema
 
@@ -33,11 +33,11 @@ None directly on this doctype. It is the join point used to compute:
 ## Lifecycle Hooks (exact)
 
 None defined on this doctype directly. Rows are created (appended) by:
-- `Job Applicant.create_interview` / `schedule_interview` — one row per interviewer returned by `Interview.get_interviewers(interview_type)`.
-- `Interview Type.create_interview` — one row per `Interviewer` on the source Interview Type.
+- `Job Applicant.create_interview` / `schedule_interview` — one row per interviewer returned by `Interview.get_interviewers(interview_type)` (see [[Job Applicant]]).
+- `Interview Type.create_interview` — one row per `Interviewer` on the source Interview Type (see [[Interview Type]]).
 - Client-side `Interview.js`'s `set_applicable_interviewers` — repopulates the table via `frm.clear_table` + `frm.add_child` whenever `interview_type` changes on the Interview form (client-only convenience, mirrors the server-side population logic; a port's server-side "create Interview" endpoint should perform the same population so API-only clients get correct default interviewers without relying on this JS).
 
-Rows are read by `Interview Feedback` (both `get_applicable_interviewers` and by extension `validate_interviewer`) and by the two scheduled reminder jobs (`send_interview_reminder`, `send_daily_feedback_reminder` in `Interview.md`) via `get_recipients`.
+Rows are read by `Interview Feedback` (both `get_applicable_interviewers` and by extension `validate_interviewer`, see [[Interview Feedback]]) and by the two scheduled reminder jobs (`send_interview_reminder`, `send_daily_feedback_reminder` in `Interview.md`) via `get_recipients`.
 
 ## Whitelisted / API Methods
 
@@ -45,7 +45,7 @@ None defined on this doctype directly.
 
 ## Permissions
 
-`"permissions": []` in the JSON — access inherits from the parent `Interview` document. Refer to `Interview.md`'s Permissions section.
+`"permissions": []` in the JSON — access inherits from the parent `Interview` document. Refer to [[Interview]]'s Permissions section. See also [[Permission Model (RBAC)]].
 
 ## Scheduled Jobs Touching This Doctype
 
@@ -58,5 +58,12 @@ Full detail of both jobs is documented in `Interview.md`.
 ## Port Notes
 
 - Model as a normal one-to-many join table: `interview_interview_detail(id PK, interview_id FK -> interview.id, interviewer_user_id FK -> user.id, idx)`.
-- `allow_on_submit: 1` is set on the **parent field** (`Interview.interview_details`, in `interview.json`) — meaning interviewers can still be added/removed on an already-submitted Interview document. A port must allow editing this child table even when the parent `Interview` is in a submitted/locked state, which is unusual for submittable-doc children and should be called out explicitly in the new stack's edit-lock logic.
+- `allow_on_submit: 1` is set on the **parent field** (`Interview.interview_details`, in `interview.json`) — meaning interviewers can still be added/removed on an already-submitted Interview document. A port must allow editing this child table even when the parent `Interview` is in a submitted/locked state (see [[Submittable Document Lifecycle]]), which is unusual for submittable-doc children and should be called out explicitly in the new stack's edit-lock logic.
 - `track_changes: 1` — same audit-trail caveat as other child doctypes in this module.
+
+## Related Doctypes
+
+- [[Interview]] — parent doctype; every Interview Detail row is owned by exactly one Interview instance.
+- [[Interview Type]] — source of default interviewer rows when an Interview is created from a type.
+- [[Job Applicant]] — `create_interview`/`schedule_interview` populate this child table when scheduling an interview.
+- [[Interview Feedback]] — reads this table (`get_applicable_interviewers`) to decide who may submit feedback for the parent Interview.

@@ -30,7 +30,7 @@ Employee Onboarding tracks the process of converting a hired job applicant into 
 
 - [[Employee Onboarding Template]] — linked from, supplies default activities/company/department/designation/grade.
 - [[Employee Boarding Activity]] — child table, one row per onboarding task.
-- Job Applicant, Job Offer, Employee, Project, Task, Holiday List — linked to (outside assigned doctype set; not documented here).
+- [[Job Applicant]], [[Job Offer]], [[Employee]], Project, Task, Holiday List — linked to (outside assigned doctype set; not documented here).
 
 ## Logic — What Happens and Why
 
@@ -54,9 +54,9 @@ Controller: `EmployeeOnboarding(EmployeeBoardingController)` in `employee_onboar
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete, submit, cancel, amend | Full control. |
-| HR Manager | Read, write, create, submit, cancel, amend | No delete. |
-| HR User | Read, write, create | Cannot submit/cancel/delete — day-to-day data entry only. |
+| [[System Manager]] | Read, write, create, delete, submit, cancel, amend | Full control. |
+| [[HR Manager]] | Read, write, create, submit, cancel, amend | No delete. |
+| [[HR User]] | Read, write, create | Cannot submit/cancel/delete — day-to-day data entry only. |
 
 ## Mermaid: State/Flow
 

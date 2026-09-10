@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** child table row — standard Frappe auto-generated row `name` (hash), no `autoname` rule defined (child tables use `istable: 1` and are named via internal row idx/hash, not a business-meaningful autoname)
 **Module:** HR (Recruitment)
 
-This is a child-table-only doctype (`istable: 1`) — it has no standalone list view, no permissions of its own, and is always owned by a parent document (`Job Offer.offer_terms` or `Job Offer Term Template.offer_terms`).
+This is a child-table-only doctype (`istable: 1`) — it has no standalone list view, no permissions of its own, and is always owned by a parent document ([[Job Offer]]'s `offer_terms` or [[Job Offer Term Template]]'s `offer_terms`).
 
 ## Schema
 
@@ -26,7 +26,7 @@ N/A — this doctype IS a child table; it does not itself contain any Table fiel
 
 ## State Machine
 
-Not submittable; no `status`/`workflow_state` field. Rows are created/updated/deleted purely as part of saving their parent document (`Job Offer` or `Job Offer Term Template`).
+Not submittable; no `status`/`workflow_state` field. Rows are created/updated/deleted purely as part of saving their parent document ([[Job Offer]] or [[Job Offer Term Template]]).
 
 ## Validation Rules (exact, in execution order)
 
@@ -48,7 +48,7 @@ None defined in `job_offer_term.py`.
 
 ## Permissions
 
-`"permissions": []` in the JSON — empty array. Child-table doctypes do not carry their own permission rules; access is governed entirely by the parent document's permissions (`Job Offer` or `Job Offer Term Template`). A port should NOT create independent ACL rows for this table — enforce access at the parent-document level only.
+`"permissions": []` in the JSON — empty array. Child-table doctypes do not carry their own permission rules; access is governed entirely by the parent document's permissions ([[Job Offer]] or [[Job Offer Term Template]]). A port should NOT create independent ACL rows for this table — enforce access at the parent-document level only. See [[Permission Model (RBAC)]].
 
 ## Scheduled Jobs Touching This Doctype
 
@@ -63,3 +63,8 @@ None found.
 - `idx` (row order) must be preserved and is significant for display order — Frappe child tables are ordered lists, not unordered sets; the "Terms" grid renders rows top-to-bottom in `idx` order.
 - No `track_changes` flag applies to child tables individually — any audit trail is inherited from the parent document's own `track_changes` setting (which is not enabled for `Job Offer` per its JSON, and not set for `Job Offer Term Template` either).
 - Because both `offer_term` and `value` are `reqd: 1`, and there is no controller-level validation beyond that, a port only needs to enforce "both columns NOT NULL / non-empty" at the database or application-input-validation layer — there is no cross-field or cross-row uniqueness constraint (e.g., the same `offer_term` Link could legitimately appear more than once in the same parent's table; nothing in source prevents duplicate `offer_term` rows within one Job Offer or one Job Offer Term Template).
+
+## Related Doctypes
+
+- [[Job Offer]] — one of the two parents that own rows of this child table.
+- [[Job Offer Term Template]] — the other parent; a reusable bundle of default term rows copied into a Job Offer client-side.

@@ -9,7 +9,7 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | title | Title | Data | — | No (`reqd` not set, but functions as the document's name via `autoname: field:title`, so it is effectively required — Frappe will error on insert if the naming field is blank) | — | No | `unique: 1` — enforced as a DB-level unique constraint by Frappe since it doubles as the document name |
-| offer_terms | Offer Terms | Table | `Job Offer Term` | No | — | No | see Child Tables; see `Job Offer Term.md` |
+| offer_terms | Offer Terms | Table | [[Job Offer Term]] | No | — | No | see Child Tables |
 
 Field order per JSON `field_order`: title, offer_terms.
 
@@ -18,7 +18,7 @@ Field order per JSON `field_order`: title, offer_terms.
 
 ## Child Tables
 
-- `offer_terms` (Table, options `Job Offer Term`) — identical child doctype as used by `Job Offer.offer_terms`; see `Job Offer Term.md`. When a user selects this template on a `Job Offer` record, the Job Offer's client script (`job_offer.js`, `job_offer_term_template` field handler) copies every row from this template's `offer_terms` into the target Job Offer's `offer_terms` table (full client-side copy, clearing the target table first — see `Job Offer.md` Port Notes for the exact client logic and its lack of a server-side equivalent).
+- `offer_terms` (Table, options `Job Offer Term`) — identical child doctype as used by [[Job Offer]]'s `offer_terms`; see [[Job Offer Term]]. When a user selects this template on a `Job Offer` record, the Job Offer's client script (`job_offer.js`, `job_offer_term_template` field handler) copies every row from this template's `offer_terms` into the target Job Offer's `offer_terms` table (full client-side copy, clearing the target table first — see [[Job Offer]] Port Notes for the exact client logic and its lack of a server-side equivalent).
 
 ## State Machine
 
@@ -61,6 +61,11 @@ None found in `hrms/hooks.py` `scheduler_events`.
 ## Port Notes
 
 - **`autoname: "field:title"`**: the primary key of this table in a relational port should either (a) literally use `title` as the primary key/unique natural key (simplest, matches source exactly), or (b) use a surrogate id column plus a separate DB-level `UNIQUE` constraint on `title` if the target ORM strongly prefers surrogate keys — either is behaviorally equivalent as long as uniqueness-on-title and rename-cascades (see below) are preserved.
-- **Rename cascade risk**: because `allow_rename: 1` and the name IS `title`, renaming a Job Offer Term Template changes its primary key. Frappe automatically updates any Link field elsewhere in the system that references the old name (e.g. `Job Offer.job_offer_term_template`) as part of its generic rename-and-relink mechanism. A port using `title` as a literal primary key must implement equivalent cascade-on-rename (`ON UPDATE CASCADE` FK, or an application-level rename routine that walks referencing tables) to preserve this behavior; a port using a surrogate id key sidesteps this problem entirely since the FK would reference the surrogate id, not the display title.
-- **No validation at all on this doctype**: unlike many master-data doctypes, there is no check preventing an empty `offer_terms` table (a template with zero terms is valid and can be linked from a Job Offer), and no check preventing duplicate `offer_term` Link values within its own `offer_terms` rows (see `Job Offer Term.md` Port Notes).
+- **Rename cascade risk**: because `allow_rename: 1` and the name IS `title`, renaming a Job Offer Term Template changes its primary key. Frappe automatically updates any Link field elsewhere in the system that references the old name (e.g. `Job Offer.job_offer_term_template`) as part of its generic rename-and-relink mechanism (see [[Naming and Autoname Rules]]). A port using `title` as a literal primary key must implement equivalent cascade-on-rename (`ON UPDATE CASCADE` FK, or an application-level rename routine that walks referencing tables) to preserve this behavior; a port using a surrogate id key sidesteps this problem entirely since the FK would reference the surrogate id, not the display title.
+- **No validation at all on this doctype**: unlike many master-data doctypes, there is no check preventing an empty `offer_terms` table (a template with zero terms is valid and can be linked from a Job Offer), and no check preventing duplicate `offer_term` Link values within its own `offer_terms` rows (see [[Job Offer Term]] Port Notes).
 - **No server-side sync obligation**: this doctype has no outbound relationship logic of its own — it is purely a reusable named bundle of term rows that other documents (`Job Offer`) copy from at a point in time (client-side, on field change). Editing a template after it has already been copied into a Job Offer does NOT retroactively update that Job Offer's own `offer_terms` — the copy is a one-time snapshot. This must be preserved in a port: do not implement live-linking between a Job Offer's terms and its template.
+
+## Related Doctypes
+
+- [[Job Offer Term]] — child table (`offer_terms`) of reusable default term rows.
+- [[Job Offer]] — the consumer doctype; copies this template's `offer_terms` client-side when selected.

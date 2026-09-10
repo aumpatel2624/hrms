@@ -22,7 +22,7 @@ A single component/amount pair used inside the earning, deduction, and accrual a
 - [[Arrear]] — parent, via the identically-named `earning_arrears`, `deduction_arrears`, `accrual_arrears` Table fields (same child doctype reused).
 - [[Salary Component]] — linked from.
 - [[Additional Salary]] — read by both parents' `create_additional_salary()` to build one Additional Salary per row.
-- Employee Benefit Ledger — read by both parents' `create_benefit_ledger_entry()` for accrual rows.
+- [[Employee Benefit Ledger]] — read by both parents' `create_benefit_ledger_entry()` for accrual rows.
 
 ## Logic — What Happens and Why
 

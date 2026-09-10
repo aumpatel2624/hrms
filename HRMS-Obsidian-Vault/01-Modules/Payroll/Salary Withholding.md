@@ -29,7 +29,7 @@ Formally holds back an employee's salary for a defined number of payroll cycles 
 - [[Salary Withholding Cycle]] — parent/child via `cycles`; each cycle can carry a linked Journal Entry once its salary is released.
 - [[Salary Slip]] — linked from (`salary_withholding` field on Salary Slip, declared via this doctype's `links`); Salary Slip's `status` is flipped between "Withheld"/"Submitted" as cycles are released/unreleased. Also, `salary_withholding_cycle` on Salary Slip ties a slip to a specific cycle row.
 - [[Journal Entry]] — triggers/linked from: when a Journal Entry referencing a withheld cycle is submitted, hrms/hooks.py wires `update_salary_withholding_payment_status` to Journal Entry's `on_submit`/`on_cancel` (hrms/hooks.py:197-211) — this is the actual release mechanism, not a Payment Entry event, despite the function name suggesting a generic "payment."
-- Payroll Employee Detail — updated (`is_salary_withheld` flag) whenever a cycle's release status flips, so Payroll Entry can exclude/include the employee accordingly.
+- [[Payroll Employee Detail]] — updated (`is_salary_withheld` flag) whenever a cycle's release status flips, so [[Payroll Entry]] can exclude/include the employee accordingly.
 
 ## Logic — What Happens and Why
 
@@ -53,9 +53,9 @@ Formally holds back an employee's salary for a defined number of payroll cycles 
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit/cancel/amend | Full control. |
-| HR Manager | read/write/create/delete/submit/cancel | Full lifecycle. |
-| Employee | read | View-only, presumably their own record. |
+| [[System Manager]] | read/write/create/delete/submit/cancel/amend | Full control. |
+| [[HR Manager]] | read/write/create/delete/submit/cancel | Full lifecycle. |
+| [[Employee]] | read | View-only, presumably their own record. |
 
 ## Mermaid: State/Flow
 

@@ -61,9 +61,9 @@ automatically (no code path for it in this controller).
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | read/write/create/submit/cancel/delete/amend | Full control |
-| HR User | read/write/create | No submit/cancel/amend/delete right — can prepare but not finalize |
-| Employee | read | View-only — cannot create or edit their own incentive records |
+| [[HR Manager]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[HR User]] | read/write/create | No submit/cancel/amend/delete right — can prepare but not finalize |
+| [[Employee]] | read | View-only — cannot create or edit their own incentive records |
 
 ## Mermaid: State/Flow
 

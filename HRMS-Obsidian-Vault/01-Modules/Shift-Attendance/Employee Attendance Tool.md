@@ -39,7 +39,7 @@ Since this is a virtual doctype, all logic lives in whitelisted module functions
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read/Write/Create | Sole role granted on this tool per the DocType JSON. The half-day bulk-update path additionally requires the caller to hold `Attendance write` permission independently (checked at runtime via `frappe.has_permission`), so an HR Manager without broader Attendance write rights would still be blocked from that specific action — not enforced further for the plain (non-half-day) creation path, which relies on `Attendance.insert()`/`submit()`'s own standard permission checks. |
+| [[HR Manager]] | Read/Write/Create | Sole role granted on this tool per the DocType JSON. The half-day bulk-update path additionally requires the caller to hold `Attendance write` permission independently (checked at runtime via `frappe.has_permission`), so an HR Manager without broader Attendance write rights would still be blocked from that specific action — not enforced further for the plain (non-half-day) creation path, which relies on `Attendance.insert()`/`submit()`'s own standard permission checks. |
 
 ## Mermaid: State/Flow
 

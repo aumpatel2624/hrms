@@ -14,8 +14,8 @@ Structurally identical to `Employee Onboarding Template` (same field set, same l
 | company | Company | Link | Company | No | — | No | |
 | department | Department | Link | Department | No | — | No | `in_list_view`. *(no client-side company-scoped filter on this doctype's `.js` — see Port Notes; this differs from Employee Onboarding Template, which does filter department by company.)* |
 | designation | Designation | Link | Designation | No | — | No | *(column_break_7)* `in_list_view`. |
-| employee_grade | Employee Grade | Link | Employee Grade | No | — | No | `in_list_view`. |
-| activities | Activities | Table | Employee Boarding Activity | No | — | No | *(section_break_7, labeled "Activities")* — see `Employee Boarding Activity.md`. |
+| employee_grade | Employee Grade | Link | [[Employee Grade]] | No | — | No | `in_list_view`. |
+| activities | Activities | Table | [[Employee Boarding Activity]] | No | — | No | *(section_break_7, labeled "Activities")* — see `Employee Boarding Activity.md`. |
 
 Controller class body is `pass` — no server-side logic.
 
@@ -60,6 +60,11 @@ No `if_owner` or `permlevel` restrictions present in the JSON.
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Employee Grade]] — via `employee_grade`: `in_list_view`.
+- [[Employee Boarding Activity]] — via `activities`: *(section_break_7, labeled "Activities")* — see `Employee Boarding Activity.md`.
 
 ## Port Notes
 

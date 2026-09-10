@@ -61,6 +61,10 @@ None on this doctype.
 
 None.
 
+## Related Doctypes
+
+- [[Full and Final Statement]] — parent via `assets_allocated` table.
+
 ## Port Notes
 
 - **Client-only calc**: `full_and_final_asset.js` triggers `frm.trigger("calculate_total_receivable_amt")` on `cost` field change — this recalculates `total_asset_recovery_cost` and `total_receivable_amount` on the parent purely client-side for live UI feedback. The authoritative calculation is the server-side `set_total_asset_recovery_cost()` / `set_totals()` methods on `Full and Final Statement`, run at `validate()` — the port must implement the server-side calculation as the source of truth; the client recompute is a UX convenience only and must not be relied on.

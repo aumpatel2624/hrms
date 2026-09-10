@@ -86,7 +86,7 @@ Ordered by `employee, time`.
    d. IF `is_half_holiday(employee, attendance_date)` (checks if the date is a half-holiday on the employee's/shift's holiday list) THEN HALVE both thresholds: `working_hours_threshold_for_half_day /= 2`, `working_hours_threshold_for_absent /= 2`.
    e. `overtime_type = single_shift_logs[0].overtime_type`.
    f. Call `get_attendance(single_shift_logs, working_hours_threshold_for_absent, working_hours_threshold_for_half_day)` → returns `(attendance_status, working_hours, late_entry, early_exit, in_time, out_time)`.
-   g. Call `mark_attendance_and_link_log(single_shift_logs, attendance_status, attendance_date, working_hours, late_entry, early_exit, in_time, out_time, shift=self.name, overtime_type=overtime_type)` — see `Employee Checkin.md` for the full body of this function (creates/updates `Attendance` and links checkins back via the `attendance` field).
+   g. Call `mark_attendance_and_link_log(single_shift_logs, attendance_status, attendance_date, working_hours, late_entry, early_exit, in_time, out_time, shift=self.name, overtime_type=overtime_type)` — see [[Employee Checkin]] for the full body of this function (creates/updates `Attendance` and links checkins back via the `attendance` field).
 3. After the loop, `frappe.db.commit()` (unless in test mode) — checkpoint progress before doing the absence sweep.
 4. `assigned_employees = self.get_assigned_employees(self.process_attendance_after, consider_default_shift=True)` (see below).
 5. FOR EACH batch of `EMPLOYEE_CHUNK_SIZE = 50` employees in `assigned_employees`:
@@ -113,9 +113,9 @@ Note: thresholds of `0` disable that check entirely (per field description "Zero
 1. `start_time = start_time` field. `dates = self.get_dates_for_attendance(employee)` (see below).
 2. FOR EACH `date` in `dates`:
    a. `timestamp = combine(date, start_time)`.
-   b. `shift_details = get_employee_shift(employee, timestamp, consider_default_shift=True)` (see `Shift Assignment.md`).
+   b. `shift_details = get_employee_shift(employee, timestamp, consider_default_shift=True)` (see [[Shift Assignment]]).
    c. IF `shift_details` exists AND `shift_details.shift_type.name == self.name` THEN:
-      - `attendance = mark_attendance(employee, date, "Absent", self.name)` — creates+submits an `Attendance` doc via savepoint/rollback-safe helper (see `Attendance.md`); returns `None` if a `DuplicateAttendanceError`/`OverlappingShiftAttendanceError` occurred (then this date is skipped, no comment added).
+      - `attendance = mark_attendance(employee, date, "Absent", self.name)` — creates+submits an [[Attendance]] doc via savepoint/rollback-safe helper; returns `None` if a `DuplicateAttendanceError`/`OverlappingShiftAttendanceError` occurred (then this date is skipped, no comment added).
       - IF `attendance` truthy THEN insert a `Comment` on the new `Attendance` with content "Employee was marked Absent due to missing Employee Checkins."
 
 ### F. `get_dates_for_attendance(employee)` — date range for absence sweep
@@ -223,7 +223,7 @@ From `hrms/hooks.py`, `scheduler_events["hourly_long"]` (in this exact order):
    1. Fetch all `Shift Type` names where `enable_auto_attendance = "1"`.
    2. FOR EACH shift name: load the cached doc and call `doc.process_auto_attendance()` (with `is_manually_triggered` defaulting to `False`, so this always synchronously runs `_process(logs)` for that shift — see Business Logic section A/C above).
 
-3. **`hrms.hr.doctype.shift_schedule_assignment.shift_schedule_assignment.process_auto_shift_creation`** (runs third) — see `Shift Schedule Assignment.md` for its full algorithm. Not directly touching Shift Type data, but shares the same scheduler cadence and typically runs right after attendance has been processed for the hour.
+3. **`hrms.hr.doctype.shift_schedule_assignment.shift_schedule_assignment.process_auto_shift_creation`** (runs third) — see [[Shift Schedule Assignment]] for its full algorithm. Not directly touching Shift Type data, but shares the same scheduler cadence and typically runs right after attendance has been processed for the hour.
 
 ## Port Notes
 
@@ -237,3 +237,11 @@ From `hrms/hooks.py`, `scheduler_events["hourly_long"]` (in this exact order):
   - `is_field_modified`/`has_value_changed` (used in `validate_unlinked_logs`) relies on Frappe's automatic "doc before save" diffing — a port must explicitly fetch the pre-update row to compare `start_time`.
   - Committing per-batch (`frappe.db.commit()`) inside a long-running job is a Frappe-specific pattern to avoid losing all progress on a mid-job crash; equivalent chunked-transaction-commit behavior should be reproduced in the target stack's job runner.
 - **No explicit validation exists on `working_hours_threshold_for_absent` vs `working_hours_threshold_for_half_day` ordering** (e.g. absent threshold could be configured higher than half-day threshold, making Half Day effectively unreachable) — this is not caught anywhere in source; flagging as a potential config foot-gun to consider (but not to silently "fix") in the port.
+
+## Related Doctypes
+
+- [[Employee Checkin]] — feeds the auto-attendance pipeline; `mark_attendance_and_link_log` creates/updates Attendance from Shift Type's grouped checkins.
+- [[Shift Assignment]] — resolves each employee's active shift occurrence; also the shared shift-window resolution engine this doctype relies on.
+- [[Attendance]] — created/updated by the auto-attendance pipeline and the absence sweeps.
+- [[Shift Schedule Assignment]] — its `process_auto_shift_creation` job runs in the same `hourly_long` scheduler bucket immediately after this doctype's auto-attendance jobs.
+- Overtime Type — referenced by `overtime_type`, but no matching doctype file exists in this repo to wikilink.

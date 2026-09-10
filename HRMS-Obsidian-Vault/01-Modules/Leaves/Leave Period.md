@@ -39,9 +39,9 @@ No submit/cancel lifecycle — it's a plain master doctype. Its only real runtim
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete | Full |
-| HR Manager | read/write/create/delete | Full |
-| HR User | read/write/create/delete | Full |
+| [[System Manager]] | read/write/create/delete | Full |
+| [[HR Manager]] | read/write/create/delete | Full |
+| [[HR User]] | read/write/create/delete | Full |
 
 ## Mermaid: State/Flow
 

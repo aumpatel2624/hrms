@@ -27,7 +27,7 @@ benefit application.
 - [[Salary Component]] — must be an Earning-type, flexible-benefit-flagged component.
 - [[Employee Benefit Application]] — provides the max ceiling copied into `Employee Benefit Application Detail.max_benefit_amount` when an application is drafted.
 - [[Employee Benefit Claim]] — reads this table's `amount` as `yearly_benefit`/basis for `max_amount_eligible` calculations when this parent is the authoritative benefit-details source.
-- [[Employee Benefit Ledger]] — accrual/payout amounts posted per Salary Slip cycle are ultimately bounded by the yearly `amount` configured here.
+- [[Employee Benefit Ledger]] — accrual/payout amounts posted per [[Salary Slip]] cycle are ultimately bounded by the yearly `amount` configured here.
 
 ## Logic — What Happens and Why
 

@@ -28,12 +28,12 @@ regional_overrides = {
 
 Call sites (only active if the current company's country resolves to "India" so the override is
 patched in):
-- `Employee Tax Exemption Declaration.validate()` (or equivalent lifecycle method) calls
+- `[[Employee Tax Exemption Declaration]].validate()` (or equivalent lifecycle method) calls
   `calculate_annual_eligible_hra_exemption(self)` when `self.monthly_house_rent` is truthy, and
   adds the returned `annual_exemption` into `self.total_exemption_amount`. It also sets
   `self.salary_structure_hra`, `self.annual_hra_exemption`, `self.monthly_hra_exemption` from the
   returned dict (fields reset to 0 first).
-- `Employee Tax Exemption Proof Submission` controller calls
+- `[[Employee Tax Exemption Proof Submission]]` controller calls
   `calculate_hra_exemption_for_period(self)` when `self.house_rent_payment_amount` is truthy, and
   adds the returned `total_eligible_hra_exemption` into `self.exemption_amount`. Fields
   `self.monthly_hra_exemption`, `self.monthly_house_rent`, `self.total_eligible_hra_exemption` are
@@ -51,21 +51,21 @@ Inputs: `doc` — an `Employee Tax Exemption Declaration` (or similar) with fiel
 2. IF either `basic_component` or `hra_component` is unset THEN throw error:
    `"Please set Basic and HRA component in Company {company_link}"`.
 3. Initialize `annual_exemption = monthly_exemption = hra_amount = basic_amount = 0`.
-4. Fetch all submitted `Salary Structure Assignment` records for `doc.employee` whose `from_date`
+4. Fetch all submitted `[[Salary Structure Assignment]]` records for `doc.employee` whose `from_date`
    falls inside `doc.payroll_period`'s date range (`get_salary_assignments`, see
    `hrms/hr/utils.py:649` — order by `from_date`); if none found in-period, fall back to the most
    recent prior assignment before the period start.
 5. IF no assignments found AND `doc.docstatus == 1` (submitted) THEN throw error:
    `"Salary Structure must be submitted before submission of {doctype}"`.
-6. Get `period_start_date` = the `Payroll Period`'s `start_date`.
+6. Get `period_start_date` = the `[[Payroll Period]]`'s `start_date`.
 7. For each assignment, clamp its `from_date` to `max(assignment.from_date, period_start_date)`
    (so an assignment that started before the period is treated as starting at period start).
    Collect these clamped `from_date`s into `assignment_dates` in order.
 8. FOR each assignment (indexed `idx`):
-   a. IF the assignment's `salary_structure` does NOT contain a `Salary Detail` row in the
+   a. IF the assignment's `[[Salary Structure]]` does NOT contain a `[[Salary Detail]]` row in the
       `earnings` table with `salary_component == hra_component` THEN skip this assignment
       (no HRA in that structure).
-   b. ELSE: generate a preview `Salary Slip` for `(employee, salary_structure, posting_date =
+   b. ELSE: generate a preview `[[Salary Slip]]` for `(employee, salary_structure, posting_date =
       assignment.from_date)` and read off the `earnings` table: `basic_amt` = amount where
       `salary_component == basic_component`, `hra_amt` = amount where `salary_component ==
       hra_component` (loop stops early once both are found).
@@ -156,10 +156,10 @@ needed by 2A (this function reuses 2A internally).
 | DocType | Fieldname | Label | Type | Insert After | Notes |
 |---|---|---|---|---|---|
 | Company | `hra_section` | HRA Settings | Section Break | `default_payroll_payable_account` | collapsible |
-| Company | `basic_component` | Basic Component | Link (Salary Component) | `hra_section` | |
-| Company | `hra_component` | HRA Component | Link (Salary Component) | `basic_component` | |
+| Company | `basic_component` | Basic Component | Link ([[Salary Component]]) | `hra_section` | |
+| Company | `hra_component` | HRA Component | Link ([[Salary Component]]) | `basic_component` | |
 | Company | `hra_column_break` | — | Column Break | `hra_component` | |
-| Company | `arrear_component` | Arrear Component | Link (Salary Component) | `hra_column_break` | not used by HRA calc directly, seeded alongside |
+| Company | `arrear_component` | Arrear Component | Link ([[Salary Component]]) | `hra_column_break` | not used by HRA calc directly, seeded alongside |
 | Employee Tax Exemption Declaration | `hra_section` | HRA Exemption | Section Break | `declarations` | |
 | Employee Tax Exemption Declaration | `monthly_house_rent` | Monthly House Rent | Currency | `hra_section` | |
 | Employee Tax Exemption Declaration | `rented_in_metro_city` | Rented in Metro City | Check | `monthly_house_rent` | `depends_on: monthly_house_rent` |
@@ -209,3 +209,14 @@ None — HRA exemption has no Gratuity Rule involvement.
 - **Validation ordering matters**: `validate_house_rent_dates` runs BEFORE the exemption
   calculation and must short-circuit (throw) before any calculation proceeds, exactly as ordered
   in `calculate_hra_exemption_for_period` step 2D.
+
+## Related Doctypes
+
+- [[Employee Tax Exemption Declaration]] — carries the HRA custom fields and calls `calculate_annual_eligible_hra_exemption`.
+- [[Employee Tax Exemption Proof Submission]] — carries the HRA custom fields and calls `calculate_hra_exemption_for_period`.
+- [[Salary Structure Assignment]] — source of the employee's active salary structure(s) per payroll period.
+- [[Salary Structure]] — checked for an `earnings` row matching the HRA component.
+- [[Salary Detail]] — the child table row type used for the earnings/HRA lookup.
+- [[Salary Slip]] — a preview slip is generated to read basic/HRA amounts.
+- [[Payroll Period]] — bounds the date range used to select salary structure assignments.
+- [[Salary Component]] — target of the Company `basic_component`/`hra_component`/`arrear_component` custom fields.

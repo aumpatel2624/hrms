@@ -10,7 +10,7 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| skill | Skill | Link | Skill | yes (`reqd: 1`) | — | yes (`read_only: 1`) | `in_list_view: 1` — read-only once set (typically pre-populated by the parent flow, not hand-typed) |
+| skill | Skill | Link | [[Skill]] | yes (`reqd: 1`) | — | yes (`read_only: 1`) | `in_list_view: 1` — read-only once set (typically pre-populated by the parent flow, not hand-typed) |
 | rating | Rating | Rating | — | yes (`reqd: 1`) | — | no | `in_list_view: 1` |
 
 `field_order`: `["skill", "rating"]`.
@@ -68,6 +68,10 @@ None defined directly on this child doctype's own controller file. (The averagin
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Skill]] — via `skill`: `in_list_view: 1` — read-only once set (typically pre-populated by the parent flow, not hand-typed)
 
 ## Port Notes
 

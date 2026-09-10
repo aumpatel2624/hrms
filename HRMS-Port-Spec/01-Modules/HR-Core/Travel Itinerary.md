@@ -60,6 +60,10 @@ None.
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Travel Request]] — parent via `itinerary` table.
+
 ## Port Notes
 
 - **No date-order validation exists** despite having paired date/datetime fields that clearly imply an order (`departure_date`/`arrival_date`, `check_in_date`/`check_out_date`). Do not add such validation silently when porting — call it out to product/stakeholders as a possible gap in the original implementation, and only add it if explicitly requested, since the ground rules forbid inventing validations not present in source.

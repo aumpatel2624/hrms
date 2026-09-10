@@ -10,7 +10,7 @@ Child doctype. **Port Note:** unlike the other doctypes in this file set, `Emplo
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| training | Training | Link | Training Event | No (not `reqd`) | — | No | shown in list view (grid column); links to a `Training Event` document despite the generic field label "Training" |
+| training | Training | Link | [[Training Event]] | No (not `reqd`) | — | No | shown in list view (grid column); links to a `Training Event` document despite the generic field label "Training" |
 | training_date | Training Date | Date | — | No | — | No | `fetch_from: training.end_time` — a Date field fetching from a Datetime source field (Frappe will take the date portion of `Training Event.end_time`); shown in list view |
 
 ## Child Tables
@@ -46,6 +46,10 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Training Event]] — via `training`: shown in list view (grid column); links to a `Training Event` document despite the generic field label "Training"
 
 ## Port Notes
 

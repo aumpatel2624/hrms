@@ -69,3 +69,5 @@ flowchart LR
 - [[India - Gratuity Rule Setup]] — seeds the default Indian gratuity slab (15/26 of last drawn salary per year, after 5 years).
 - [[India - Custom Fields]] — India-only fields added to Employee, Company, Salary Component, and the tax exemption doctypes.
 - [[UAE - Gratuity Rules]] — seeds the three UAE end-of-service gratuity slab rules (limited contract, unlimited contract termination, unlimited contract resignation).
+
+These regional overrides feed directly into the [[Payroll Run Lifecycle]]: HRA exemption and marginal-relief tax calculations change the TDS deducted on each [[Salary Slip]], and the seeded Gratuity Rules determine the payout when a [[Gratuity]] record is processed at separation.

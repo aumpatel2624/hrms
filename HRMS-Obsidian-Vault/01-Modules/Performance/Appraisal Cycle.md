@@ -52,10 +52,10 @@ The container process that defines a company's performance-review round: its dat
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read, write, create, delete, export | No submit/cancel — doctype is not submittable. |
-| HR Manager | read, write, create, delete, export | Same rights as System Manager. |
-| HR User | read, write, create, export | No delete. |
-| Employee | read, select, export | Read-only visibility (e.g. to see their own cycle); cannot create/edit. |
+| [[System Manager]] | read, write, create, delete, export | No submit/cancel — doctype is not submittable. |
+| [[HR Manager]] | read, write, create, delete, export | Same rights as System Manager. |
+| [[HR User]] | read, write, create, export | No delete. |
+| [[Employee]] | read, select, export | Read-only visibility (e.g. to see their own cycle); cannot create/edit. |
 
 ## Mermaid: State/Flow
 

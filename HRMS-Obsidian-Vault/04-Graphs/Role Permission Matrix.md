@@ -9,7 +9,7 @@ Cross-cutting summary of who can do what on the highest-traffic doctypes in the
 system. This is a summary for orientation — the authoritative, complete table for any
 one doctype is always that doctype's own `## Roles & Permissions` section.
 
-| Doctype | Employee | Leave/Expense Approver | HR User | HR Manager | System Manager |
+| Doctype | [[Employee]] | [[Leave Approver]]/[[Expense Approver]] | [[HR User]] | [[HR Manager]] | [[System Manager]] |
 |---|---|---|---|---|---|
 | [[Employee]] | read own, limited write | — | read/write all | read/write all | full |
 | [[Leave Application]] | create/submit own | approve/reject (if named) | read/write all | read/write all | full |
@@ -22,7 +22,7 @@ one doctype is always that doctype's own `## Roles & Permissions` section.
 | [[Payroll Entry]] | — | — | create | create/submit | full |
 | [[Employee Tax Exemption Declaration]] | create/submit own | — | read all | read all | full |
 | [[Appraisal]] | self-rate section only | — | create/write all | create/write all | full |
-| [[Interview]] | — | — (Interviewer role: read/feedback on assigned only) | create/write all | create/write all | full |
+| [[Interview]] | — | — ([[Interviewer (Role)|Interviewer]] role: read/feedback on assigned only) | create/write all | create/write all | full |
 | [[Job Applicant]] | — | — | create/write all | create/write all | full |
 | [[Employee Separation]] | read own | — | create/write | create/write/submit | full |
 | [[Full and Final Statement]] | read own | — | create/write | create/write/submit | full |
@@ -37,4 +37,4 @@ one doctype is always that doctype's own `## Roles & Permissions` section.
   via [[Department Approver]] fallback.
 - **full** = [[System Manager]]/Administrator, unrestricted, framework-level escape hatch.
 
-See also: [[Roles Overview]], [[Master Relationship Graph]].
+See also: [[Roles Overview]], [[Role Login Views]], [[Master Relationship Graph]].

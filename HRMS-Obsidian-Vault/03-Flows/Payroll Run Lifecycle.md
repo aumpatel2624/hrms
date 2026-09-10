@@ -28,12 +28,12 @@ flowchart TD
 
 | Step | Role |
 |---|---|
-| Define Salary Component / Salary Structure | [[HR Manager]] |
+| Define [[Salary Component]] / [[Salary Structure]] | [[HR Manager]] |
 | Assign structure to an employee | [[HR User]] / [[HR Manager]] |
 | Declare/submit tax exemption info | [[Employee]] (self only) |
-| Create and review Payroll Entry | [[HR User]] |
+| Create and review [[Payroll Entry]] | [[HR User]] |
 | Submit Payroll Entry (locks the period) | [[HR Manager]] |
-| View own Salary Slip | [[Employee]] (read-only) |
+| View own [[Salary Slip]] | [[Employee]] (read-only) |
 
 ## Why This Chain, Not a Direct "Compute Pay" Button
 
@@ -42,7 +42,7 @@ flowchart TD
   different formulas/amounts — a statutory rate change (e.g. a new PF percentage) is
   edited once at the component level and every structure referencing it recalculates
   consistently, rather than needing per-structure edits.
-- **Salary Structure Assignment carries an effective date**, not just "current
+- **[[Salary Structure Assignment]] carries an effective date**, not just "current
   structure," because compensation changes (raises, promotions) must apply from a
   specific date without rewriting payroll history — old Salary Slips must still reflect
   the structure that was actually in force when they were generated.
@@ -51,9 +51,9 @@ flowchart TD
   nothing at the accounting level (the company can't post partial payroll for a
   period) and because bulk actions (bank file generation, GL posting) operate on the
   whole batch.
-- **Tax calculation reads three separate inputs** (Income Tax Slab for the rate table,
-  Employee Tax Exemption Declaration for the employee's plan, Employee Tax Exemption
-  Proof Submission for verified actuals) instead of one number, because tax law
+- **Tax calculation reads three separate inputs** ([[Income Tax Slab]] for the rate table,
+  [[Employee Tax Exemption Declaration]] for the employee's plan,
+  [[Employee Tax Exemption Proof Submission]] for verified actuals) instead of one number, because tax law
   requires periodic withholding based on an *estimate* early in the year and a
   *reconciled actual* near year-end — collapsing these into one field would either
   over-withhold all year or under-withhold and leave a shortfall at filing time. See

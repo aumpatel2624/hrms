@@ -12,7 +12,7 @@
 | department | Department | Link | Department | no | — | no | `in_list_view` |
 | designation | Designation | Link | Designation | no | — | no | — |
 | *(column_break_wkcr)* | | Column Break | | | | | layout only |
-| employment_type | Employment Type | Link | Employment Type | no | — | no | — |
+| employment_type | Employment Type | Link | [[Employment Type]] | no | — | no | — |
 | location | Location | Link | Branch | no | — | no | — |
 | *(pay_details_section "Pay Details")* | | Section Break | | | | | group heading |
 | currency | Currency | Link | Currency | no | — | no | — |
@@ -48,7 +48,7 @@ No lifecycle methods are defined (controller body is `pass`).
 
 | Method name | HTTP-equivalent purpose | Args | Returns | What it does |
 |---|---|---|---|---|
-| `create_job_opening_from_template` (module-level function) | "Create Job Opening" mapped-doc action from a template | `source: str | Document` (the Job Opening Template's name or doc) | New (unsaved) `Job Opening` Document | Creates a new `Job Opening` via `get_mapped_doc` from the source template, with field map `name → job_opening_template` (i.e., the new Job Opening records which template it came from). Additionally sets `target_doc.job_title = source_doc.designation`. Because `get_mapped_doc`'s default behavior (with no explicit `field_map` entries for the other shared fields) still copies same-named fields when both doctypes define them, `department`, `designation`, `employment_type`, `location`, `currency`, `upper_range`, `lower_range`, `salary_per`, `publish_salary_range`, and `description` are copied across automatically since both doctypes share those exact fieldnames — this is standard `get_mapped_doc` behavior, not an explicit field_map entry, so a port must replicate "copy all identically-named fields" as the default mapping semantic, not just the two fields explicitly named in `field_map`. |
+| `create_job_opening_from_template` (module-level function) | "Create Job Opening" mapped-doc action from a template | `source: str | Document` (the Job Opening Template's name or doc) | New (unsaved) [[Job Opening]] Document | Creates a new `Job Opening` via `get_mapped_doc` from the source template, with field map `name → job_opening_template` (i.e., the new Job Opening records which template it came from). Additionally sets `target_doc.job_title = source_doc.designation`. Because `get_mapped_doc`'s default behavior (with no explicit `field_map` entries for the other shared fields) still copies same-named fields when both doctypes define them, `department`, `designation`, `employment_type`, `location`, `currency`, `upper_range`, `lower_range`, `salary_per`, `publish_salary_range`, and `description` are copied across automatically since both doctypes share those exact fieldnames — this is standard `get_mapped_doc` behavior, not an explicit field_map entry, so a port must replicate "copy all identically-named fields" as the default mapping semantic, not just the two fields explicitly named in `field_map`. |
 
 ## Permissions
 
@@ -68,3 +68,8 @@ None.
 - The client script (`job_opening_template.js`) adds a "Create Job Opening" button on saved (non-new) records that calls `create_job_opening_from_template` — pure UI convenience, no additional business rule to port beyond the whitelisted function itself.
 - No field on this doctype is fetched from elsewhere and no field feeds elsewhere except via the explicit mapped-doc copy in `create_job_opening_from_template`.
 - Frappe automatic behaviors relied on implicitly: `creation`/`modified`/`modified_by`/`owner` audit columns; `sort_field`/`sort_order` = `creation DESC` for default list ordering; `grid_page_length: 50` and `rows_threshold_for_grid_search: 20` are UI/grid display settings only, not data-layer concerns.
+
+## Related Doctypes
+
+- [[Job Opening]] — created from this template via `create_job_opening_from_template`; also linkable back via `Job Opening.job_opening_template`.
+- [[Employment Type]] — copied onto the new Job Opening as a default.

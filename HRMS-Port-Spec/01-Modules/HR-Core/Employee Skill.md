@@ -10,7 +10,7 @@ Child table used exclusively via the `employee_skills` Table field on `Employee 
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| skill | Skill | Link | Skill | yes (`reqd: 1`) | — | no | `in_list_view: 1` |
+| skill | Skill | Link | [[Skill]] | yes (`reqd: 1`) | — | no | `in_list_view: 1` |
 | proficiency | Proficiency | Rating | — | yes (`reqd: 1`) | — | no | `in_list_view: 1`; Rating fieldtype stores a float 0–1 in increments (Frappe default 5-star rating, i.e. values are multiples of 0.2 up to 1.0 unless a custom `options` star-count is set — no `options` set here, so default star count applies) |
 | evaluation_date | Evaluation Date | Date | — | no | `"Today"` (evaluates to current date at row-creation time) | no | `in_list_view: 1` |
 
@@ -55,6 +55,10 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Skill]] — via `skill`: `in_list_view: 1`
 
 ## Port Notes
 

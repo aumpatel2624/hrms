@@ -28,7 +28,7 @@ Pure master/setup data — the Python controller (`IdentificationDocumentType`) 
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, Write, Create, Delete | Only role with explicit permissions defined — no HR Manager/HR User rows are present in this doctype's permission list, so day-to-day HR roles rely on System Manager-configured entries or role-based permission inheritance elsewhere in the system. |
+| [[System Manager]] | Read, Write, Create, Delete | Only role with explicit permissions defined — no HR Manager/HR User rows are present in this doctype's permission list, so day-to-day HR roles rely on System Manager-configured entries or role-based permission inheritance elsewhere in the system. |
 
 ## Mermaid: State/Flow
 

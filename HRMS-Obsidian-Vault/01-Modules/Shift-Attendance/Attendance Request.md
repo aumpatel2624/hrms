@@ -50,10 +50,10 @@ A retroactive (or advance) correction mechanism: an employee or HR declares that
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + Submit/Cancel/Amend | |
-| HR Manager | Full CRUD + Submit/Cancel/Amend | |
-| HR User | Full CRUD + Submit/Cancel/Amend | Same operational rights as HR Manager. |
-| Employee | Create/Read/Write/Delete | No submit/cancel right in the DocType permissions — `validate_no_attendance_to_create` and the workflow imply requests are meant to be reviewed before submission, but there is no explicit approver/workflow field on this doctype itself (unlike Shift Request's `approver`); submission gating for Employee is enforced purely by the absence of the `submit` permission bit. |
+| [[System Manager]] | Full CRUD + Submit/Cancel/Amend | |
+| [[HR Manager]] | Full CRUD + Submit/Cancel/Amend | |
+| [[HR User]] | Full CRUD + Submit/Cancel/Amend | Same operational rights as HR Manager. |
+| [[Employee]] | Create/Read/Write/Delete | No submit/cancel right in the DocType permissions — `validate_no_attendance_to_create` and the workflow imply requests are meant to be reviewed before submission, but there is no explicit approver/workflow field on this doctype itself (unlike Shift Request's `approver`); submission gating for Employee is enforced purely by the absence of the `submit` permission bit. |
 
 ## Mermaid: State/Flow
 

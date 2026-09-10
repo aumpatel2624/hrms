@@ -45,8 +45,8 @@ No submit/cancel lifecycle — plain master doctype.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create | No delete right listed |
-| HR Manager | read/write/create | No delete right listed |
+| [[HR User]] | read/write/create | No delete right listed |
+| [[HR Manager]] | read/write/create | No delete right listed |
 
 ## Mermaid: State/Flow
 

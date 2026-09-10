@@ -10,17 +10,17 @@ Full field list, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes | — | No | `in_list_view`. Client script filters picker to `status: "Active"` (shared `employee_property_update.js`). |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | Yes | — | No | `in_list_view`. Client script filters picker to `status: "Active"` (shared `employee_property_update.js`). |
 | employee_name | Employee Name | Data | — | No | — | Yes | `fetch_from: employee.employee_name`. |
 | transfer_date | Transfer Date | Date | — | Yes | — | No | Anchor date for the transfer; also used as `from_date` for the new internal-work-history row, and gates submission (see Validation Rules). |
 | company | Company | Link | Company | No | — | No | *(column_break_3)* `fetch_from: employee.company`. This is the employee's CURRENT company (source side of the transfer). |
 | new_company | New Company | Link | Company | No | — | No | Target company if this transfer is an inter-company move. |
 | department | Department | Link | Department | No | — | Yes | `bold: 1`. `fetch_from: employee.department`. |
-| transfer_details | Employee Transfer Detail | Table | Employee Property History | Yes | — | No | *(details_section, "Employee Transfer Details")* Each row = one Employee field being changed (property/current/new/fieldname) — see `Employee Property History` schema below. |
+| transfer_details | Employee Transfer Detail | Table | [[Employee Property History]] | Yes | — | No | *(details_section, "Employee Transfer Details")* Each row = one Employee field being changed (property/current/new/fieldname) — see `Employee Property History` schema below. |
 | reallocate_leaves | Re-allocate Leaves | Check | — | No | `0` | No | **`hidden: 1`** — present in the schema/database but not shown in the UI at all in this version, and NOT referenced anywhere in `employee_transfer.py`. Dead/unused field currently. |
 | create_new_employee_id | Create New Employee Id | Check | — | No | `0` | No | Toggles whether this transfer creates a brand-new Employee record (for the "new legal employment record" pattern, e.g. inter-company transfer) vs. updating the existing Employee in place. |
-| new_employee_id | New Employee ID | Link | Employee | No | — | Yes | `allow_on_submit: 1`. Populated via `db_set` on submit only if `create_new_employee_id` is checked. |
-| amended_from | Amended From | Link | Employee Transfer | No | — | Yes | `no_copy`, `print_hide`. |
+| new_employee_id | New Employee ID | Link | [[Employee Core Model|Employee]] | No | — | Yes | `allow_on_submit: 1`. Populated via `db_set` on submit only if `create_new_employee_id` is checked. |
+| amended_from | Amended From | Link | [[Employee Transfer]] | No | — | Yes | `no_copy`, `print_hide`. |
 
 ## Child Tables
 
@@ -36,6 +36,8 @@ Full field list, in JSON `field_order`:
   `permissions: []` (inherits from parent, standard child-table convention). `quick_entry: 1` (UI-only).
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]).
 
 ```mermaid
 stateDiagram-v2
@@ -111,6 +113,8 @@ No monetary calculation. The core logic is "apply a set of field changes to an E
 
 ## Lifecycle Hooks (exact)
 
+Includes cross-doctype [[Cross-Doctype Hooks (doc_events)|`doc_events`]] hooks (rows below prefixed "Cross-doctype:").
+
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
 | `before_submit` | Guard: `transfer_date` must not be in the future. | None. |
@@ -163,6 +167,11 @@ No `if_owner` or `permlevel` restrictions present in the JSON.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: `in_list_view`. Client script filters picker to `status: "Active"` (shared `employee_property_update.js`).
+- [[Employee Property History]] — via `transfer_details`: *(details_section, "Employee Transfer Details")* Each row = one Employee field being changed (property/current/new/fieldname) — see `Employee Property History` schema below.
 
 ## Port Notes
 

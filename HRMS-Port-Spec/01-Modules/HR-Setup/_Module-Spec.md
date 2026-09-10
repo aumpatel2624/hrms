@@ -8,11 +8,11 @@ HR Setup holds the small, module-wide configuration and master/lookup doctypes t
 
 | Doctype | Purpose |
 |---|---|
-| `HR Settings` | Site-wide singleton controlling Employee naming, leave/expense approval-mandatory flags, self-approval prevention, reminder schedules and templates, shift/attendance defaults, exit questionnaire config, and hiring/interview reminder config. |
-| `Employment Type` | Named lookup: employment categories (Full-time, Contract, etc.), linked from `Employee`. |
-| `Employee Grade` | Named lookup: employee grade/band, optionally carrying a default Salary Structure and base pay for pre-filling Employee/Payroll assignment. |
+| `HR Settings` | Site-wide singleton controlling Employee naming, leave/expense approval-mandatory flags, self-approval prevention, reminder schedules and templates, shift/attendance defaults, exit questionnaire config, and hiring/interview reminder config. — see [[HR Settings]] |
+| `Employment Type` | Named lookup: employment categories (Full-time, Contract, etc.), linked from `Employee`. — see [[Employment Type]] |
+| `Employee Grade` | Named lookup: employee grade/band, optionally carrying a default Salary Structure and base pay for pre-filling Employee/Payroll assignment. Documented under HR-Core, not this folder — see [[Employee Grade]] |
 
-Not covered here (core ERPNext, no doctype JSON in this app): `Company`, `Branch`. Not covered here (owned by other agents, referenced by name only): `Employee` (HR-Core), `Salary Structure`/`Salary Structure Assignment` (Payroll).
+Not covered here (core ERPNext, no doctype JSON in this app): `Company`, `Branch`. Not covered here (owned by other agents, referenced by name only): `Employee` (HR-Core, see [[Employee Core Model]]), `Salary Structure`/`Salary Structure Assignment` (Payroll, see [[Salary Structure]] / [[Salary Structure Assignment]]).
 
 ## Recommended Target Schema Shape
 
@@ -70,7 +70,7 @@ No child tables in this module; all three doctypes are flat/standalone with no o
 
 ## Port Notes: Company Hook Behavior (`hrms/overrides/company.py`)
 
-`Company` and `Branch` are core ERPNext doctypes with no JSON schema in this app to source from. This app instead attaches behavior to `Company` via `hrms/hooks.py` `doc_events`:
+`Company` and `Branch` are core ERPNext doctypes with no JSON schema in this app to source from. This app instead attaches behavior to `Company` via `hrms/hooks.py` `doc_events` (see [[Cross-Doctype Hooks (doc_events)]]):
 
 ```
 "Company": {
@@ -104,7 +104,7 @@ No child tables in this module; all three doctypes are flat/standalone with no o
 
 ### `handle_linked_docs(doc, method=None)` — Company `on_trash`
 Runs two cleanup steps when a Company is deleted:
-1. `delete_docs_with_company_field(doc)`: for every doctype listed in the `company_data_to_be_ignored` hook list (`hrms/hooks.py`: `Salary Component Account`, `Salary Structure`, `Salary Structure Assignment`, `Payroll Period`, `Income Tax Slab`, `Leave Period`, `Leave Policy Assignment`, `Employee Onboarding Template`, `Employee Separation Template`), find all records where `company == doc.name` and hard-delete them directly via `frappe.db.delete` (bypasses normal delete validation/hooks on those doctypes entirely).
+1. `delete_docs_with_company_field(doc)`: for every doctype listed in the `company_data_to_be_ignored` hook list (`hrms/hooks.py`: `Salary Component Account`, [[Salary Structure]], [[Salary Structure Assignment]], [[Payroll Period]], [[Income Tax Slab]], [[Leave Period]], [[Leave Policy Assignment]], [[Employee Onboarding Template]], [[Employee Separation Template]]), find all records where `company == doc.name` and hard-delete them directly via `frappe.db.delete` (bypasses normal delete validation/hooks on those doctypes entirely).
 2. `clear_company_field_for_single_doctypes(doc)`: finds every Single doctype (`issingle=1`) in modules `HR` or `Payroll` that has a `Link` field pointing at `Company`, and blanks out that field's stored value (in Frappe's `Singles` key-value table) wherever it currently equals the deleted company's name — e.g. this is how `HR Settings`-like singletons in the `Payroll` module (not `HR Settings` itself, which has no `company` field) get their dangling Company reference cleared instead of raising a broken-link error.
 
 **Port Notes:**
@@ -118,4 +118,4 @@ Runs two cleanup steps when a Company is deleted:
 1. `HR Settings` is a true singleton — exactly one row must exist per tenant scope; there is no create/delete lifecycle for it beyond initial provisioning.
 2. `Employment Type.employee_type_name` and `Employee Grade`'s name (user-prompted) must each be unique — both are used as natural-key `Link` targets from `Employee` and Payroll doctypes, so renames must cascade to every referencing record if the port preserves name-as-identity semantics, or must instead use a surrogate key with a separate unique display-name column.
 3. `Employee Grade.currency` is always derived from `default_salary_structure.currency` and must never be independently editable — treat it as a computed/cached column, recomputed whenever the linked Salary Structure (or that structure's currency) changes.
-4. Any new stack must decide explicitly where `HR Settings.expense_approver_mandatory_in_expense_claim` and `emp_created_by` are ENFORCED — in the source they only take effect via client-side JS branching (`Expense Claim` approver required-ness) or ERPNext-core meta-programming (`Employee` naming rule), neither of which exists by default in a from-scratch port; both must be reimplemented as explicit server-side logic (see `Expense Claim.md` Port Notes and `HR Settings.md` Business Logic #1).
+4. Any new stack must decide explicitly where `HR Settings.expense_approver_mandatory_in_expense_claim` and `emp_created_by` are ENFORCED — in the source they only take effect via client-side JS branching (`Expense Claim` approver required-ness) or ERPNext-core meta-programming (`Employee` naming rule), neither of which exists by default in a from-scratch port; both must be reimplemented as explicit server-side logic (see [[Expense Claim]] Port Notes and `HR Settings.md` Business Logic #1).

@@ -92,6 +92,10 @@ CRM for candidates:
 - [[Job Offer Term]] — child table row (term + value) attached to a Job Offer or template.
 - [[Job Offer Term Template]] — reusable set of Job Offer Terms.
 
+## Related Flows
+- [[Recruitment to Onboarding]] — the end-to-end lifecycle flow this module feeds into, from Job Requisition through to Employee creation.
+- [[Hire to Retire Overview]] — the full employee lifecycle overview, of which this module covers the opening phase.
+
 ## Public-Facing Surface
 `hrms/www/jobs` (`index.py` + `index.html`) is a Website page, not a doctype — it renders
 the public job board by querying `Job Opening` records where `status = "Open"` and

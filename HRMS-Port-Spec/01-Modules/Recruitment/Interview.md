@@ -9,9 +9,9 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(interview_details_section)* | Details | Section Break | — | — | — | — | |
-| interview_type | Interview Type | Link | Interview Type | yes (`reqd`) | — | no | in list view + standard filter |
-| job_applicant | Job Applicant | Link | Job Applicant | yes (`reqd`) | — | no | in list view + standard filter; also the doctype's `title_field` |
-| job_opening | Job Opening | Link | Job Opening | no | — | yes (read_only) | `fetch_from: job_applicant.job_title` |
+| interview_type | Interview Type | Link | [[Interview Type]] | yes (`reqd`) | — | no | in list view + standard filter |
+| job_applicant | Job Applicant | Link | [[Job Applicant]] | yes (`reqd`) | — | no | in list view + standard filter; also the doctype's `title_field` |
+| job_opening | Job Opening | Link | [[Job Opening]] | no | — | yes (read_only) | `fetch_from: job_applicant.job_title` |
 | designation | Designation | Link | Designation | no | — | yes (read_only) | `fetch_from: interview_type.designation`; in list view + standard filter |
 | resume_link | Resume link | Data | — | no | — | no | `fetch_from: job_applicant.resume_link`, `fetch_if_empty: 1` |
 | *(column_break_4)* | — | Column Break | — | — | — | — | |
@@ -20,7 +20,7 @@
 | from_time | From Time | Time | — | yes (`reqd`) | — | no | `set_only_once: 1`; in list view |
 | to_time | To Time | Time | — | yes (`reqd`) | — | no | `set_only_once: 1`; in list view |
 | *(section_break_hqvh)* | — | Section Break | — | — | — | — | |
-| interview_details | Interviewers | Table | Interview Detail (child) | no | — | no | `allow_on_submit: 1` — see `Interview Detail.md` |
+| interview_details | Interviewers | Table | [[Interview Detail]] (child) | no | — | no | `allow_on_submit: 1` — see `Interview Detail.md` |
 | *(ratings_section)* | Ratings | Section Break | — | — | — | — | |
 | expected_average_rating | Expected Average Rating | Rating | — | no | — | yes (read_only) | `fetch_from: interview_type.expected_average_rating` |
 | *(column_break_12)* | — | Column Break | — | — | — | — | |
@@ -28,15 +28,15 @@
 | *(section_break_13)* | Interview Summary | Section Break | — | — | — | — | collapsible |
 | interview_summary | (Interview Summary, unlabeled field, inherits section label) | Text | — | no | — | no | `allow_on_submit: 1` |
 | reminded | Reminded | Check | — | no | `0` | no | hidden; internal flag set by `send_interview_reminder` to avoid duplicate reminders |
-| amended_from | Amended From | Link | Interview | no | — | yes (read_only) | `no_copy: 1`, `print_hide: 1`; standard Frappe amend-chain pointer |
+| amended_from | Amended From | Link | Interview (self) | no | — | yes (read_only) | `no_copy: 1`, `print_hide: 1`; standard Frappe amend-chain pointer, see [[Submittable Document Lifecycle]] |
 | *(feedback_tab)* | Feedback | Tab Break | — | — | — | — | |
 | feedback_html | Feedback HTML | HTML | — | no | — | no | client-rendered feedback summary (ratings breakdown, per-skill averages, feedback list) — no server-stored value |
 
-Doctype-level flags: `editable_grid: 1`, `index_web_pages_for_search: 1`, `track_changes: 1`, `sort_field: creation` / `sort_order: DESC`, `title_field: job_applicant`. Links section declares `Interview Feedback` as a linked child-list (`link_fieldname: interview`) shown on the Interview form's connections/related-docs panel.
+Doctype-level flags: `editable_grid: 1`, `index_web_pages_for_search: 1`, `track_changes: 1` (see [[Implicit Framework Behaviors]]), `sort_field: creation` / `sort_order: DESC`, `title_field: job_applicant`. Links section declares [[Interview Feedback]] as a linked child-list (`link_fieldname: interview`) shown on the Interview form's connections/related-docs panel.
 
 ## Child Tables
 
-- `interview_details` -> **Interview Detail** — see `Interview Detail.md` for full schema (single field: `interviewer` Link to User).
+- `interview_details` -> **Interview Detail** — see [[Interview Detail]] for full schema (single field: `interviewer` Link to User).
 
 ## State Machine
 
@@ -102,7 +102,7 @@ No numeric formula lives on Interview itself; `average_rating` is written extern
 
 ### Scheduled Job: `send_interview_reminder`
 
-**Source:** `hrms/hr/doctype/interview/interview.py`, function `send_interview_reminder()`. Registered in `hrms/hooks.py` under `scheduler_events["all"]` — Frappe's `"all"` bucket runs on every scheduler tick, by default **every 4 minutes** (`scheduler_interval`/`all` cron, unless the site overrides it).
+**Source:** `hrms/hr/doctype/interview/interview.py`, function `send_interview_reminder()`. Registered in `hrms/hooks.py` under `scheduler_events["all"]` (see [[Background Jobs (Scheduler Events)]]) — Frappe's `"all"` bucket runs on every scheduler tick, by default **every 4 minutes** (`scheduler_interval`/`all` cron, unless the site overrides it).
 
 Exact logic, in order:
 1. Read HR Settings singleton fields: `send_interview_reminder`, `interview_reminder_template`, `hiring_sender_email` (`frappe.db.get_value("HR Settings", "HR Settings", [...], as_dict=True)`).
@@ -131,7 +131,7 @@ Frequency: every scheduler tick under the `"all"` bucket (out-of-the-box Frappe 
 |---|---|---|---|---|
 | `reschedule_interview` (instance method) | POST — change an Interview's schedule after creation | `scheduled_on: date`, `from_time: time`, `to_time: time` | `None` | IF all three values are unchanged from current -> `frappe.msgprint(_("No changes found in timings."), indicator="orange", title=_("Interview Not Rescheduled"))` and return (no-op). ELSE: capture `original_date/from_time/to_time`, then `self.db_set({"scheduled_on": ..., "from_time": ..., "to_time": ...})` (direct write, no revalidation despite `scheduled_on`/`from_time`/`to_time` being `set_only_once` fields — `db_set` bypasses that constraint), `self.notify_update()`. Compute `recipients = get_recipients(self.name)`. Attempt `frappe.sendmail(recipients=recipients, subject=_("Interview: {0} Rescheduled").format(self.name), message=_("Your Interview session is rescheduled from {0} {1} - {2} to {3} {4} - {5}").format(original_date, original_from_time, original_to_time, self.scheduled_on, self.from_time, self.to_time), reference_doctype=self.doctype, reference_name=self.name)`; on any exception, swallow it and show `frappe.msgprint(_("Failed to send the Interview Reschedule notification. Please configure your email account."))` instead of raising. Finally `frappe.msgprint(_("Interview Rescheduled successfully"), indicator="green")` unconditionally (shown even if the email failed). |
 | `get_interviewers` | GET — list interviewers configured on an Interview Type | `interview_type: str` | `list[dict]` (`{"interviewer": <user>}` rows) | `frappe.has_permission("Interview Type", "read", interview_type, throw=True)`; `frappe.get_all("Interviewer", filters={"parent": interview_type}, fields=["user as interviewer"])`. |
-| `get_feedback` | GET — feedback list for an Interview's detail/summary panel | `interview: str` | `list[dict]` | `frappe.has_permission("Interview Feedback", "read", throw=True)` (note: checked at doctype level, not against the specific interview). Query joins `Interview Feedback` (docstatus=1, matching `interview`) to `Employee` (`ON interview_feedback.interviewer == employee.user_id`), selecting `name`, `modified as added_on`, `interviewer as user`, `feedback`, `average_rating * 5 as total_score`, `employee.employee_name as reviewer_name`, `employee.designation as reviewer_designation`; ordered by `interview_feedback.creation`. |
+| `get_feedback` | GET — feedback list for an Interview's detail/summary panel | `interview: str` | `list[dict]` | `frappe.has_permission("Interview Feedback", "read", throw=True)` (note: checked at doctype level, not against the specific interview). Query joins `Interview Feedback` (docstatus=1, matching `interview`) to [[Employee Core Model|Employee]] (`ON interview_feedback.interviewer == employee.user_id`), selecting `name`, `modified as added_on`, `interviewer as user`, `feedback`, `average_rating * 5 as total_score`, `employee.employee_name as reviewer_name`, `employee.designation as reviewer_designation`; ordered by `interview_feedback.creation`. |
 | `get_skill_wise_average_rating` | GET — per-skill average rating chart data | `interview: str` | `list[dict]` (`{skill, rating}`) | `frappe.has_permission("Interview", "read", interview, throw=True)`. Joins `Skill Assessment` (child of `Interview Feedback`) to `Interview Feedback` on `skill_assessment.parent == interview_feedback.name`, filters `interview_feedback.interview == interview AND docstatus == 1`, groups by `skill_assessment.skill`, averages `skill_assessment.rating`, orders by `skill_assessment.idx`. |
 | `update_job_applicant_status` | POST — apply the Interview-submit confirmation dialog's chosen outcome | `status: str`, `job_applicant: str` | `None` (side-effecting) | Wrapped in try/except: IF `job_applicant` falsy -> `frappe.throw(_("Please specify the job applicant to be updated."))`. Else loads the Job Applicant, sets `status`, calls `doc.save()` (full validate cycle, unlike the Employee-driven `db_set` path), then `frappe.msgprint(_("Updated the Job Applicant status to {0}").format(doc.status), alert=True, indicator="green")`. On any exception: `frappe.log_error("Failed to update Job Applicant status")` and `frappe.msgprint(_("Failed to update the Job Applicant status"), alert=True, indicator="red")` — errors are swallowed from the caller's perspective (no exception propagates, only a red toast + server error log entry). |
 | `get_expected_skill_set` | GET — skills to assess for a given Interview Type | `interview_type: str` | `list[dict]` (`{skill}` rows, ordered) | `frappe.has_permission("Interview Type", "read", interview_type, throw=True)`. `frappe.get_all("Expected Skill Set", filters={"parent": interview_type}, fields=["skill"], order_by="idx")`. |
@@ -155,7 +155,9 @@ No explicit "Amend" column truthy for any role in the JSON (all blank) despite t
 | Job | Frequency (per `hrms/hooks.py`) | Function |
 |---|---|---|
 | `send_interview_reminder` | `scheduler_events["all"]` — every scheduler tick (default every 4 minutes) | `hrms.hr.doctype.interview.interview.send_interview_reminder` — full detail above |
-| `send_daily_feedback_reminder` | `scheduler_events["daily"]` — once per day | `hrms.hr.doctype.interview.interview.send_daily_feedback_reminder` — full detail in `Interview Feedback.md` |
+| `send_daily_feedback_reminder` | `scheduler_events["daily"]` — once per day | `hrms.hr.doctype.interview.interview.send_daily_feedback_reminder` — full detail in [[Interview Feedback]] |
+
+See [[Background Jobs (Scheduler Events)]] for the general scheduler mechanics.
 
 ## Port Notes
 
@@ -167,3 +169,13 @@ No explicit "Amend" column truthy for any role in the JSON (all blank) despite t
 - `frappe.sendmail`'s failure-swallowing pattern (`reschedule_interview`) and try/except-with-log pattern (`update_job_applicant_status`) both intentionally hide errors from the immediate caller in favor of a generic toast; replicate this UX (don't let a transient email failure block the primary state change) but ensure the equivalent of `frappe.log_error` (a durable server-side error log) exists so failures are still discoverable.
 - `track_changes: 1` — same audit-trail caveat as other doctypes in this module: build an explicit version/history mechanism.
 - Standard Frappe amend-chain (`amended_from`) must be modeled explicitly: cancelling then amending a submitted Interview creates a new Draft document copying the cancelled one's data and linking back via `amended_from`.
+
+## Related Doctypes
+
+- [[Interview Type]] — the reusable round definition this Interview is scheduled against; supplies `designation`/`expected_average_rating`.
+- [[Job Applicant]] — the candidate being interviewed; required link, also the source of `resume_link`.
+- [[Job Opening]] — fetched from the Job Applicant; the vacancy this interview relates to.
+- [[Interview Detail]] — child table of assigned interviewers for this specific instance.
+- [[Interview Feedback]] — one per interviewer per Interview; writes back `average_rating` on this doctype.
+- [[Employee Core Model]] — joined in `get_feedback` to resolve interviewer name/designation.
+- [[Permission Model (RBAC)]] — role-based access as detailed in Permissions above.

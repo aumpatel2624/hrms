@@ -8,15 +8,15 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | — | no | in_standard_filter, search_index |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | in_standard_filter, search_index |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | log_type | Log Type | Select | (blank)/IN/OUT | no | — | no | |
-| shift | Shift | Link | Shift Type | no | — | yes | search_index; set by `fetch_shift()` |
+| shift | Shift | Link | [[Shift Type]] | no | — | yes | search_index; set by `fetch_shift()` |
 | column_break_4 | (Column) | Column Break | — | — | — | — | |
 | time | Time | Datetime | — | yes | "Now" | no | permlevel 1; `read_only_depends_on: eval:doc.attendance` (locked once attendance linked) |
 | device_id | Location / Device ID | Data | — | no | — | no | |
 | skip_auto_attendance | Skip Auto Attendance | Check | — | no | 0 | no | |
-| attendance | Attendance Marked | Link | Attendance | no | — | yes | set by auto-attendance pipeline |
+| attendance | Attendance Marked | Link | [[Attendance]] | no | — | yes | set by auto-attendance pipeline |
 | shift_start | Shift Start | Datetime | — | no | — | no | hidden; set by `fetch_shift()` |
 | shift_end | Shift End | Datetime | — | no | — | no | hidden; set by `fetch_shift()` |
 | shift_actual_start | Shift Actual Start | Datetime | — | no | — | no | hidden; set by `fetch_shift()` |
@@ -55,9 +55,9 @@ Not submittable — no docstatus workflow beyond standard Draft(0)/Cancelled via
 6. `validate_distance_from_shift_location`:
    a. IF `HR Settings.allow_geolocation_tracking` is falsy THEN skip entirely (return).
    b. IF neither `latitude` nor `longitude` is set THEN `frappe.throw(_("Latitude and longitude values are required for checking in."))`.
-   c. Find active, submitted Shift Assignments for this employee+shift with a `shift_location` set, where `start_date <= self.time` AND (`end_date >= self.time` OR `end_date` unset).
+   c. Find active, submitted [[Shift Assignment]]s for this employee+shift with a `shift_location` set, where `start_date <= self.time` AND (`end_date >= self.time` OR `end_date` unset).
    d. IF no such assignment-location found THEN skip (return) — no radius check applies.
-   e. ELSE fetch `checkin_radius, latitude, longitude` from the first matching `Shift Location`. IF `checkin_radius <= 0` THEN skip (radius check disabled for that location).
+   e. ELSE fetch `checkin_radius, latitude, longitude` from the first matching [[Shift Location]]. IF `checkin_radius <= 0` THEN skip (radius check disabled for that location).
    f. Compute `distance = get_distance_between_coordinates(location.latitude, location.longitude, self.latitude, self.longitude)` (haversine formula, meters).
    g. IF `distance > checkin_radius` THEN `frappe.throw(_("You must be within {0} meters of your shift location to check in.").format(checkin_radius))`, `exc=CheckinRadiusExceededError` (source: `validate_distance_from_shift_location`).
 
@@ -65,7 +65,7 @@ Not submittable — no docstatus workflow beyond standard Draft(0)/Cancelled via
 
 ### `fetch_shift()` — whitelisted; resolves and caches shift-window fields on the checkin
 
-1. `shift_actual_timings = get_actual_start_end_datetime_of_shift(self.employee, self.time, consider_default_shift=True)` (see `Shift Assignment.md` for the full underlying algorithm — resolves the exact shift occurrence, including grace-period margins, that this checkin's timestamp falls within).
+1. `shift_actual_timings = get_actual_start_end_datetime_of_shift(self.employee, self.time, consider_default_shift=True)` (see [[Shift Assignment]] for the full underlying algorithm — resolves the exact shift occurrence, including grace-period margins, that this checkin's timestamp falls within).
 2. IF no shift found (`shift_actual_timings` falsy) THEN `self.shift = None`, `self.offshift = 1`; return.
 3. IF `shift_actual_timings.shift_type.determine_check_in_and_check_out == "Strictly based on Log Type in Employee Checkin"` AND `self.log_type` is empty AND `self.skip_auto_attendance` is falsy THEN `frappe.throw(_("Log Type is required for check-ins falling in the shift: {0}.").format(shift_type.name))`.
 4. IF `self.attendance` is NOT already set (i.e. this checkin hasn't been consumed by attendance processing yet) THEN:
@@ -78,7 +78,7 @@ Not submittable — no docstatus workflow beyond standard Draft(0)/Cancelled via
    - `self.overtime_type = shift_actual_timings.overtime_type or None`
    (If `self.attendance` IS already set, none of these fields are touched — they stay frozen once attendance has been marked, consistent with `time` being locked at that point too.)
 
-### `calculate_working_hours(logs, check_in_out_type, working_hours_calc_type)` — module-level, called from `Shift Type.get_attendance`
+### `calculate_working_hours(logs, check_in_out_type, working_hours_calc_type)` — module-level, called from [[Shift Type]]`.get_attendance`
 
 Preconditions: `logs` is a chronologically-ordered list of Employee Checkin dict-likes for one employee's one shift occurrence.
 
@@ -190,3 +190,11 @@ Not submittable, so Submit/Cancel/Amend are n/a.
 - **The working-hours calculation algorithms (Case A/B above) are intricate stateful scans**, not simple aggregate queries — a straightforward "sum of IN/OUT pairs" port could easily diverge from source behavior on edge cases (odd number of logs, mixed/missing log_type values, `skip_auto_attendance` mid-sequence). Recommend porting `calculate_working_hours` as a literal step-by-step translation and unit-testing against `test_employee_checkin.py`'s cases.
 - **Geolocation/radius check is opt-in site-wide** via `HR Settings.allow_geolocation_tracking` — a port needs an equivalent global settings flag gating both the mandatory lat/long requirement and the shift-location radius enforcement.
 - **`bulk_fetch_shift` explicitly bypasses validation** (`flags.ignore_validate = True`) when re-saving — meaning it will NOT re-run duplicate-log, time-change, or distance checks; only `fetch_shift()`'s own field assignments happen. A port must replicate this "partial update without full validation" semantic precisely (e.g. a dedicated internal update path that skips those specific checks) rather than reusing the standard save/validate pipeline.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the checkin belongs to this employee.
+- [[Shift Type]] — resolved via `fetch_shift()`; drives log-type requirements and auto-attendance processing.
+- [[Shift Assignment]] — used to resolve the exact shift occurrence (with grace-period margins) and any assigned Shift Location.
+- [[Shift Location]] — geolocation radius validation checks the checkin's coordinates against the assigned shift location.
+- [[Attendance]] — `attendance` links back to the Attendance record this checkin was consumed into by the auto-attendance pipeline.

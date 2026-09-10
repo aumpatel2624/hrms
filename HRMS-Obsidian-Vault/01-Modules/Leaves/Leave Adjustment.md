@@ -50,8 +50,8 @@ Two whitelisted helper functions support the UI: `get_leave_allocation_for_posti
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create/delete/submit/cancel/amend | Full |
-| HR Manager | read/write/create/delete/submit/cancel/amend | Full |
+| [[HR User]] | read/write/create/delete/submit/cancel/amend | Full |
+| [[HR Manager]] | read/write/create/delete/submit/cancel/amend | Full |
 
 ## Mermaid: State/Flow
 

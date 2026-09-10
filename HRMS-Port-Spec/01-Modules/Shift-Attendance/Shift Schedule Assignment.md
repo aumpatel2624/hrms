@@ -13,13 +13,13 @@
 | enabled | Enabled | Check | — | no | 1 | no | "Select this if you want shift assignments to be automatically created indefinitely." |
 | create_shifts_after | Create Shifts After | Date | — | conditionally (`mandatory_depends_on: eval:doc.enabled`) | "Today" | no | `depends_on: eval:doc.enabled`; watermark — new Shift Assignments created only after this date; advanced automatically as shifts are generated |
 | shift_details_section | Employee Details (label) | Section Break | — | — | — | — | |
-| employee | Employee | Link | Employee | yes | — | no | in_list_view, in_standard_filter |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | in_list_view, in_standard_filter |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | column_break_toss | (Column) | Column Break | — | — | — | — | |
 | company | Company | Link | Company | yes | — | yes | fetch_from `employee.company`, in_list_view |
 | shift_status | Shift Status | Select | Active/Inactive | no | Active | no | value stamped onto generated Shift Assignments' `status` |
-| shift_schedule | Shift Schedule | Link | Shift Schedule | yes | — | no | |
-| shift_location | Shift Location | Link | Shift Location | no | — | no | stamped onto generated Shift Assignments |
+| shift_schedule | Shift Schedule | Link | [[Shift Schedule]] | yes | — | no | |
+| shift_location | Shift Location | Link | [[Shift Location]] | no | — | no | stamped onto generated Shift Assignments |
 
 ## Child Tables
 
@@ -34,7 +34,7 @@ Not submittable — no docstatus workflow. No `status` field on the doctype itse
 `validate()`:
 1. `validate_existing_shift_assignments()`:
    - Runs ONLY IF `self.has_value_changed("create_shifts_after")` AND `not self.is_new()` (i.e. editing `create_shifts_after` on an existing record).
-   - `existing_shift_assignments, last_shift_end_date = self.get_existing_shift_assignments()`: finds Shift Assignments (via inner join on `shift_schedule_assignment == self.name`) that are `status = "Active"`, belong to `self.employee`, and have `end_date >= self.create_shifts_after` (i.e. shift assignments already generated for dates at/after the new watermark being set).
+   - `existing_shift_assignments, last_shift_end_date = self.get_existing_shift_assignments()`: finds [[Shift Assignment]]s (via inner join on `shift_schedule_assignment == self.name`) that are `status = "Active"`, belong to `self.employee`, and have `end_date >= self.create_shifts_after` (i.e. shift assignments already generated for dates at/after the new watermark being set).
    - IF any such assignments exist THEN `frappe.throw(msg=_("Shift assignments for {0} after {1} are already created. Please change {2} date to a date later than {3} {4}").format(shift_schedule, create_shifts_after, "Create Shifts After", last_shift_end_date, <bulleted list of links to the conflicting Shift Assignments>), title=_("Existing Shift Assignments"))` — prevents rewinding the watermark into a period that already has generated assignments (would create duplicates).
 
 ## Business Logic / Calculations
@@ -63,7 +63,7 @@ Not submittable — no docstatus workflow. No `status` field on the doctype itse
 
 ### B. `create_individual_assignment(shift_type, start_date, end_date)`
 
-1. Call `create_shift_assignment(self.employee, self.company, shift_type, start_date, end_date, self.shift_status, self.shift_location, self.name)` — see `Shift Assignment Tool.md` for the full body (creates, saves, and submits a new `Shift Assignment` doc, stamping `shift_schedule_assignment = self.name`).
+1. Call `create_shift_assignment(self.employee, self.company, shift_type, start_date, end_date, self.shift_status, self.shift_location, self.name)` — see [[Shift Assignment Tool]] for the full body (creates, saves, and submits a new `Shift Assignment` doc, stamping `shift_schedule_assignment = self.name`).
 2. `self.db_set("create_shifts_after", end_date, update_modified=False)` — advances this record's own watermark to the end of the block just created, directly via DB write (no re-validation, no modified-timestamp bump).
 
 ### C. `process_auto_shift_creation()` — module-level, the scheduler entry point
@@ -101,7 +101,7 @@ None declared with `@frappe.whitelist()` directly on this controller. `create_sh
 
 ## Scheduled Jobs Touching This Doctype
 
-From `hrms/hooks.py`, `scheduler_events["hourly_long"]` (third entry, after the two Shift Type jobs documented in `Shift Type.md`):
+From `hrms/hooks.py`, `scheduler_events["hourly_long"]` (third entry, after the two Shift Type jobs documented in [[Shift Type]]):
 
 **`hrms.hr.doctype.shift_schedule_assignment.shift_schedule_assignment.process_auto_shift_creation`** — full algorithm reproduced in Business Logic section C above. Runs hourly (long-running scheduler bucket); each run advances every enabled schedule assignment's generated-shift-assignment horizon by up to 90 days from its last watermark, and only for assignments whose watermark has already arrived (`create_shifts_after <= today`).
 
@@ -113,3 +113,12 @@ From `hrms/hooks.py`, `scheduler_events["hourly_long"]` (third entry, after the 
 - **Failure isolation**: one Shift Schedule Assignment's exception during the scheduled batch is logged and skipped, not retried and not aborting the rest of the batch (`continue` in the except block) — a port's job runner needs equivalent per-item error isolation, not a single all-or-nothing transaction across every enabled schedule assignment.
 - **`shift_status` on this doctype is copied verbatim onto every generated Shift Assignment's `status` field** — including the value `"Inactive"`, which (per `Shift Assignment.validate_overlapping_shifts`) skips that assignment's own overlap validation entirely. This means an admin can configure an entire recurring schedule to generate assignments that never overlap-check against anything — reproduce this behavior; do not add an overlap check that source doesn't have.
 - **`track_changes: 1`** is not set on this doctype's JSON (audit history not automatic here, unlike Attendance/Shift Type) — confirm this is intentional in source; a port should match (no implicit versioning requirement for this specific doctype).
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the assignment binds this employee to a recurring schedule.
+- [[Shift Schedule]] — the recurrence pattern (frequency + days) this assignment follows.
+- [[Shift Location]] — optional geofence location stamped onto generated Shift Assignments.
+- [[Shift Assignment]] — the records this doctype auto-generates via `create_shifts`/`create_individual_assignment`.
+- [[Shift Assignment Tool]] — its "Assign Shift Schedule" action creates these assignments and can eagerly trigger `create_shifts`.
+- [[Shift Type]] — the auto-attendance scheduler jobs documented there run immediately before this doctype's `process_auto_shift_creation` job in the same `hourly_long` bucket.

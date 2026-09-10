@@ -3,7 +3,7 @@
 **Source:** `hrms/regional/united_arab_emirates/setup.py`
 **Module:** Regional (United Arab Emirates) — one-time fixture/setup logic only. No calculation
 overrides exist for UAE (no `hooks.py` `regional_overrides["United Arab Emirates"]` entry) —
-UAE's contribution is exclusively 3 preset `Gratuity Rule` records reflecting UAE labor-law
+UAE's contribution is exclusively 3 preset `[[Gratuity Rule]]` records reflecting UAE labor-law
 gratuity formulas.
 
 ## 1. Exact Trigger
@@ -34,7 +34,7 @@ def setup():
       exists — functionally idempotent, different mechanism).
 
 No calculation logic is involved — these are static reference records read by the generic core
-Gratuity calculation engine (which is NOT part of this module's scope; it lives in
+[[Gratuity]] calculation engine (which is NOT part of this module's scope; it lives in
 `hrms/hr/doctype/gratuity/` or similar core doctype, owned by another module).
 
 ## 3. Custom Fields
@@ -101,8 +101,8 @@ law's resignation-specific reduction):
 
 - **No `RegionalStrategy` code needed for UAE** — since there are no calculation-function
   overrides, UAE contributes purely to the Gratuity Rule reference-data table. Port as 3 seed rows
-  (plus their slab child rows) inserted by the same seed/migration mechanism used for India's
-  Gratuity Rule (see `_Module-Spec.md`'s guidance on treating fixture seeding as one-time
+  (plus their [[Gratuity Rule Slab]] child rows) inserted by the same seed/migration mechanism used
+  for India's Gratuity Rule (see `01-Modules/Regional/_Module-Spec.md`'s guidance on treating fixture seeding as one-time
   migration data, not runtime code).
 - **Idempotency mechanism differs from India's**: UAE relies on the insert call's
   `ignore_if_duplicate=True` flag rather than an explicit pre-check. In a port, prefer an explicit
@@ -126,3 +126,9 @@ law's resignation-specific reduction):
 - **No `uninstall()`**: unlike India, there is no fixture-removal path defined for UAE at all —
   flag this asymmetry to the product owner if "uninstall regional pack" is a requirement in the
   ported system, rather than silently adding one.
+
+## Related Doctypes
+
+- [[Gratuity Rule]] — the 3 records seeded by this fixture (Limited Contract, Unlimited Contract termination, Unlimited Contract resignation).
+- [[Gratuity Rule Slab]] — the child table rows defining each rule's tenure-based fraction breakpoints.
+- [[Gratuity]] — the core calculation engine (owned by Payroll) that consumes these seeded rules; not part of this module's scope.

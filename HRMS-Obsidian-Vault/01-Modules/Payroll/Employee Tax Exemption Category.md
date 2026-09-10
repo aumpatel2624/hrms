@@ -37,9 +37,9 @@ Why: statutory tax categories (e.g. Section 80C in India) have a combined ceilin
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete | Full control, standard admin access. |
-| HR Manager | read/write/create/delete | Full control over category master. |
-| HR User | read/write/create/delete | Full control — no distinction from HR Manager in this doctype's permission rows. |
+| [[System Manager]] | read/write/create/delete | Full control, standard admin access. |
+| [[HR Manager]] | read/write/create/delete | Full control over category master. |
+| [[HR User]] | read/write/create/delete | Full control — no distinction from HR Manager in this doctype's permission rows. |
 
 No `Employee` role permission — employees cannot view or edit categories directly (they only see them via linked fields on declarations/proofs).
 

@@ -20,7 +20,7 @@ Field order per JSON `field_order`. Section/Column Break/Tab Break rows are note
 | status | Status | Select | `Pending`, `Open & Approved`, `Rejected`, `Filled`, `On Hold`, `Cancelled` | yes | — | no | `in_list_view` |
 | company | Company | Link | Company | yes | — | no | — |
 | *(section_break_7 "Requested By")* | | Section Break | | | | | group heading: Requested By |
-| requested_by | Requested By | Link | Employee | yes | — | no | `in_standard_filter` |
+| requested_by | Requested By | Link | [[Employee Core Model\|Employee]] | yes | — | no | `in_standard_filter` |
 | requested_by_name | Requested By (Name) | Data | — | no | — | yes | fetch_from `requested_by.employee_name`; `in_list_view` |
 | *(column_break_10)* | | Column Break | | | | | layout only |
 | requested_by_dept | Department | Link | Department | no | — | yes | fetch_from `requested_by.department` |
@@ -36,7 +36,7 @@ Field order per JSON `field_order`. Section/Column Break/Tab Break rows are note
 | time_to_fill | Time to Fill | Duration | — | no | — | yes | `hide_seconds`; computed server-side, see Business Logic |
 | *(connections_tab "Connections")* | | Tab Break | | | | | `show_dashboard: 1` — renders linked-doc dashboard (Job Opening via `links`) |
 
-Doctype-level `links`: one entry — `Job Opening` linked via field `job_requisition` (drives the "Connections" tab document link count).
+Doctype-level `links`: one entry — [[Job Opening]] linked via field `job_requisition` (drives the "Connections" tab document link count).
 
 ## Child Tables
 
@@ -92,8 +92,8 @@ No `before_insert`, `on_update`, `on_submit`, `on_cancel`, `on_trash`, `after_in
 | Method name | HTTP-equivalent purpose | Args | Returns | What it does |
 |---|---|---|---|---|
 | `check_duplicate_job_requisition` (instance method) | Pre-save duplicate check | none (uses `self`) | `str` (name of existing doc) or falsy | Runs `frappe.db.exists("Job Requisition", {designation: self.designation, department: self.department, requested_by: self.requested_by, status: not in ["Cancelled","Filled"], name: != self.name})`. Returns the existing matching document's name if found. |
-| `associate_job_opening` (instance method) | Link an existing Job Opening to this requisition | `job_opening: str` | none (raises on failure) | 1) Checks caller has `write` permission on the target Job Opening (`frappe.has_permission(..., throw=True)`) — throws standard Frappe permission error if not. 2) `frappe.db.set_value("Job Opening", job_opening, {"job_requisition": self.name, "vacancies": self.no_of_positions})` (direct DB write, bypasses that doc's own `validate`). 3) `frappe.msgprint` with title `"Job Opening Associated"` and message `"Job Requisition {0} has been associated with Job Opening {1}"` (bold requisition name, link to the Job Opening form). |
-| `make_job_opening` (module-level function) | "Create Job Opening" mapped-doc action | `source_name: str`, `target_doc: str | Document | None` | New (unsaved) `Job Opening` Document | Uses `get_mapped_doc` from Job Requisition to Job Opening with field map `designation→designation`, `name→job_requisition`, `department→department`, `no_of_positions→vacancies`. Additionally sets on the target: `job_title = designation`, `status = "Open"`, `currency = Company.default_currency` (looked up via `source.company`), `lower_range = expected_compensation`, `description = description`. |
+| `associate_job_opening` (instance method) | Link an existing [[Job Opening]] to this requisition | `job_opening: str` | none (raises on failure) | 1) Checks caller has `write` permission on the target Job Opening (`frappe.has_permission(..., throw=True)`) — throws standard Frappe permission error if not. 2) `frappe.db.set_value("Job Opening", job_opening, {"job_requisition": self.name, "vacancies": self.no_of_positions})` (direct DB write, bypasses that doc's own `validate`). 3) `frappe.msgprint` with title `"Job Opening Associated"` and message `"Job Requisition {0} has been associated with Job Opening {1}"` (bold requisition name, link to the Job Opening form). |
+| `make_job_opening` (module-level function) | "Create Job Opening" mapped-doc action | `source_name: str`, `target_doc: str | Document | None` | New (unsaved) [[Job Opening]] Document | Uses `get_mapped_doc` from Job Requisition to Job Opening with field map `designation→designation`, `name→job_requisition`, `department→department`, `no_of_positions→vacancies`. Additionally sets on the target: `job_title = designation`, `status = "Open"`, `currency = Company.default_currency` (looked up via `source.company`), `lower_range = expected_compensation`, `description = description`. |
 | `get_avg_time_to_fill` (module-level function) | Reporting/dashboard aggregate | `company: str | None`, `department: str | None`, `designation: str | None` | Formatted duration string or `0` | See Business Logic above. |
 
 ## Permissions
@@ -112,7 +112,7 @@ None directly. (See `Job Opening.md` for `close_expired_job_openings`, which ind
 
 ## Port Notes
 
-- `naming_series` has only one legal option (`HR-HIREQ-`); the actual generated name is `HR-HIREQ-#####` style Frappe auto-increment behind that series prefix — reproduce as a per-series incrementing counter table (Frappe's naming series counters are global per prefix string, not per-tenant/company), e.g. `HR-HIREQ-00001`.
+- `naming_series` has only one legal option (`HR-HIREQ-`); the actual generated name is `HR-HIREQ-#####` style Frappe auto-increment behind that series prefix — reproduce as a per-series incrementing counter table (Frappe's naming series counters are global per prefix string, not per-tenant/company), e.g. `HR-HIREQ-00001`. See [[Naming and Autoname Rules]].
 - `requested_by_name`, `requested_by_dept`, `requested_by_designation` are "fetch" fields: Frappe auto-populates them from the linked `Employee` (`requested_by`) whenever that link field changes, both client-side and re-verified server-side on save. A port must replicate this fetch-on-change behavior explicitly (it is not automatic in a generic ORM).
 - `description` uses `fetch_if_empty`: unlike normal fetch fields, this one only auto-populates when currently blank, so it will NOT silently overwrite user edits if `designation` changes later. Reproduce as "populate from Designation.description only if field is currently empty."
 - `expected_compensation`'s `options: "Company:company:default_currency"` is Frappe's dynamic-currency-link idiom — the field's display/precision currency is looked up live from the `company` field's linked Company's `default_currency`. A port needs an explicit join/derivation for this rather than a stored currency code, unless it denormalizes it.
@@ -120,4 +120,10 @@ None directly. (See `Job Opening.md` for `close_expired_job_openings`, which ind
 - `sort_field`/`sort_order` = `creation DESC` — default list ordering to replicate.
 - `title_field` = `designation` — used for link-field display and breadcrumb titles; a port's UI should show `designation` as the record's display title, not `name`.
 - The duplicate-check `frappe.confirm` dialog (see Validation Rules #2) is a **soft warning only** — Frappe does not block the save if the user clicks through. There is no equivalent server-side hard-stop; if the target stack wants a genuine constraint (e.g. unique per designation+department+requested_by while open), that would be a new invariant not present in the original code — call this out to the developer rather than silently adding it.
-- Cross-doctype: `Employee Referral` records (in `job_requisition.js` `refresh`) are queried client-side by `for_designation = designation, status = "Pending"` purely to show an informational banner + link on the form; this is UI-only and has no server-side coupling to port as data logic.
+- Cross-doctype: [[Employee Referral]] records (in `job_requisition.js` `refresh`) are queried client-side by `for_designation = designation, status = "Pending"` purely to show an informational banner + link on the form; this is UI-only and has no server-side coupling to port as data logic.
+
+## Related Doctypes
+
+- [[Job Opening]] — postings created from/associated with this requisition (`make_job_opening`, `associate_job_opening`); closing the opening cascades this requisition's status to Filled.
+- [[Employee Core Model]] — `requested_by` links to the requesting Employee, whose name/department/designation are fetched onto this doctype.
+- [[Employee Referral]] — queried client-side (informational only) for pending referrals against the same designation.

@@ -69,6 +69,10 @@ None on the child-row controller itself. However, the module file defines one wh
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Shift Request]] — one of the three parent tables (`shift_request_approver`) this child row shape is reused for, per source; owned by `Department` (out of scope).
+
 ## Port Notes
 
 - **Cross-doctype relationship (noted per assignment, `Department` itself out of scope):** `Department Approver` rows are stored as three separate child tables on `Department` — `leave_approvers`, `expense_approvers`, `shift_request_approver` — each holding rows shaped by this same doctype (`approver: User`). A port should model this as one `department_approvers` table (or three) with a `parentfield`/`role_type` discriminator column (`leave_approvers` / `expense_approvers` / `shift_request_approver`), a `department_id` FK, and an `approver_user_id` FK — mirroring Frappe's generic parent/parentfield/parenttype child-table pattern.

@@ -56,9 +56,9 @@ There is no `on_cancel` override — cancelling a Leave Policy Assignment does n
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit/cancel | Full |
-| HR Manager | read/write/create/delete/submit/cancel | Full |
-| HR User | read/write/create/delete/submit/cancel | Full |
+| [[System Manager]] | read/write/create/delete/submit/cancel | Full |
+| [[HR Manager]] | read/write/create/delete/submit/cancel | Full |
+| [[HR User]] | read/write/create/delete/submit/cancel | Full |
 
 ## Mermaid: State/Flow
 

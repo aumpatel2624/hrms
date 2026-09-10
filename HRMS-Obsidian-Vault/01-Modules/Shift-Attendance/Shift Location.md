@@ -31,10 +31,10 @@ A named physical site (with coordinates and an allowed check-in radius) that shi
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read/Write/Create/Delete | |
-| HR Manager | Read/Write/Create/Delete | |
-| HR User | Read/Write/Create/Delete | Same full rights as HR Manager for this reference data. |
-| Employee | Read | View-only. |
+| [[System Manager]] | Read/Write/Create/Delete | |
+| [[HR Manager]] | Read/Write/Create/Delete | |
+| [[HR User]] | Read/Write/Create/Delete | Same full rights as HR Manager for this reference data. |
+| [[Employee]] | Read | View-only. |
 
 ## Mermaid: State/Flow
 

@@ -44,9 +44,9 @@ Attaches a specific employee to a [[Shift Schedule]] template and drives the act
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | Read | View-only. |
-| HR User | Read/Write/Create | No delete — can set up and adjust rota assignments but not remove them. |
-| HR Manager | Read/Write/Create/Delete | Full control, but note this doctype is **not submittable** (no `is_submittable` in JSON) — there is no submit/cancel/amend lifecycle here, unlike most of this module; "Active/Inactive" lives only in the `shift_status` field, not the docstatus workflow. |
+| [[Employee]] | Read | View-only. |
+| [[HR User]] | Read/Write/Create | No delete — can set up and adjust rota assignments but not remove them. |
+| [[HR Manager]] | Read/Write/Create/Delete | Full control, but note this doctype is **not submittable** (no `is_submittable` in JSON) — there is no submit/cancel/amend lifecycle here, unlike most of this module; "Active/Inactive" lives only in the `shift_status` field, not the docstatus workflow. |
 
 ## Mermaid: State/Flow
 

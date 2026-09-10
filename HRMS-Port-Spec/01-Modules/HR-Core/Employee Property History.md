@@ -71,6 +71,12 @@ None.
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Employee Promotion]] — parent via `promotion_details`; populates rows on submit and updates the linked Employee.
+- [[Employee Transfer]] — parent via `transfer_details`; populates rows on submit and updates the linked Employee.
+- [[Employee Core Model]] — rows record field-level changes applied back to the Employee master.
+
 ## Port Notes
 
 - **Field population is client-side only.** Nothing in the available Python source populates `property`, `current`, `new`, or `fieldname` — that happens in the parent doctypes' `.js` client scripts (`employee_promotion.js`, `employee_transfer.js`), which are out of scope for this file (owned by `Employee Promotion`/`Employee Transfer` specs). A faithful port must replicate whatever comparison logic those scripts perform (diffing selected Employee fields against their current values) as a server-side or shared-library routine, since a new stack cannot rely on Frappe's client-form event model.

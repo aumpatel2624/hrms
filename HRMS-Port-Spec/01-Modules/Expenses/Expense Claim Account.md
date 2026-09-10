@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** child table (no autoname; row-level `name` is a random hash, standard Frappe child-row naming)
 **Module:** HR
 
-Child doctype of `Expense Claim Type` (table field `accounts`). Maps one default GL account per Company for a given Expense Claim Type.
+Child doctype of [[Expense Claim Type]] (table field `accounts`). Maps one default GL account per Company for a given Expense Claim Type.
 
 ## Schema
 
@@ -50,3 +50,7 @@ None.
 ## Port Notes
 
 - This is a pure child/owned-row table in the relational sense: model as `expense_claim_account(parent_expense_claim_type_id FK, company_id FK, default_account_id FK, idx)`. No independent lifecycle or permissions of its own.
+
+## Related Doctypes
+
+- [[Expense Claim Type]] — parent doctype; this child table holds its per-company default account mapping.

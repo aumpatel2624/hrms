@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** `autoname: hash` (random hash, `naming_rule: "Random"`)
 **Module:** HR
 
-Child doctype of `Expense Claim` (table field `taxes`). One row per tax/charge line applied on top of the claim's sanctioned amount.
+Child doctype of [[Expense Claim]] (table field `taxes`). One row per tax/charge line applied on top of the claim's sanctioned amount.
 
 ## Schema
 
@@ -62,3 +62,7 @@ None directly; included in `accounting_dimension_doctypes` (`hrms/hooks.py`), so
 - Model as an owned child row: `expense_taxes_and_charges(parent_expense_claim_id FK, account_head_id FK, rate, tax_amount, base_tax_amount, total, base_total, description, cost_center_id FK NULL, project_id FK NULL, idx)`.
 - `track_changes: 1` on a CHILD table is unusual (most child tables here don't set it) — Frappe versions the row's field changes into the standard `Version` doctype alongside the parent. A port needs an explicit audit-log table/mechanism if it wants row-level history for tax lines specifically, since it won't come for free the way it would on a submittable parent doctype.
 - `cost_center` defaults to `":Company"` — Frappe's special default syntax meaning "use the current session/site default Cost Center", NOT a fetch from the `Expense Claim.company`'s own cost center field (that pattern, `fetch_from: company.cost_center`, is used elsewhere e.g. on `Expense Claim.cost_center` itself). A port must replicate this exact default source distinction.
+
+## Related Doctypes
+
+- [[Expense Claim]] — parent doctype; this child table holds its `taxes` line items.

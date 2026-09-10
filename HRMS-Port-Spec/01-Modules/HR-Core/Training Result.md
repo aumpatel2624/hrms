@@ -8,10 +8,10 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| training_event | Training Event | Link | Training Event | Yes (reqd) | — | No | `unique` — only one Training Result may exist per Training Event; shown in list view |
+| training_event | Training Event | Link | [[Training Event]] | Yes (reqd) | — | No | `unique` — only one Training Result may exist per Training Event; shown in list view |
 | section_break_3 | — | Section Break | — | — | — | — | layout only |
-| employees | Employees | Table | `Training Result Employee` | No | — | No | populated client-side from the linked Training Event's attendee list (see Port Notes / whitelisted method) |
-| amended_from | Amended From | Link | Training Result | No | — | Yes | `no_copy`, `print_hide`; standard amendment field |
+| employees | Employees | Table | [[Training Result Employee]] | No | — | No | populated client-side from the linked Training Event's attendee list (see Port Notes / whitelisted method) |
+| amended_from | Amended From | Link | [[Training Result]] | No | — | Yes | `no_copy`, `print_hide`; standard amendment field |
 | employee_emails | Employee Emails | Small Text | (options: `Email`) | No | — | No | `hidden`; computed by controller from current `employees` rows (same pattern as Training Event) |
 
 ## Child Tables
@@ -20,7 +20,7 @@
 
 ## State Machine
 
-Submittable doctype; standard docstatus lifecycle only (Draft -> Submitted -> Cancelled -> Amend). No independent `status`/`workflow_state` field on this doctype itself.
+Submittable doctype (see [[Submittable Document Lifecycle]]); standard docstatus lifecycle only (Draft -> Submitted -> Cancelled -> Amend). No independent `status`/`workflow_state` field on this doctype itself.
 
 ```mermaid
 stateDiagram-v2
@@ -88,6 +88,11 @@ None found in `hrms/hooks.py`.
 - Subject: `Please Share your Feedback For {{ doc.training_event }}`.
 - Body: renders a generic `{{ message }}` placeholder plus a details block (`Event Name` linking to `event_link`, `Event Location`, `Start Time`, `End Time`, `Attendance` — referencing template variables `event_link`, `location`, `start_time`, `end_time`, `attendance`, `name` that are NOT obviously fields on Training Result itself). **Port Note:** this template references context variables (`message`, `event_link`, `location`, `start_time`, `end_time`, `attendance`) that do not correspond 1:1 to Training Result's own schema fields; `training_feedback.py` under `hrms/hr/notification/training_feedback/` (the notification's optional `get_context` hook) is a no-op stub (`def get_context(context): pass`), meaning none of these extra template variables are actually being populated by custom Python here — they would render as empty/undefined in the sent email. This is a likely-inert/broken template in the source; document faithfully, do not invent the "intended" wiring.
 - Effect intended (per the accompanying HTML at `training_feedback.html`, a second/alternate template file colocated with the notification): tell each attendee they attended the training and invite them to submit feedback via "Training Feedback > New". A port implementing "send feedback-invite email on Training Result submit" should send to the addresses in this doctype's `employee_emails` field, and can safely base the email purely on `doc.training_event`, `doc.employees` (names) — treating the extra undefined template variables as unimplemented/aspirational in the source rather than reproducing broken interpolation.
+
+## Related Doctypes
+
+- [[Training Event]] — via `training_event`: `unique` — only one Training Result may exist per Training Event; shown in list view
+- [[Training Result Employee]] — via `employees`: populated client-side from the linked Training Event's attendee list (see Port Notes / whitelisted method)
 
 ## Port Notes
 

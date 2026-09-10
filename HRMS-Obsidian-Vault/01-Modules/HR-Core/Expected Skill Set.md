@@ -18,9 +18,9 @@ A child-table row defining one skill (with its description) that is expected to 
 
 ## Relationships
 
-- Interview Type (Recruitment module, outside this vault section) — parent doctype (child table field `expected_skill_set`).
+- [[Interview Type]] (Recruitment module) — parent doctype (child table field `expected_skill_set`).
 - [[Skill]] — linked from, via `skill`; also the source of the fetched `description`.
-- [[Skill Assessment]] — read by: Interview Feedback's `get_expected_skill_set` whitelisted method (in the Recruitment module's `interview.py`) uses an interview's Expected Skill Set rows to build the interview's Skill Assessment table.
+- [[Skill Assessment]] — read by: [[Interview Feedback]]'s `get_expected_skill_set` whitelisted method (in the Recruitment module's `interview.py`) uses an interview's Expected Skill Set rows to build the interview's Skill Assessment table.
 - [[Designation Skill]] — populated from: `interview_type.js` seeds `expected_skill_set` rows from the selected Designation's `skills` (Designation Skill) child table.
 
 ## Logic — What Happens and Why
@@ -29,7 +29,7 @@ The `ExpectedSkillSet(Document)` controller is a `pass`-only class — no valida
 
 ## Roles & Permissions
 
-Child table — no own `permissions` array (empty). Access is governed entirely by the parent Interview Type doctype's permissions (defined in the Recruitment module).
+Child table — no own `permissions` array (empty). Access is governed entirely by the parent [[Interview Type]] doctype's permissions (defined in the Recruitment module).
 
 ## Mermaid: State/Flow
 

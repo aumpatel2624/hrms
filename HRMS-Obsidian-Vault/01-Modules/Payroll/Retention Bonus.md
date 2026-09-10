@@ -44,10 +44,10 @@ Records a promised bonus for keeping an employee on staff through a future date,
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit/cancel/amend | Full control. |
-| HR Manager | read/write/create/delete/submit/cancel | Full lifecycle. |
-| HR User | read/write/create/delete/submit/cancel | Same as HR Manager per JSON. |
-| Employee | read | View-only — presumably to see their own bonus (not enforced to "own records only" in code; relies on standard employee-self permission restriction elsewhere in the framework). |
+| [[System Manager]] | read/write/create/delete/submit/cancel/amend | Full control. |
+| [[HR Manager]] | read/write/create/delete/submit/cancel | Full lifecycle. |
+| [[HR User]] | read/write/create/delete/submit/cancel | Same as HR Manager per JSON. |
+| [[Employee]] | read | View-only — presumably to see their own bonus (not enforced to "own records only" in code; relies on standard employee-self permission restriction elsewhere in the framework). |
 
 ## Mermaid: State/Flow
 

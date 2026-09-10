@@ -1,7 +1,7 @@
 # Appraisal Cycle
 
 **Source:** `hrms/hr/doctype/appraisal_cycle/appraisal_cycle.json`, `appraisal_cycle.py`, `appraisal_cycle.js`
-**Submittable:** no   **Tree:** no   **Naming:** `field:cycle_name` — the document's name IS the value typed into `cycle_name` (must be unique, `allow_rename: 1`)
+**Submittable:** no   **Tree:** no   **Naming:** `field:cycle_name` ([[Naming and Autoname Rules]]) — the document's name IS the value typed into `cycle_name` (must be unique, `allow_rename: 1`)
 **Module:** HR
 
 ## Schema
@@ -24,7 +24,7 @@
 | department | Department | Link | Department | no | — | no | optional filter; UI further scopes the Department link-query to `company` |
 | designation | Designation | Link | Designation | no | — | no | optional filter |
 | get_employees | Get Employees | Button | — | — | — | — | triggers `set_employees()` |
-| appraisees | (no label) | Table (Appraisee) | Appraisee | no | — | no | populated by `set_employees`; owned by another module's doctype (`Appraisee` — out of this port's assigned scope, reference only) |
+| appraisees | (no label) | Table (Appraisee) | Appraisee | no | — | no | populated by `set_employees`; owned by another module's doctype (`Appraisee` — out of this port's assigned scope, reference only; no matching file found in `01-Modules`) |
 
 ## Child Tables
 
@@ -103,7 +103,7 @@ filters = {status: "Active", company: self.company}
 IF self.department: filters.department = self.department
 IF self.branch: filters.branch = self.branch
 IF self.designation: filters.designation = self.designation
-RETURN Employee list (name, employee_name, branch, designation, department) matching filters
+RETURN [[Employee Core Model]] list (name, employee_name, branch, designation, department) matching filters
 ```
 
 ### Template resolution — `get_appraisal_template_map()`
@@ -169,7 +169,7 @@ IF AppraisalCycle.status == "Completed":
           "Set the status to {In Progress} if required."   (title "Not Allowed")
 ```
 
-## Lifecycle Hooks (exact)
+## Lifecycle Hooks (exact) ([[Cross-Doctype Hooks (doc_events)]])
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -187,7 +187,7 @@ IF AppraisalCycle.status == "Completed":
 | `get_appraisal_cycle_summary(cycle_name)` (module-level) | Dashboard summary counts | `cycle_name: str` | dict (see Business Logic) | Requires read permission |
 | `get_employees_without_feedback(cycle_name=None)` (module-level) | Count of employees still missing feedback | `cycle_name: str \| None` | int | Defaults to the current "In Progress" cycle if none given; requires read permission |
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -200,11 +200,18 @@ IF AppraisalCycle.status == "Completed":
 
 None found in `hrms/hooks.py` `scheduler_events`.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — source of the employee population selected via `get_employees_for_appraisal`/`set_employees` (not a schema Link field on this doctype).
+- [[Appraisal]] — one Appraisal is created per appraisee (`create_appraisals_for_cycle`); this doctype's `status`/`kra_evaluation_method` gate Appraisal creation and edits.
+- [[Goal]] — read (not a schema link) by `get_employees_without_goals` to compute the dashboard summary.
+- [[Employee Performance Feedback]] — read (not a schema link) by `get_employees_without_feedback` to compute the dashboard summary.
+
 ## Port Notes
 
 - **Naming = `field:cycle_name`**: the primary key/document name is literally whatever the user types as `cycle_name`, and it must be globally unique. In an RDBMS port, either make `cycle_name` the primary key directly (natural key) or keep a surrogate PK plus a unique constraint on `cycle_name`, matching however other doctypes reference "Appraisal Cycle" by name (they store the cycle's name/PK as a string, e.g. `Appraisal.appraisal_cycle`).
 - **`status` is read-only in the form but freely settable via `frm.set_value` + save from custom buttons** — i.e. there is no dedicated whitelisted "start"/"complete" transition method for Not Started -> In Progress or Completed -> In Progress; those two transitions are just a plain field save from client script (`appraisal_cycle.js`). Only Not-Started/In-Progress -> Completed goes through the guarded `complete_cycle()` method. A port should decide whether to also guard the other transitions server-side (the source code does not) or intentionally replicate the same "ungated" behavior.
 - **`final_score_formula`** is a raw Python expression string (Code field, `options: PythonExpression`) — see `Appraisal.md` Business Logic for how it's consumed; the autocompletion metadata in `appraisal_cycle.js` (`set_autocompletions_for_final_score_formula`) is UI-only sugar (lists available field names from Employee/Appraisal Cycle/Appraisal plus the three computed score names) and carries no server-side meaning.
 - **`Designation.appraisal_template`** and the whole `Appraisee` child doctype are defined in another doctype's ownership (outside this agent's Performance-module assignment) — the relational design (per-designation default templates, and the cycle's own per-appraisee override) must be captured wherever that doctype is ported; noted here as a cross-module dependency.
-- **`track_changes: 1`**: same as `Appraisal` — full field-level audit history is automatic in Frappe and must be built explicitly in a new stack if required.
+- **`track_changes: 1`** ([[Implicit Framework Behaviors]]): same as `Appraisal` — full field-level audit history is automatic in Frappe and must be built explicitly in a new stack if required.
 - **Background job for >30 appraisees**: `create_appraisals` enqueues on a "long" queue (600s timeout) when more than 30 appraisee rows exist; a port needs an equivalent async job/worker mechanism (and a progress-publishing channel, e.g. websockets, to replicate the `frappe.publish_progress` progress bar) for parity, though this is a UX/perf concern rather than a correctness one — a synchronous loop also works correctness-wise for smaller batches.

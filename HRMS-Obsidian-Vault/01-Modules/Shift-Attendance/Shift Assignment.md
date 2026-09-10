@@ -49,9 +49,9 @@ Records that a specific employee is assigned to a specific Shift Type for a date
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | Read | View own/team assignments only as permitted by standard record-level rules; no write. |
-| HR Manager | Read/Write/Create/Delete/Submit/Cancel/Amend | Full lifecycle control. |
-| HR User | Read/Write/Create/Submit | No delete/cancel/amend — can create and submit new assignments but not unwind them; cancellation of a live assignment is an HR Manager action. |
+| [[Employee]] | Read | View own/team assignments only as permitted by standard record-level rules; no write. |
+| [[HR Manager]] | Read/Write/Create/Delete/Submit/Cancel/Amend | Full lifecycle control. |
+| [[HR User]] | Read/Write/Create/Submit | No delete/cancel/amend — can create and submit new assignments but not unwind them; cancellation of a live assignment is an HR Manager action. |
 
 ## Mermaid: State/Flow
 

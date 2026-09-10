@@ -8,8 +8,8 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| shift_type | Shift Type | Link | Shift Type | yes | — | no | in_list_view |
-| employee | Employee | Link | Employee | yes | — | no | in_list_view |
+| shift_type | Shift Type | Link | [[Shift Type]] | yes | — | no | in_list_view |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | in_list_view |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | no | — | yes | fetch_from `employee.department` |
 | status | Status | Select | Draft/Approved/Rejected | yes | Draft | no | |
@@ -39,7 +39,7 @@ stateDiagram-v2
 Plain list:
 - (Draft, user/approver sets status field to "Approved" or "Rejected", still Draft docstatus) — guard: `validate_status_change` — only a user with Submit permission on this doctype may change `status` away from "Draft"; anyone else attempting to change it gets `frappe.PermissionError`.
 - (Draft docstatus, submit, Submitted docstatus) — guard: `on_submit` throws `frappe.throw(_("Only Shift Request with status 'Approved' and 'Rejected' can be submitted"))` if `self.status not in ["Approved", "Rejected"]`.
-- (Submitted+status=Approved, on_submit side effect) — creates and submits a new `Shift Assignment` (`company, shift_type, employee, start_date=from_date, end_date=to_date if set, shift_request=self.name`), inserted with `ignore_permissions=1`.
+- (Submitted+status=Approved, on_submit side effect) — creates and submits a new [[Shift Assignment]] (`company, shift_type, employee, start_date=from_date, end_date=to_date if set, shift_request=self.name`), inserted with `ignore_permissions=1`.
 - (Submitted, cancel, Cancelled) — `on_cancel` cancels every submitted `Shift Assignment` where `employee=self.employee, shift_request=self.name, docstatus=1`.
 - (Draft, discard, status="Cancelled") — `on_discard` sets `self.db_set("status", "Cancelled")` directly (this doctype DOES have a `status` field, unlike `Attendance Request`).
 
@@ -53,7 +53,7 @@ Plain list:
    - FOR EACH overlap: IF `has_overlapping_timings(self.shift_type, other.shift_type)` THEN `throw_overlap_error(other)`: `frappe.throw(_("Employee {0} has already applied for Shift {1}: {2} that overlaps within this period").format(...))`, `title=_("Overlapping Shift Requests")`, `exc=OverlappingShiftRequestError`.
 4. `validate_approver()`:
    - `department = Employee.department`; `shift_approver = Employee.shift_request_approver`.
-   - `dept_approvers` = all `Department Approver` child rows where `parent=department AND parentfield="shift_request_approver"`, collected as a list of approver users; append `shift_approver` to that list.
+   - `dept_approvers` = all [[Department Approver]] child rows where `parent=department AND parentfield="shift_request_approver"`, collected as a list of approver users; append `shift_approver` to that list.
    - IF `self.approver` not in that combined list THEN `frappe.throw(_("Only Approvers can Approve this Request."))`.
 5. `validate_default_shift()`: `default_shift = Employee.default_shift`. IF `self.shift_type == default_shift` THEN `frappe.throw(_("You can not request for your Default Shift: {0}").format(shift_type))`.
 6. `validate_status_change()`: IF the current user has Submit permission on this Shift Request THEN skip (allowed to change status freely). ELSE IF `self.status != "Draft"` THEN `frappe.throw(_("You do not have permission to change the Status of a Shift Request."), frappe.PermissionError)`.
@@ -89,7 +89,7 @@ None declared with `@frappe.whitelist()` on this controller. (The client script 
 
 ## Scheduled Jobs Touching This Doctype
 
-None directly. Indirectly surfaced in bulk via `Shift Assignment Tool`'s "Process Shift Requests" action (see `Shift Assignment Tool.md`), which is user-triggered, not scheduled.
+None directly. Indirectly surfaced in bulk via [[Shift Assignment Tool]]'s "Process Shift Requests" action, which is user-triggered, not scheduled.
 
 ## Port Notes
 
@@ -97,3 +97,11 @@ None directly. Indirectly surfaced in bulk via `Shift Assignment Tool`'s "Proces
 - **`share_doc_with_approver` is a Frappe-specific document-sharing/ACL mechanism** (`frappe.share.add_docshare`) used to grant the approver Submit rights on this specific document even if their role doesn't normally have Submit permission — a port needs an equivalent per-document ACL grant/revoke mechanism tied to the `approver` field, including revoking the previous approver's share when `approver` changes (see `share_doc_with_approver`'s "remove shared doc if approver changes" logic in `hrms/hr/utils.py`).
 - **This doctype's own `status` field co-exists with `docstatus`** — Draft/Approved/Rejected is a data value that is validated/gate-kept independently of the submit action; a port must model both dimensions (submit-state and this custom status) and enforce that submission is only possible once status is Approved or Rejected, exactly as `on_submit` does.
 - **`validate_status_change` uses a live permission check (`frappe.has_permission(..., "submit", self)`) inside `validate()`** to decide whether a `status` field change is even allowed — this is an unusual "field write permission conditional on a different permission type" pattern; a port's authorization layer needs an equivalent per-field-transition permission check, not just a coarse-grained "who can edit this doctype" rule.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the request is filed for this employee.
+- [[Shift Type]] — the shift being requested; also used for overlap-timing checks.
+- [[Shift Assignment]] — created and submitted automatically when this request is approved and submitted; cancelled when this request is cancelled.
+- [[Department Approver]] — combined with the employee's own `shift_request_approver` to validate who may approve this request.
+- [[Shift Assignment Tool]] — its "Process Shift Requests" action can bulk-approve/reject Shift Requests.

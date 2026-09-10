@@ -51,10 +51,10 @@ An employee-submitted, submittable request claiming extra leave in exchange for 
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete | No submit right listed |
-| HR Manager | read/write/create/delete/submit/cancel | Full |
-| HR User | read/write/create/delete/submit | No cancel |
-| Employee | read/write/create/delete | Can self-submit request (create), no submit/cancel right — approval effectively happens via someone with submit rights |
+| [[System Manager]] | read/write/create/delete | No submit right listed |
+| [[HR Manager]] | read/write/create/delete/submit/cancel | Full |
+| [[HR User]] | read/write/create/delete/submit | No cancel |
+| [[Employee]] | read/write/create/delete | Can self-submit request (create), no submit/cancel right — approval effectively happens via someone with submit rights |
 
 ## Mermaid: State/Flow
 

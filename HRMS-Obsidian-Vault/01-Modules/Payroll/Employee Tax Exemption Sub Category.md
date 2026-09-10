@@ -38,9 +38,9 @@ No submit/cancel lifecycle — this is a plain master doctype (`is_submittable` 
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete | Full control. |
-| HR Manager | read/write/create/delete | Full control. |
-| HR User | read/write/create/delete | Full control — identical rights to HR Manager. |
+| [[System Manager]] | read/write/create/delete | Full control. |
+| [[HR Manager]] | read/write/create/delete | Full control. |
+| [[HR User]] | read/write/create/delete | Full control — identical rights to HR Manager. |
 
 No `Employee` role — employees only select sub-categories via Link fields on declarations/proofs, never edit the master.
 

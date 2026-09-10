@@ -56,10 +56,10 @@ The raw punch/log record — a single IN or OUT event for an employee at a times
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD (incl. permlevel-1 fields) | permlevel 1 covers a small set of fields (visible in the dashboard/list but write restricted at that level to elevated roles). |
-| HR Manager | Full CRUD (incl. permlevel-1 fields) | |
-| HR User | Full CRUD (incl. permlevel-1 fields) | |
-| Employee | Create/Read/Write/Delete (base level); Read only at permlevel 1 | Employees can log their own checkins but cannot write the permlevel-1 fields — not enforced further in code beyond the standard field-permission mechanism as to *which* fields sit at permlevel 1 (defined in the JSON, not filtered per-employee in Python). |
+| [[System Manager]] | Full CRUD (incl. permlevel-1 fields) | permlevel 1 covers a small set of fields (visible in the dashboard/list but write restricted at that level to elevated roles). |
+| [[HR Manager]] | Full CRUD (incl. permlevel-1 fields) | |
+| [[HR User]] | Full CRUD (incl. permlevel-1 fields) | |
+| [[Employee]] | Create/Read/Write/Delete (base level); Read only at permlevel 1 | Employees can log their own checkins but cannot write the permlevel-1 fields — not enforced further in code beyond the standard field-permission mechanism as to *which* fields sit at permlevel 1 (defined in the JSON, not filtered per-employee in Python). |
 
 ## Mermaid: State/Flow
 

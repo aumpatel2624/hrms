@@ -12,7 +12,7 @@
 | frequency | Frequency | Select | Every Week / Every 2 Weeks / Every 3 Weeks / Every 4 Weeks | yes | — | no | in_list_view; drives the "gap" used in `Shift Schedule Assignment.create_shifts` |
 | repeat_on_days | Repeat On Days | Table | Assignment Rule Day (child, Frappe framework standard doctype — has a single `day` Select field: Monday..Sunday) | yes | — | no | de-duplicated in `before_validate` |
 | column_break_iprq | (Column) | Column Break | — | — | — | — | |
-| shift_type | Shift Type | Link | Shift Type | yes | — | no | in_list_view, in_standard_filter |
+| shift_type | Shift Type | Link | [[Shift Type]] | yes | — | no | in_list_view, in_standard_filter |
 | amended_from | Amended From | Link | Shift Schedule | no | — | yes | no_copy, search_index |
 
 ## Child Tables
@@ -70,10 +70,16 @@ None declared with `@frappe.whitelist()` on this controller.
 
 ## Scheduled Jobs Touching This Doctype
 
-None directly — read (not written) by `Shift Schedule Assignment.create_shifts` (see `Shift Schedule Assignment.md`), which is itself invoked from the `hourly_long` `process_auto_shift_creation` job.
+None directly — read (not written) by `Shift Schedule Assignment.create_shifts` (see [[Shift Schedule Assignment]]), which is itself invoked from the `hourly_long` `process_auto_shift_creation` job.
 
 ## Port Notes
 
 - **Silent de-duplication of `repeat_on_days` is a "correct and value" (not error) behavior** — a user adding "Monday" twice does not get an error, the second row is silently dropped in `before_validate`. Reproduce this exactly rather than adding a validation error for duplicates, unless product direction changes it.
 - **`get_or_insert_shift_schedule` bypasses the doctype's own `autoname: "prompt"` convention** by directly assigning a random string as the document name during programmatic creation — a port modeling "prompt" naming as a UI-only concern (with an auto-generated fallback ID for programmatic creates) would match this behavior; do not assume every Shift Schedule record's identifier was manually chosen by a user.
 - **`Assignment Rule Day` is a shared Frappe framework doctype** (used elsewhere for generic weekday-based rules, e.g. Assignment Rule) — in the port this can be a simple owned enum-valued child row scoped to Shift Schedule; there is no need to model it as a generic reusable framework entity unless the target stack has an equivalent generic "assignment rule" concept elsewhere that also needs it.
+
+## Related Doctypes
+
+- [[Shift Type]] — the shift this recurrence pattern applies to.
+- [[Shift Schedule Assignment]] — binds employees to this schedule and consumes it to auto-generate Shift Assignment records.
+- Assignment Rule Day — Frappe core child doctype used for `repeat_on_days`; not part of this repo's ported doctype set, so no matching file to wikilink.

@@ -28,9 +28,9 @@ Reverses Leave-Without-Pay (LWP) deductions that were applied to an already-subm
 - [[Salary Slip]] — linked from via `salary_slip_reference`; its earning/deduction/accrued_benefits rows are the source for `populate_breakup_table`.
 - [[Salary Component]] — only components flagged `arrear_component` (and, for earnings/deductions, not `variable_based_on_taxable_salary`) are included.
 - [[Additional Salary]] — triggers: one created and submitted per earning/deduction arrear row on submit.
-- Employee Benefit Ledger — triggers: one accrual entry per accrual arrear row on submit; deleted on cancel via `delete_employee_benefit_ledger_entry`.
+- [[Employee Benefit Ledger]] — triggers: one accrual entry per accrual arrear row on submit; deleted on cancel via `delete_employee_benefit_ledger_entry`.
 - [[Payroll Period]] — linked from; scopes slip lookup.
-- [[Arrear]] — sibling consumer of the same Payroll Correction Child child-table doctype and referenced by Arrear's `fetch_existing_payroll_corrections` (so a slip already corrected here isn't double-arreared by a later structure-change Arrear).
+- [[Arrear]] — sibling consumer of the same [[Payroll Correction Child]] child-table doctype and referenced by Arrear's `fetch_existing_payroll_corrections` (so a slip already corrected here isn't double-arreared by a later structure-change Arrear).
 
 ## Logic — What Happens and Why
 
@@ -56,10 +56,10 @@ Reverses Leave-Without-Pay (LWP) deductions that were applied to an already-subm
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit/cancel/amend | Full control. |
-| HR Manager | read/write/create/delete/submit/cancel, select | Full lifecycle plus report "select" access. |
-| HR User | read/write/create/delete/submit/cancel, select | Same as HR Manager per JSON. |
-| Employee | read/write/create | No submit/cancel/delete — can draft but not finalize a correction for themself; not restricted to "own records only" in code shown here. |
+| [[System Manager]] | read/write/create/delete/submit/cancel/amend | Full control. |
+| [[HR Manager]] | read/write/create/delete/submit/cancel, select | Full lifecycle plus report "select" access. |
+| [[HR User]] | read/write/create/delete/submit/cancel, select | Same as HR Manager per JSON. |
+| [[Employee]] | read/write/create | No submit/cancel/delete — can draft but not finalize a correction for themself; not restricted to "own records only" in code shown here. |
 
 ## Mermaid: State/Flow
 

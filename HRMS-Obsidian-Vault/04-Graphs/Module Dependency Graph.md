@@ -27,15 +27,15 @@ flowchart TD
 
 ## Why the Dependency Order Matters
 
-- **HR Setup before HR Core**: [[HR Settings]] toggles (self-approval rules, naming,
+- **[[01-Modules/HR-Setup/_Overview|HR Setup]] before [[01-Modules/HR-Core/_Overview|HR Core]]**: [[HR Settings]] toggles (self-approval rules, naming,
   backdating limits) are read by controllers across almost every other module — if
   they don't exist yet, those controllers fall back to defaults that may not match
   the organization's actual policy, silently.
-- **HR Core before everything downstream**: every transactional doctype in Leaves,
-  Payroll, Shift-Attendance, Performance, and Expenses carries an `employee` Link
+- **[[01-Modules/HR-Core/_Overview|HR Core]] before everything downstream**: every transactional doctype in [[01-Modules/Leaves/_Overview|Leaves]],
+  [[01-Modules/Payroll/_Overview|Payroll]], [[01-Modules/Shift-Attendance/_Overview|Shift-Attendance]], [[01-Modules/Performance/_Overview|Performance]], and [[01-Modules/Expenses/_Overview|Expenses]] carries an `employee` Link
   field — none of them are meaningful (or, in most cases, even creatable, since the
   field is mandatory) without an [[Employee]] record existing first.
-- **Leaves feeds Shift & Attendance, which feeds Payroll**: an approved
+- **[[01-Modules/Leaves/_Overview|Leaves]] feeds [[01-Modules/Shift-Attendance/_Overview|Shift & Attendance]], which feeds [[01-Modules/Payroll/_Overview|Payroll]]**: an approved
   [[Leave Application]] updates [[Attendance]] so a leave day isn't misclassified as
   absent; Attendance in turn is what [[Salary Slip]] reads (via Salary Slip Leave/
   payable-days logic) to compute actual pay for a period with unpaid leave or
@@ -44,11 +44,11 @@ flowchart TD
 - **Tax & Benefits doctypes physically live inside Payroll's source folder** — it's
   not an independent module dependency-wise, it's a conceptual sub-grouping documented
   separately in this vault for clarity (see the note on [[01-Modules/Tax-Benefits/_Overview|Tax & Benefits]]).
-- **Regional sits downstream of Payroll and HR Core**, patching into their controllers
+- **[[01-Modules/Regional/_Overview|Regional]] sits downstream of Payroll and HR Core**, patching into their controllers
   via `erpnext.allow_regional` hooks and one-time `setup.py` fixtures (gratuity rules,
   custom fields) rather than being a self-contained module — it only makes sense once
   the doctypes it overrides already exist.
-- **Recruitment is the one module that feeds back upstream**: it doesn't depend on HR
+- **[[01-Modules/Recruitment/_Overview|Recruitment]] is the one module that feeds back upstream**: it doesn't depend on HR
   Core to function on its own (Job Opening/Job Applicant/Interview can run before any
   Employee exists), but its successful outcome (an accepted Job Offer) is what
   *creates* the HR Core Employee record that every other module then depends on —

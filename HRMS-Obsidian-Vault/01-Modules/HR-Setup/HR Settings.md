@@ -32,11 +32,11 @@ A single (`issingle: 1`) global configuration document controlling company-wide 
 
 - [[Employee]] — `emp_created_by` drives Employee's naming series behavior.
 - [[Expense Claim]] — `prevent_self_expense_approval`, `expense_approver_mandatory_in_expense_claim` read directly in its controller.
-- Leave Application (HR-Core/Leaves) — `prevent_self_leave_approval`, `leave_approver_mandatory_in_leave_application`, `restrict_backdated_leave_application`, `send_leave_notification` and its templates.
+- [[Leave Application]] (HR-Core/Leaves) — `prevent_self_leave_approval`, `leave_approver_mandatory_in_leave_application`, `restrict_backdated_leave_application`, `send_leave_notification` and its templates.
 - Shift Assignment / Employee Checkin — `allow_multiple_shift_assignments`, `allow_employee_checkin_from_mobile_app`, `allow_geolocation_tracking`.
 - Employee Advance — `unlink_payment_on_cancellation_of_employee_advance`.
 - Job Offer — `check_vacancies`.
-- Employee Separation — `exit_questionnaire_web_form`, `exit_questionnaire_notification_template`.
+- [[Employee Separation]] — `exit_questionnaire_web_form`, `exit_questionnaire_notification_template`.
 - Scheduled Job Type — `validate_frequency_change()` looks up the weekly/monthly reminder scheduled jobs by method name to warn about a gap in reminder coverage when frequency changes.
 
 ## Logic — What Happens and Why

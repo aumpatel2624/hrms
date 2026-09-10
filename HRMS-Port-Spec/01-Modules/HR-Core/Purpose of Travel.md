@@ -50,6 +50,10 @@ None.
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Travel Request]] — consumer via its `purpose_of_travel` Link field.
+
 ## Port Notes
 
 - Same naming-mechanics caveat as `Identification Document Type`: `purpose_of_travel` is not marked `reqd: 1` in the JSON, but `autoname: "field:purpose_of_travel"` implicitly requires it to be set at save time to derive the document name — enforce this in the port even though no explicit `reqd` flag is present.

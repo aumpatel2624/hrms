@@ -13,7 +13,7 @@ Full field list, in JSON `field_order`. Section/Column/Tab breaks noted as headi
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | naming_series | Series | Select | `HR-EXP-.YYYY.-` | yes | - | - | `set_only_once`, `no_copy` |
-| employee | From Employee | Link | Employee | yes | - | - | `in_global_search`, `in_standard_filter`, `search_index` |
+| employee | From Employee | Link | [[Employee Core Model]] | yes | - | - | `in_global_search`, `in_standard_filter`, `search_index` |
 | employee_name | Employee Name | Data | - | - | - | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | - | - | - | fetch_from `employee.department`, `fetch_if_empty` |
 | *(column break)* | | | | | | | |
@@ -23,11 +23,11 @@ Full field list, in JSON `field_order`. Section/Column/Tab breaks noted as headi
 | currency | Currency | Link | Currency | yes | - | - | fetch_from `employee.salary_currency`, `fetch_if_empty`; `depends_on: eval:(doc.docstatus==1 || doc.employee)` |
 | exchange_rate | Exchange Rate | Float | - | yes | - | - | precision 9; `depends_on: currency` |
 | *(section: expense_details)* | | | | | | | |
-| expenses | Expenses | Table | `Expense Claim Detail` | yes | - | - | child table |
+| expenses | Expenses | Table | `[[Expense Claim Detail]]` | yes | - | - | child table |
 | *(section: Taxes & Charges, collapsible when `taxes` has rows)* | | | | | | | |
-| taxes | Expense Taxes and Charges | Table | `Expense Taxes and Charges` | - | - | - | child table |
+| taxes | Expense Taxes and Charges | Table | `[[Expense Taxes and Charges]]` | - | - | - | child table |
 | *(section: Advance Payments, collapsible when `advances` has rows)* | | | | | | | |
-| advances | Advances | Table | `Expense Claim Advance` | - | - | - | child table |
+| advances | Advances | Table | `[[Expense Claim Advance]]` | - | - | - | child table |
 | *(section: Totals)* | | | | | | | |
 | base_total_sanctioned_amount | Total Sanctioned Amount (Company Currency) | Currency | Company:company:default_currency | - | - | yes | `no_copy` |
 | base_total_advance_amount | Total Advance Amount (Company Currency) | Currency | Company:company:default_currency | - | - | yes | |
@@ -79,9 +79,9 @@ Title field: `employee_name`. Timeline field: `employee`. Sort: `creation DESC`.
 
 ## Child Tables
 
-- `expenses` -> `Expense Claim Detail` (see `Expense Claim Detail.md`)
-- `taxes` -> `Expense Taxes and Charges` (see `Expense Taxes and Charges.md`)
-- `advances` -> `Expense Claim Advance` (see `Expense Claim Advance.md`)
+- `expenses` -> `Expense Claim Detail` (see [[Expense Claim Detail]])
+- `taxes` -> `Expense Taxes and Charges` (see [[Expense Taxes and Charges]])
+- `advances` -> `Expense Claim Advance` (see [[Expense Claim Advance]])
 
 ## State Machine
 
@@ -353,3 +353,11 @@ This is the mechanism by which paying/cancelling a Payment Entry or Journal Entr
 - The self-approval check (`validate_for_self_approval`) is skipped entirely when Frappe Workflow is configured for this doctype (`get_workflow_name("Expense Claim")` truthy) — i.e. workflow-based approval is assumed to already enforce its own separation of duties. A port must decide how it wants to model this if it doesn't have an equivalent generic workflow engine.
 - `expense_approver` is NOT flagged `reqd` in the schema, but `expense_claim.js`'s `onload` conditionally makes it required client-side, driven by a server call to `leave_application.get_mandatory_approval` (shared helper, keyed off `HR Settings.expense_approver_mandatory_in_expense_claim`) — the port needs a server-side equivalent of this conditional-mandatory check, since it is enforced only in JS today.
 - `set_expense_account` is called twice conceptually: once forcibly from the client (`expense_type` change handler, always overwrites `default_account`/`cost_center`) and once defensively from `validate()` server-side with `validate=True` (only fills if empty) — the server does NOT recompute the default account if the client already set one, even if `expense_type` changed after the fact and default_account is stale. This is a potential data-integrity gap worth flagging to a re-implementer relying only on server-side validation.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the claim is filed against this employee; validation checks active status and fetches `employee_name`/`department`/`salary_currency` from it.
+- [[Expense Claim Detail]] — child table (`expenses`) of individual expense line items (date, type, claimed vs sanctioned amount).
+- [[Expense Taxes and Charges]] — child table (`taxes`) of tax/charge lines computed against the claim's sanctioned total.
+- [[Expense Claim Advance]] — child table (`advances`) linking paid Employee Advances allocated/claimed against this claim.
+- [[Expense Claim Type]] — each expense line's `expense_type` resolves to a default GL account via this doctype (see `get_expense_claim_account`).

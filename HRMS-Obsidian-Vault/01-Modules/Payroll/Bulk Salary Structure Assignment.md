@@ -29,7 +29,7 @@ A single-instance (`issingle: 1`) utility tool for assigning one [[Salary Struct
 - [[Salary Structure Assignment]] — triggers: `bulk_assign_structure()` creates and submits one Assignment per selected employee.
 - Employee — linked from: `get_employees()` queries active employees matching quick/advanced filters, excluding those already assigned for the same `from_date`, and excluding employees who joined after or were relieved before `from_date`.
 - Employee Grade — linked from: left-joined in `get_employees()` to default each candidate's `base` to the grade's `default_base_pay`.
-- Income Tax Slab — links to: passed through to each created assignment.
+- [[Income Tax Slab]] — links to: passed through to each created assignment.
 
 ## Logic — What Happens and Why
 
@@ -51,8 +51,8 @@ A single-instance (`issingle: 1`) utility tool for assigning one [[Salary Struct
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create/print/email/share | Single doctype — no delete/submit concept applies. |
-| HR Manager | read/write/create/print/email/share | Same rights as HR User for this tool. |
+| [[HR User]] | read/write/create/print/email/share | Single doctype — no delete/submit concept applies. |
+| [[HR Manager]] | read/write/create/print/email/share | Same rights as HR User for this tool. |
 
 ## Mermaid: State/Flow
 

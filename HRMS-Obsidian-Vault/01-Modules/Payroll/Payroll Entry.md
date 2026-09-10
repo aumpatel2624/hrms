@@ -43,7 +43,7 @@ Payroll Entry is the batch-processing control document that drives an entire pay
 - [[Employee]] — filtered by company, status, date of joining/relieving date, department/branch/designation/grade to build the payroll population.
 - [[Employee Cost Center]] — read via a Salary Structure Assignment subquery to split earnings/deductions/payable amounts across cost centers per employee (`get_payroll_cost_centers_for_employee`).
 - [[Journal Entry]] — created and submitted for (a) the accrual entry across earnings/deductions/payable accounts (`make_accrual_jv_entry` → `make_journal_entry`), and (b) the bank/cash payment entry (`make_bank_entry` → `set_accounting_entries_for_bank_entry`); linked back to Salary Slips via `Salary Slip.journal_entry`. Cancelling the Payroll Entry cancels these Journal Entries (`cancel_linked_journal_entries`).
-- [[Salary Component]] / Salary Component Account — earnings/deductions summed per component and mapped to GL accounts (`get_salary_component_account`, `get_salary_component_total`).
+- [[Salary Component]] / [[Salary Component Account]] — earnings/deductions summed per component and mapped to GL accounts (`get_salary_component_account`, `get_salary_component_total`).
 - [[Employee Advance]] — deductions tagged with an `additional_salary` referencing an Employee Advance are posted as separate advance-settlement JV rows against the employee as party (`get_advance_deduction`, `add_advance_deduction_entry`).
 - [[Salary Withholding]] — employees with an active withholding cycle for the period are flagged `is_salary_withheld` (`update_employees_with_withheld_salaries`, `get_salary_withholdings`); withheld salary slips are excluded from the normal bank entry and paid separately via `make_bank_entry(for_withheld_salaries=True)`, then linked back with `link_bank_entry_in_salary_withholdings`. Cancelling the linked Journal Entry (via the `Journal Entry` `on_cancel` hook in `hrms/hooks.py`) calls `salary_withholding.update_salary_withholding_payment_status`, keeping withholding payment status in sync.
 - [[Overtime Slip]] — optionally created and submitted for eligible employees before/around payroll (`create_overtime_slips`, `submit_overtime_slips`), tracked via `overtime_step` and linked back via `Overtime Slip.payroll_entry` (declared in `links` in payroll_entry.json).
@@ -81,7 +81,7 @@ Payroll Entry is the batch-processing control document that drives an entire pay
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, Write, Create, Submit, Cancel, Delete, Report, Share | Sole role defined in `permissions[]` in `payroll_entry.json`; no other role has explicit rights. Whitelisted methods (`fill_employee_details`, `create_salary_slips`, `submit_salary_slips`, `make_bank_entry`, etc.) additionally call `self.check_permission("write")`, so any user without HR Manager (or a custom role granted equivalent permissions) cannot invoke them even via API. |
+| [[HR Manager]] | Read, Write, Create, Submit, Cancel, Delete, Report, Share | Sole role defined in `permissions[]` in `payroll_entry.json`; no other role has explicit rights. Whitelisted methods (`fill_employee_details`, `create_salary_slips`, `submit_salary_slips`, `make_bank_entry`, etc.) additionally call `self.check_permission("write")`, so any user without HR Manager (or a custom role granted equivalent permissions) cannot invoke them even via API. |
 
 ## Mermaid: State/Flow
 

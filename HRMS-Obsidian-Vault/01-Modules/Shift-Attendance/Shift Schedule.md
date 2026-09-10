@@ -33,9 +33,9 @@ A reusable rota template: "this Shift Type repeats on these weekdays, every N we
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | Read | View-only. |
-| HR User | Read/Write/Create | No delete/submit — mirrors the general pattern of HR User being able to configure but not finalize/remove templates directly (submission likely intended via HR Manager or `get_or_insert_shift_schedule`). |
-| HR Manager | Full CRUD + Submit/Cancel/Amend | Full lifecycle control of the template. |
+| [[Employee]] | Read | View-only. |
+| [[HR User]] | Read/Write/Create | No delete/submit — mirrors the general pattern of HR User being able to configure but not finalize/remove templates directly (submission likely intended via HR Manager or `get_or_insert_shift_schedule`). |
+| [[HR Manager]] | Full CRUD + Submit/Cancel/Amend | Full lifecycle control of the template. |
 
 ## Mermaid: State/Flow
 

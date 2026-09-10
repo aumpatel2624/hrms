@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** child table (random-hash row name)
 **Module:** HR
 
-Child doctype of `Expense Claim` (table field `advances`). Links one Employee Advance's paid-but-unclaimed balance to this claim and records how much of it is being allocated/claimed here.
+Child doctype of [[Expense Claim]] (table field `advances`). Links one Employee Advance's paid-but-unclaimed balance to this claim and records how much of it is being allocated/claimed here.
 
 ## Schema
 
@@ -67,3 +67,8 @@ None.
 - Model as an owned child row: `expense_claim_advance(parent_expense_claim_id FK, employee_advance_id FK, reference_type, reference_name, posting_date, advance_paid, base_advance_paid, exchange_rate, exchange_gain_loss, unclaimed_amount, base_unclaimed_amount, return_amount, allocated_amount, base_allocated_amount, advance_account_id FK NULL, payment_entry_reference, idx)`.
 - `reference_type`/`reference_name` is a polymorphic (Dynamic Link) reference to whichever voucher (Payment Entry or Journal Entry) actually paid the Employee Advance — a relational port needs either two nullable FK columns or a `(type, id)` pair with app-level integrity checks (no DB-level FK possible across two tables).
 - `payment_entry_reference` field appears vestigial — not read or written anywhere in the traced `.py`/`.js` logic for this doctype or its parent. Flagging as an unused/legacy field rather than inventing a purpose for it.
+
+## Related Doctypes
+
+- [[Expense Claim]] — parent doctype; this child table holds its `advances` allocation rows.
+- Employee Advance — referenced by `employee_advance`/`advance_account`, but owned by the Payroll/Tax-Benefits module and not yet ported in this repo; no matching file exists to wikilink.

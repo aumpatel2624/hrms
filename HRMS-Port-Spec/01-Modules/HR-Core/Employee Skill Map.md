@@ -8,14 +8,14 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | not `reqd` in JSON (naming field) | — | no | `unique: 1` — one Employee Skill Map per Employee |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | not `reqd` in JSON (naming field) | — | no | `unique: 1` — one Employee Skill Map per Employee |
 | employee_name | Employee Name | Read Only | — | no | — | yes (fieldtype Read Only) | `fetch_from: "employee.employee_name"` |
 | column_break_3 | — | Column Break | — | — | — | — | layout only |
 | designation | Designation | Read Only | — | no | — | yes (fieldtype Read Only) | `fetch_from: "employee.designation"` |
 | skills_section | Skills | Section Break | — | — | — | — | section heading grouping `employee_skills` |
-| employee_skills | Employee Skills | Table | Employee Skill | no | — | no | see `Employee Skill.md` |
+| employee_skills | Employee Skills | Table | [[Employee Skill]] | no | — | no | see `Employee Skill.md` |
 | trainings_section | Trainings | Section Break | — | — | — | — | section heading grouping `trainings` |
-| trainings | Trainings | Table | Employee Training | no | — | no | `Employee Training` is a separate doctype owned by another module — reference by name only, not documented here |
+| trainings | Trainings | Table | [[Employee Training]] | no | — | no | `Employee Training` is a separate doctype owned by another module — reference by name only, not documented here |
 
 `title_field: "employee_name"` — list views / link display titles use `employee_name` instead of the raw `name` (employee ID).
 
@@ -63,6 +63,12 @@ None defined in `employee_skill_map.py`.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: `unique: 1` — one Employee Skill Map per Employee
+- [[Employee Skill]] — via `employee_skills`: see `Employee Skill.md`
+- [[Employee Training]] — via `trainings`: `Employee Training` is a separate doctype owned by another module — reference by name only, not documented here
 
 ## Port Notes
 

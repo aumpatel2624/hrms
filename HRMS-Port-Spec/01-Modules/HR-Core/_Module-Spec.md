@@ -19,46 +19,46 @@ the two "boarding" workflows (Employee Onboarding, Employee Separation).
 
 | Doctype | Purpose |
 |---|---|
-| Employee Onboarding | Submittable workflow driving a new hire's checklist of boarding activities before/after joining; on completion can auto-create the Employee record. |
-| Employee Onboarding Template | Reusable template of default onboarding activities per designation/department, cloned into new Employee Onboarding docs. |
-| Employee Boarding Activity | Child table (shared shape) listing one checklist activity + assigned user + task link; used by both Onboarding and Separation. |
-| Employee Separation | Submittable workflow driving an exiting employee's offboarding checklist; can trigger Employee `relieving_date`/status update and generation of Full and Final Statement. |
-| Employee Separation Template | Reusable template of default separation activities per designation/department. |
-| Exit Interview | Submittable record of the exit interview conducted for a separating employee; holds questionnaire responses and a status (Pending/Scheduled/Completed). |
-| Employee Transfer | Submittable record of one employee's transfer between company/department/designation/branch, etc.; snapshots old values and creates an Employee Property History entry per changed field, optionally creates a new Employee record for company transfers. |
-| Employee Promotion | Submittable record of an employee's promotion; updates Employee's designation/grade/CTC and appends Employee Property History / Employee Internal Work History (ERPNext core) entries. |
-| Employee Referral | Non-submittable record of an employee referring a candidate; tracks referral bonus eligibility/payment via an Additional Salary link. |
-| Employee Grievance | Submittable grievance case with type, raised-by, resolution fields, and escalation. |
-| Grievance Type | Simple master listing grievance categories, each optionally linked to a default resolution department/user. |
-| Full and Final Statement | Submittable final-settlement document for a separating employee: aggregates payables/receivables (assets, outstanding statements) and can post a Journal Entry. |
-| Full and Final Asset | Child table on Full and Final Statement: one company asset assigned to the employee, with return/handover status. |
-| Full and Final Outstanding Statement | Child table on Full and Final Statement: one outstanding payable/receivable line item (e.g. loan, advance, deduction) with computed running total. |
-| Staffing Plan | Submittable multi-department hiring plan for a date range: budgeted vacancies per designation. |
-| Staffing Plan Detail | Child table on Staffing Plan: one designation's planned vacancy count, current openings, and estimated cost. |
-| Employee Property History | Child table (owned by Employee, populated by Transfer/Promotion) recording a single field-level change (property, old value, new value) as an audit trail row. |
-| Employee Health Insurance | Child table (owned by Employee) listing one health insurance provider + policy number for the employee. |
-| Employee Grade | Master defining a salary/seniority grade, optionally linked to a default leave policy reference used elsewhere. |
-| Department Approver | Child table (owned by Department, out of this module's scope) listing users authorized to approve Leave Applications/Expense Claims for that department. |
-| Identification Document Type | Simple master listing types of ID documents (Passport, SSN, etc.) employees can be asked to provide. |
-| Travel Request | Submittable request for company travel: itinerary, costing, purpose, advance/reimbursement flags. |
-| Travel Itinerary | Child table on Travel Request: one leg of the trip (mode, from/to, dates). |
-| Travel Request Costing | Child table on Travel Request: one cost line item (sponsored/funded amount by category). |
-| Purpose of Travel | Simple master listing reasons for travel (Conference, Training, Onsite, etc.), referenced by Travel Request. |
-| Training Program | Master describing a training curriculum; tracks overall status (Scheduled/Completed) rolled up from its Training Events. |
-| Training Event | Submittable/schedulable session under a Training Program with a location, trainer, date/time, and attendee list. |
-| Training Event Employee | Child table on Training Event: one attendee (employee) + attendance/completion status. |
-| Training Result | Submittable record of one employee's outcome for a Training Event (used mainly to cascade a "Completed" status). |
-| Training Result Employee | Child table on Training Result: one employee + result grade/comment. |
-| Training Feedback | Submittable feedback form filled by an employee about a Training Event they attended. |
-| Employee Training | Child table (owned by Employee) listing training programs an employee has completed, for the Employee's own training history section. |
-| Employee Skill Map | Non-submittable snapshot of one employee's self/manager-rated skills, seeded from their Designation's expected skill set. |
-| Employee Skill | Child table on Employee Skill Map: one skill + proficiency rating. |
-| Skill | Simple master listing distinct skill names. |
-| Skill Assessment | Doctype physically present in `hr/doctype` but functionally tied to Recruitment's Interview Feedback flow, not to Employee Skill Map — no structural FK to any other HR Core doctype in this list; document standalone. |
-| Designation Skill | Child table listing one expected skill for a Designation (Designation itself lives in ERPNext core, outside this repo). |
-| Expected Skill Set | Doctype physically present in `hr/doctype` but functionally tied to Recruitment's Interview Type, not to Designation/Employee Skill Map — no structural FK to any other HR Core doctype in this list; document standalone. |
+| [[Employee Onboarding]] | Submittable workflow driving a new hire's checklist of boarding activities before/after joining; on completion can auto-create the Employee record. |
+| [[Employee Onboarding Template]] | Reusable template of default onboarding activities per designation/department, cloned into new Employee Onboarding docs. |
+| [[Employee Boarding Activity]] | Child table (shared shape) listing one checklist activity + assigned user + task link; used by both Onboarding and Separation. |
+| [[Employee Separation]] | Submittable workflow driving an exiting employee's offboarding checklist; can trigger Employee `relieving_date`/status update and generation of Full and Final Statement. |
+| [[Employee Separation Template]] | Reusable template of default separation activities per designation/department. |
+| [[Exit Interview]] | Submittable record of the exit interview conducted for a separating employee; holds questionnaire responses and a status (Pending/Scheduled/Completed). |
+| [[Employee Transfer]] | Submittable record of one employee's transfer between company/department/designation/branch, etc.; snapshots old values and creates an Employee Property History entry per changed field, optionally creates a new Employee record for company transfers. |
+| [[Employee Promotion]] | Submittable record of an employee's promotion; updates Employee's designation/grade/CTC and appends Employee Property History / Employee Internal Work History (ERPNext core) entries. |
+| [[Employee Referral]] | Non-submittable record of an employee referring a candidate; tracks referral bonus eligibility/payment via an Additional Salary link. |
+| [[Employee Grievance]] | Submittable grievance case with type, raised-by, resolution fields, and escalation. |
+| [[Grievance Type]] | Simple master listing grievance categories, each optionally linked to a default resolution department/user. |
+| [[Full and Final Statement]] | Submittable final-settlement document for a separating employee: aggregates payables/receivables (assets, outstanding statements) and can post a Journal Entry. |
+| [[Full and Final Asset]] | Child table on Full and Final Statement: one company asset assigned to the employee, with return/handover status. |
+| [[Full and Final Outstanding Statement]] | Child table on Full and Final Statement: one outstanding payable/receivable line item (e.g. loan, advance, deduction) with computed running total. |
+| [[Staffing Plan]] | Submittable multi-department hiring plan for a date range: budgeted vacancies per designation. |
+| [[Staffing Plan Detail]] | Child table on Staffing Plan: one designation's planned vacancy count, current openings, and estimated cost. |
+| [[Employee Property History]] | Child table (owned by Employee, populated by Transfer/Promotion) recording a single field-level change (property, old value, new value) as an audit trail row. |
+| [[Employee Health Insurance]] | Child table (owned by Employee) listing one health insurance provider + policy number for the employee. |
+| [[Employee Grade]] | Master defining a salary/seniority grade, optionally linked to a default leave policy reference used elsewhere. |
+| [[Department Approver]] | Child table (owned by Department, out of this module's scope) listing users authorized to approve Leave Applications/Expense Claims for that department. |
+| [[Identification Document Type]] | Simple master listing types of ID documents (Passport, SSN, etc.) employees can be asked to provide. |
+| [[Travel Request]] | Submittable request for company travel: itinerary, costing, purpose, advance/reimbursement flags. |
+| [[Travel Itinerary]] | Child table on Travel Request: one leg of the trip (mode, from/to, dates). |
+| [[Travel Request Costing]] | Child table on Travel Request: one cost line item (sponsored/funded amount by category). |
+| [[Purpose of Travel]] | Simple master listing reasons for travel (Conference, Training, Onsite, etc.), referenced by Travel Request. |
+| [[Training Program]] | Master describing a training curriculum; tracks overall status (Scheduled/Completed) rolled up from its Training Events. |
+| [[Training Event]] | Submittable/schedulable session under a Training Program with a location, trainer, date/time, and attendee list. |
+| [[Training Event Employee]] | Child table on Training Event: one attendee (employee) + attendance/completion status. |
+| [[Training Result]] | Submittable record of one employee's outcome for a Training Event (used mainly to cascade a "Completed" status). |
+| [[Training Result Employee]] | Child table on Training Result: one employee + result grade/comment. |
+| [[Training Feedback]] | Submittable feedback form filled by an employee about a Training Event they attended. |
+| [[Employee Training]] | Child table (owned by Employee) listing training programs an employee has completed, for the Employee's own training history section. |
+| [[Employee Skill Map]] | Non-submittable snapshot of one employee's self/manager-rated skills, seeded from their Designation's expected skill set. |
+| [[Employee Skill]] | Child table on Employee Skill Map: one skill + proficiency rating. |
+| [[Skill]] | Simple master listing distinct skill names. |
+| [[Skill Assessment]] | Doctype physically present in `hr/doctype` but functionally tied to Recruitment's Interview Feedback flow, not to Employee Skill Map — no structural FK to any other HR Core doctype in this list; document standalone. |
+| [[Designation Skill]] | Child table listing one expected skill for a Designation (Designation itself lives in ERPNext core, outside this repo). |
+| [[Expected Skill Set]] | Doctype physically present in `hr/doctype` but functionally tied to Recruitment's Interview Type, not to Designation/Employee Skill Map — no structural FK to any other HR Core doctype in this list; document standalone. |
 
-`Job Requisition` (Recruitment module, out of scope here) is referenced by name only where
+[[Job Requisition]] (Recruitment module, out of scope here) is referenced by name only where
 Staffing Plan/Employee Onboarding logic touches it.
 
 ## Recommended Target Schema Shape

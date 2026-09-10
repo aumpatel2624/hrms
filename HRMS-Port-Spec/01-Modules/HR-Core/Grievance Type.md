@@ -54,6 +54,10 @@ Not submittable, so Submit/Cancel/Amend columns are not applicable (no such righ
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Employee Grievance]] — consumer via its `grievance_type` Link field.
+
 ## Port Notes
 
 - **`autoname: "Prompt"` / `allow_rename: 1`**: this is a simple master/lookup table where the primary key is a user-typed string (not a system-generated code). In a relational port, model this as a table with a unique text primary key (or a surrogate integer PK plus a unique `name`/`title` column if the target ORM/framework does not support natural-string PKs well) plus the `description` text column. Renaming in Frappe updates the `name` value everywhere it's referenced (including on `Employee Grievance.grievance_type` foreign-key values) — a new stack must decide whether to use a surrogate ID with a separate mutable label, or a true natural-key rename-cascade, to reproduce this behavior; using a surrogate ID (avoiding rename-cascade complexity) is the simpler, still-faithful choice for most stacks, but it is worth calling out explicitly since Frappe's real behavior is a cascading rename of the natural key.

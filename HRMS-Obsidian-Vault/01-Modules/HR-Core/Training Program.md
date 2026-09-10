@@ -38,8 +38,8 @@ The `training_program.py` controller (`TrainingProgram(Document)`) contains no `
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, write, create, delete | Full control of program masters. |
-| HR User | Read, write | Cannot create or delete programs. |
+| [[HR Manager]] | Read, write, create, delete | Full control of program masters. |
+| [[HR User]] | Read, write | Cannot create or delete programs. |
 
 ## Mermaid: State/Flow
 

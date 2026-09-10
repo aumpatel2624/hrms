@@ -4,14 +4,14 @@
 **Submittable:** no   **Tree:** no   **Naming:** child table (random-hash row name)
 **Module:** HR
 
-Child doctype of `Expense Claim` (table field `expenses`). One row per individual expense line item within a claim.
+Child doctype of [[Expense Claim]] (table field `expenses`). One row per individual expense line item within a claim.
 
 ## Schema
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | expense_date | Expense Date | Date | - | - | Today | - | in_list_view |
-| expense_type | Expense Claim Type | Link | Expense Claim Type | yes | - | - | in_list_view |
+| expense_type | Expense Claim Type | Link | [[Expense Claim Type]] | yes | - | - | in_list_view |
 | default_account | Default Account | Link | Account | - | - | yes | `hidden`; `depends_on: expense_type`; auto-populated (see `Expense Claim.md` Validation #6 and API `get_expense_claim_account_and_cost_center`) |
 | description | Description | Text Editor | - | - | - | - | in_list_view; auto-fetched from `Expense Claim Type.description` client-side if empty |
 | amount | Amount | Currency | currency | yes | - | - | `non_negative`, `no_copy`, in_list_view |
@@ -63,3 +63,8 @@ None directly; included in `accounting_dimension_doctypes` (`hrms/hooks.py`) so 
 
 - Model as an owned child row table: `expense_claim_detail(parent_expense_claim_id FK, expense_date, expense_type_id FK, default_account_id FK NULL, description, amount, base_amount, sanctioned_amount, base_sanctioned_amount, cost_center_id FK NULL, project_id FK NULL, idx)`.
 - The "amount defaults into sanctioned_amount on entry" behavior (client-only) has no server-side equivalent — a port with an API-only client (no browser form) must replicate this default explicitly, or leave `sanctioned_amount` unset/0 and rely on separate approval logic to set it. Flagging as a client-vs-server logic gap per spec ground rules.
+
+## Related Doctypes
+
+- [[Expense Claim]] — parent doctype; this child table holds its `expenses` line items.
+- [[Expense Claim Type]] — each row's `expense_type` links to this doctype to resolve a default account.

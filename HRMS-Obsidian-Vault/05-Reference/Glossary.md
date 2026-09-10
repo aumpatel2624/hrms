@@ -14,7 +14,7 @@ tags: [hrms, glossary]
   [[Salary Detail]] rows inside [[Salary Structure]]); has no independent list view
   and inherits its parent's permissions.
 - **doc_events** — the `hrms/hooks.py` mapping of `{Doctype: {event: function}}` that
-  wires cross-doctype logic (e.g. Journal Entry's submit updating Expense Claim
+  wires cross-doctype logic (e.g. Journal Entry's submit updating [[Expense Claim]]
   payment status) without editing the target doctype's own controller.
 - **Scheduler events** — recurring background jobs (`hourly`, `daily`, `daily_long`,
   etc. in `hrms/hooks.py`) that run scheduled logic like auto-attendance marking or
@@ -25,7 +25,7 @@ tags: [hrms, glossary]
   the calling code.
 - **Workflow state** — for submittable doctypes, the Draft → Submitted → Cancelled
   lifecycle Frappe enforces natively; some doctypes layer an additional custom status
-  field (e.g. Leave Application's Open/Approved/Rejected) on top of this.
+  field (e.g. [[Leave Application]]'s Open/Approved/Rejected) on top of this.
 - **Link field** — a foreign-key-style field pointing at another doctype's document by
   name; the basis for most "Relationships" sections throughout this vault.
 - **Table field** — a child-table Link, holding many rows of a child doctype.

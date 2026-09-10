@@ -52,7 +52,7 @@ A single/virtual bulk-operations doctype (not a data record — `issingle: 1`) u
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | Read/Write/Create | Sole role with access to this tool per the DocType JSON; being a virtual single doctype, "create" effectively means opening/using the tool form itself, and the real authorization checks happen on the underlying doctypes each action writes to (Shift Assignment, Shift Schedule Assignment, Shift Request — each enforces its own role and `ignore_permissions` usage as documented on those pages). Not enforced further in code as to whether HR Manager/System Manager also implicitly get access — only "HR User" appears in `permissions`. |
+| [[HR User]] | Read/Write/Create | Sole role with access to this tool per the DocType JSON; being a virtual single doctype, "create" effectively means opening/using the tool form itself, and the real authorization checks happen on the underlying doctypes each action writes to (Shift Assignment, Shift Schedule Assignment, Shift Request — each enforces its own role and `ignore_permissions` usage as documented on those pages). Not enforced further in code as to whether HR Manager/System Manager also implicitly get access — only "HR User" appears in `permissions`. |
 
 ## Mermaid: State/Flow
 

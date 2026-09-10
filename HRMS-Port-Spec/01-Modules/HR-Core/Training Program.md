@@ -20,7 +20,7 @@
 | contact_number | Contact Number | Data | — | No | — | No | |
 | section_break_11 | — | Section Break | — | — | — | — | layout only |
 | description | Description | Text Editor | — | Yes (reqd) | — | No | rich text (HTML) |
-| amended_from | Amended From | Link | Training Program | No | — | Yes | `no_copy`, `print_hide`; standard Frappe amendment-tracking field. Since this doctype is not submittable, amendment is not actually usable — field exists but is vestigial |
+| amended_from | Amended From | Link | [[Training Program]] | No | — | Yes | `no_copy`, `print_hide`; standard Frappe amendment-tracking field. Since this doctype is not submittable, amendment is not actually usable — field exists but is vestigial |
 
 ## Child Tables
 
@@ -60,6 +60,10 @@ None defined in `training_program.py`.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Training Event]] — consumer via its `training_program` Link field; this doctype's status is rolled up from its linked Training Events.
 
 ## Port Notes
 

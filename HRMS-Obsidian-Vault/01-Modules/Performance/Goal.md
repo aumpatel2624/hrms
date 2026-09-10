@@ -47,10 +47,10 @@ A tracked objective an employee is working toward, organized as a tree (goals ca
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read, write, create, delete, export | Full control. |
-| HR User | read, write, create, delete, export | Full control. |
-| HR Manager | read, write, create, delete, export | Full control. |
-| Employee | read, write, create, delete, export | Employees manage their own goals directly; no field-level restriction to "own record only" is enforced in this JSON — not enforced in code beyond standard user-permission/employee-linking conventions. |
+| [[System Manager]] | read, write, create, delete, export | Full control. |
+| [[HR User]] | read, write, create, delete, export | Full control. |
+| [[HR Manager]] | read, write, create, delete, export | Full control. |
+| [[Employee]] | read, write, create, delete, export | Employees manage their own goals directly; no field-level restriction to "own record only" is enforced in this JSON — not enforced in code beyond standard user-permission/employee-linking conventions. |
 
 ## Mermaid: State/Flow
 

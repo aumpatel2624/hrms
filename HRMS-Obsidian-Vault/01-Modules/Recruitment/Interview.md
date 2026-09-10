@@ -104,10 +104,10 @@ the calendar/Gantt UI, colored by status.
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + submit/cancel/export/print/report/share/email | — |
-| HR Manager | Full CRUD + submit/cancel/export/print/report/share/email | — |
-| Interviewer | Full CRUD + submit/cancel/export/print/report/share/email | Interviewers have the same broad rights as HR Manager on this doctype — not scoped to only interviews they're assigned to (not enforced in code). |
-| HR User | Full CRUD + submit/cancel/export/print/report/share/email | — |
+| [[System Manager]] | Full CRUD + submit/cancel/export/print/report/share/email | — |
+| [[HR Manager]] | Full CRUD + submit/cancel/export/print/report/share/email | — |
+| [[Interviewer (Role)]] | Full CRUD + submit/cancel/export/print/report/share/email | Interviewers have the same broad rights as HR Manager on this doctype — not scoped to only interviews they're assigned to (not enforced in code). |
+| [[HR User]] | Full CRUD + submit/cancel/export/print/report/share/email | — |
 
 ## Mermaid: State/Flow
 ```mermaid

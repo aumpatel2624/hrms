@@ -34,9 +34,9 @@ Submittable but has no `on_submit`/`on_cancel` side effects of its own — submi
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit/cancel/amend | Full |
-| HR Manager | read/write/create/delete/submit/cancel/amend | Full |
-| HR User | read/write/create/delete/submit/cancel/amend | Full |
+| [[System Manager]] | read/write/create/delete/submit/cancel/amend | Full |
+| [[HR Manager]] | read/write/create/delete/submit/cancel/amend | Full |
+| [[HR User]] | read/write/create/delete/submit/cancel/amend | Full |
 
 ## Mermaid: State/Flow
 

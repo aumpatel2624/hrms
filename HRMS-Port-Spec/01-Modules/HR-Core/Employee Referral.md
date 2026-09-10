@@ -22,13 +22,13 @@
 | department | Department | Link | Department | no | — | yes | `fetch_from: "employee.department"` — NOTE: source field is `employee`, but this doctype has no field named `employee`; only `referrer` (Link to Employee) exists. This fetch expression appears to reference a non-existent field on this doctype — likely a leftover/bug from a copy-paste. Flag under Port Notes. |
 | *(additional_information_section)* | Additional Information  | Section Break | — | — | — | — | section heading — groups: work_references |
 | work_references | Work References | Text Editor | — | no | — | no | |
-| amended_from | Amended From | Link | Employee Referral | no | — | yes | `no_copy: 1`, `print_hide: 1`. Standard amend-tracking field. |
+| amended_from | Amended From | Link | [[Employee Referral]] | no | — | yes | `no_copy: 1`, `print_hide: 1`. Standard amend-tracking field. |
 | *(column_break_14)* | — | Column Break | — | — | — | — | layout only |
 | for_designation | For Designation  | Link | Designation | yes | — | no | In list view, in standard filter |
 | email | Email | Data | Email | yes | — | no | In list view, in standard filter |
 | is_applicable_for_referral_bonus | Is Applicable for Referral Bonus | Check | — | no | `1` | no | Drives `referral_payment_status` logic |
 | qualification_reason | Why is this Candidate Qualified for this Position? | Text Editor | — | no | — | no | |
-| referrer | Referrer | Link | Employee | yes | — | no | In standard filter |
+| referrer | Referrer | Link | [[Employee Core Model|Employee]] | yes | — | no | In standard filter |
 | referrer_name | Referrer Name | Data | — | no | — | yes | `fetch_from: "referrer.employee_name"`. In list view. |
 | resume_link | Resume Link | Data | — | no | — | no | |
 | referral_payment_status | Referral Bonus Payment Status | Select | `\nUnpaid\nPaid` | no | — | yes | Set programmatically in `set_referral_bonus_payment_status()` |
@@ -42,6 +42,8 @@
 None.
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]) run alongside the `status` field below.
 
 ```mermaid
 stateDiagram-v2
@@ -105,6 +107,8 @@ Both methods are invoked from `employee_referral.js` via `frappe.call` (client o
 
 ## Permissions
 
+See [[Permission Model (RBAC)]] for the general role/permlevel model; this doctype's `status` field carries `permlevel: 1`, detailed below.
+
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
 | System Manager | yes | yes | yes | yes | no | no | no | yes | yes | share, email, print all 1 |
@@ -120,6 +124,10 @@ Note: none of the three roles have `write: 1` at `permlevel: 1`, meaning the `st
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` (`scheduler_events`) — no cron/job references `Employee Referral`.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `referrer`: In standard filter
 
 ## Port Notes
 

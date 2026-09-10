@@ -9,23 +9,23 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | interview_type_name | Interview Type Name | Data | — | no (`reqd` not set, but implicitly required by `autoname: field:` — Frappe requires the naming field to be filled) | — | no | `unique: 1`; supplies the document `name` |
-| interviewers | Interviewers | Table MultiSelect | Interviewer (child) | no | — | no | see Child Tables |
+| interviewers | Interviewers | Table MultiSelect | [[Interviewer]] (child) | no | — | no | see Child Tables |
 | *(column_break_3)* | — | Column Break | — | — | — | — | |
 | expected_average_rating | Expected Average Rating | Rating | — | no | — | no | target/benchmark rating for this round |
 | *(expected_skills_section)* | — | Section Break | — | — | — | — | |
-| designation | Designation | Link | Designation | no | — | no | when set, restricts this Interview Type to applicants/interviews of that Designation (enforced in `Job Applicant.create_interview` / `schedule_interview` and `Interview.validate_designation`) |
-| expected_skill_set | Expected Skillset | Table | Expected Skill Set (child) | yes (`reqd: 1`) | — | no | see Child Tables |
+| designation | Designation | Link | Designation | no | — | no | when set, restricts this Interview Type to applicants/interviews of that Designation (enforced in [[Job Applicant]]'s `create_interview` / `schedule_interview` and [[Interview]]'s `validate_designation`) |
+| expected_skill_set | Expected Skillset | Table | [[Expected Skill Set]] (child) | yes (`reqd: 1`) | — | no | see Child Tables |
 | *(section_break_xlzv)* | — | Section Break | — | — | — | — | |
 | description | Description | Text | — | no | — | no | |
 
 ## Child Tables
 
-- `interviewers` -> **Interviewer** child doctype (module-scoped, simple — no separate file per assignment; documented in full in `Interviewer.md`). Table MultiSelect field type: in the Frappe UI this renders as a multi-select tag input rather than a grid, but the underlying storage is an ordinary child table row per selected User.
-- `expected_skill_set` -> **Expected Skill Set** child doctype. Not separately assigned in this port batch; inlined here since it is simple and module-scoped:
+- `interviewers` -> **Interviewer** child doctype (module-scoped, simple — no separate file per assignment; documented in full in [[Interviewer]]). Table MultiSelect field type: in the Frappe UI this renders as a multi-select tag input rather than a grid, but the underlying storage is an ordinary child table row per selected User.
+- `expected_skill_set` -> **Expected Skill Set** child doctype ([[Expected Skill Set]]). Not separately assigned in this port batch; inlined here since it is simple and module-scoped:
 
   | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
   |---|---|---|---|---|---|---|---|
-  | skill | Skill | Link | Skill | yes (`reqd: 1`) | — | no | |
+  | skill | Skill | Link | [[Skill]] | yes (`reqd: 1`) | — | no | |
   | description | Description | Small Text | — | no | — | no | `fetch_from: skill.description` |
 
   Populated client-side (see below) from the selected Designation's own skill list.
@@ -77,5 +77,12 @@ None. No `scheduler_events` entries reference Interview Type.
 
 - **Interview Round merge (v16 patch):** Frappe HRMS previously had a separate "Interview Round" doctype. A migration patch, `hrms/patches/v16_0/merge_interview_round_with_interview_type.py`, merges it into Interview Type: `execute()` checks `frappe.db.has_table("Interview Round")`; if that table exists, for every `(name, interview_type)` pair in the old Interview Round table where `interview_type != interview_round` and both are truthy, it calls `rename_doc("Interview Type", interview_type, interview_round)` — i.e. it renames the surviving Interview Type record to match the old Interview Round's name/identity, effectively collapsing the two into one doctype keyed by what used to be the Interview Round's name. Confirmed via directory listing: there is **no** separate `interview_round/` folder under `hrms/hr/doctype/` in the current codebase — only `interview_type/` exists. A port targeting a fresh install does not need to replicate the Interview Round doctype at all; this note is purely historical/migration context in case existing production data still carries the old naming.
 - `autoname: field:interview_type_name` means the natural/business key IS the primary key in Frappe's model. In a relational port, either make `interview_type_name` the primary key directly, or use a surrogate PK with a `UNIQUE NOT NULL` constraint on `interview_type_name` and treat rename-of-name as a cascading update to all FKs that reference it by name (Frappe's `rename_doc` mechanism, used by the very patch above, is exactly this cascading rename — must be replicated as an explicit multi-table update or avoided by switching all downstream doctypes to reference a surrogate id instead of the name string).
-- `track_changes: 1` in the JSON — Frappe auto-maintains a version/audit history of field changes. Must be built explicitly (e.g. an audit/history table capturing before/after values per save) if required in the new stack.
+- `track_changes: 1` in the JSON — Frappe auto-maintains a version/audit history of field changes (see [[Implicit Framework Behaviors]]). Must be built explicitly (e.g. an audit/history table capturing before/after values per save) if required in the new stack.
 - The Table MultiSelect field type (`interviewers`) is functionally an ordinary one-to-many child table (`Interviewer` rows with `parent` = this Interview Type's name) with a different widget in Frappe Desk — no special backend modeling is needed beyond a normal child table.
+
+## Related Doctypes
+
+- [[Interviewer]] — child table (`interviewers`) of default interviewer rows for this type.
+- [[Expected Skill Set]] — child table (`expected_skill_set`) of skills assessed for this round.
+- [[Interview]] — created from an Interview Type via `create_interview`; fetches `designation`/`expected_average_rating` from it.
+- [[Job Applicant]] — `create_interview`/`schedule_interview` build Interviews against a chosen Interview Type.

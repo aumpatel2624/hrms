@@ -78,10 +78,10 @@ generating this Additional Salary.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/submit/cancel/delete/amend | Full control |
-| HR Manager | read/write/create/submit/cancel/delete/amend | Full control |
-| HR User | read/write/create/submit/cancel/delete/amend | Full control |
-| Employee | read/write/create/delete | No submit/cancel/amend — can prepare a claim but not finalize it themselves (submission gated to HR roles; not enforced via a workflow state, just permission absence). |
+| [[System Manager]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[HR Manager]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[HR User]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[Employee]] | read/write/create/delete | No submit/cancel/amend — can prepare a claim but not finalize it themselves (submission gated to HR roles; not enforced via a workflow state, just permission absence). |
 
 ## Mermaid: State/Flow
 

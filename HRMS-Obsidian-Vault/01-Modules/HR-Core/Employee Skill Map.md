@@ -37,9 +37,9 @@ Controller: `EmployeeSkillMap(Document)` in `employee_skill_map.py` is a `pass`-
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete | Full control. |
-| HR Manager | Read, write, create, delete | Full control (no `email`/`share` explicitly set unlike System Manager). |
-| HR User | Read, write, create | Cannot delete. |
+| [[System Manager]] | Read, write, create, delete | Full control. |
+| [[HR Manager]] | Read, write, create, delete | Full control (no `email`/`share` explicitly set unlike System Manager). |
+| [[HR User]] | Read, write, create | Cannot delete. |
 
 ## Mermaid: State/Flow
 

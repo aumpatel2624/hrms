@@ -27,8 +27,8 @@ Exit Interview manages the structured exit-interview process for a departing emp
 ## Relationships
 
 - [[Employee Separation]] — related offboarding process (no direct doctype link field; both concern the same departing employee independently).
-- Employee — linked to (outside assigned doctype set); this doc reads `relieving_date` from and writes `held_on` back onto the Employee record.
-- HR Settings, Email Template, Interviewer — linked to (outside assigned doctype set); used for the exit-questionnaire email flow.
+- [[Employee]] — linked to; this doc reads `relieving_date` from and writes `held_on` back onto the Employee record.
+- [[HR Settings]], Email Template, [[Interviewer]] — linked to (outside assigned doctype set, except HR Settings/Interviewer); used for the exit-questionnaire email flow.
 
 ## Logic — What Happens and Why
 
@@ -50,9 +50,9 @@ Controller: `ExitInterview(Document)` in `exit_interview.py`.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete, submit, cancel, amend | Full control. |
-| HR Manager | Read, write, create | Can email/print/export; no explicit submit/cancel/delete permission row. |
-| HR User | Read only | No create/write — view-only access per permissions. |
+| [[System Manager]] | Read, write, create, delete, submit, cancel, amend | Full control. |
+| [[HR Manager]] | Read, write, create | Can email/print/export; no explicit submit/cancel/delete permission row. |
+| [[HR User]] | Read only | No create/write — view-only access per permissions. |
 
 ## Mermaid: State/Flow
 

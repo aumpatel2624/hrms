@@ -40,7 +40,7 @@ For each of the 3 report names `"Professional Tax Deductions"`, `"Provident Fund
    an existing one's role list.)
 
 ### 2C. `create_gratuity_rule_for_india()`
-1. IF the `Gratuity Rule` DocType does not exist in the target system (defensive check for install
+1. IF the `[[Gratuity Rule]]` DocType does not exist in the target system (defensive check for install
    ordering — Payroll module may not be installed) THEN return without doing anything.
 2. IF a `Gratuity Rule` named `"Indian Standard Gratuity Rule"` already exists THEN return (no-op,
    idempotent).
@@ -62,8 +62,8 @@ referenced there rather than duplicated. The remaining fields from the same fixt
 
 | DocType | Fieldname | Label | Type | Insert After | Options / Notes |
 |---|---|---|---|---|---|
-| Salary Component | `component_type` | Component Type | Select | `description` | Options: `""`, `Provident Fund`, `Additional Provident Fund`, `Provident Fund Loan`, `Professional Tax`. `depends_on: eval:doc.type == "Deduction"`. `translatable: 0`. |
-| Employee | `bank_cb` | — | Column Break | `bank_ac_no` | layout only |
+| [[Salary Component]] | `component_type` | Component Type | Select | `description` | Options: `""`, `Provident Fund`, `Additional Provident Fund`, `Provident Fund Loan`, `Professional Tax`. `depends_on: eval:doc.type == "Deduction"`. `translatable: 0`. |
+| [[Employee Core Model\|Employee]] | `bank_cb` | — | Column Break | `bank_ac_no` | layout only |
 | Employee | `ifsc_code` | IFSC Code | Data | `bank_cb` | `print_hide: 1`, `depends_on: eval:doc.salary_mode == "Bank"`, `translatable: 0` |
 | Employee | `pan_number` | PAN Number | Data | `payroll_cost_center` | `print_hide: 1`, `translatable: 0` |
 | Employee | `micr_code` | MICR Code | Data | `ifsc_code` | `print_hide: 1`, `depends_on: eval:doc.salary_mode == "Bank"`, `translatable: 0` |
@@ -72,10 +72,10 @@ referenced there rather than duplicated. The remaining fields from the same fixt
 Full field list (all DocTypes, cross-referenced): Salary Component (`component_type` — above),
 Employee (`bank_cb`, `ifsc_code`, `pan_number`, `micr_code`, `provident_fund_account` — above),
 Company (`hra_section`, `basic_component`, `hra_component`, `hra_column_break`,
-`arrear_component` — see `India HRA Exemption.md` §3), Employee Tax Exemption Declaration (7 HRA
-fields — see `India HRA Exemption.md` §3), Employee Tax Exemption Proof Submission (9 HRA fields
-— see `India HRA Exemption.md` §3), Income Tax Slab (`marginal_relief_limit` — see `India
-Marginal Relief Tax.md` §3).
+`arrear_component` — see [[India HRA Exemption]] §3), [[Employee Tax Exemption Declaration]] (7 HRA
+fields — see [[India HRA Exemption]] §3), [[Employee Tax Exemption Proof Submission]] (9 HRA fields
+— see [[India HRA Exemption]] §3), [[Income Tax Slab]] (`marginal_relief_limit` — see
+[[India Marginal Relief Tax]] §3).
 
 ## 4. Exact Gratuity Rule Record Seeded
 
@@ -88,7 +88,7 @@ One `Gratuity Rule` record:
 | `work_experience_calculation_method` | `Round Off Work Experience` |
 | `minimum_year_for_gratuity` | `5` |
 
-Child table `gratuity_rule_slabs` (1 row):
+Child table `gratuity_rule_slabs` (see [[Gratuity Rule Slab]]) (1 row):
 
 | `from_year` | `to_year` | `fraction_of_applicable_earnings` |
 |---|---|---|
@@ -126,3 +126,13 @@ than summing across slabs).
   NOT NULL/required-field constraints are, filling in any additional required columns with sane
   defaults rather than reproducing a "skip validation" bypass (which may not be expressible/safe
   in a typical relational schema with NOT NULL constraints).
+
+## Related Doctypes
+
+- [[Gratuity Rule]] — seeded record (`Indian Standard Gratuity Rule`) created by this fixture.
+- [[Gratuity Rule Slab]] — child table row seeded under the Gratuity Rule above.
+- [[Salary Component]] — target of the `component_type` custom field.
+- [[Employee Core Model|Employee]] — target of the bank/PAN custom fields (`ifsc_code`, `pan_number`, `micr_code`, `provident_fund_account`).
+- [[Employee Tax Exemption Declaration]] — receives HRA custom fields from the same fixture (see [[India HRA Exemption]]).
+- [[Employee Tax Exemption Proof Submission]] — receives HRA custom fields from the same fixture (see [[India HRA Exemption]]).
+- [[Income Tax Slab]] — receives the `marginal_relief_limit` custom field (see [[India Marginal Relief Tax]]).

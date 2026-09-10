@@ -28,9 +28,9 @@ Captures back-pay owed to an employee when a new Salary Structure is assigned re
 - [[Salary Structure Assignment]] — validated to exist for the employee/structure on or after `arrear_start_date`.
 - [[Salary Slip]] — reads existing submitted slips (from `arrear_start_date` onward) to get already-paid component amounts; also builds an in-memory preview slip (not saved) per existing slip to compute what the new structure would have paid.
 - [[Salary Component]] — only components flagged `arrear_component` are considered.
-- [[Payroll Correction]] — reads existing Payroll Correction amounts for the same slips so arrears aren't double counted; shares the child table doctype (Payroll Correction Child).
+- [[Payroll Correction]] — reads existing Payroll Correction amounts for the same slips so arrears aren't double counted; shares the child table doctype ([[Payroll Correction Child]]).
 - [[Additional Salary]] — triggers: one Additional Salary is created and submitted per non-zero earning/deduction arrear component.
-- Employee Benefit Ledger — triggers: one ledger entry created per accrual arrear component (transaction_type "Accrual"), and deleted on cancel via `delete_employee_benefit_ledger_entry`.
+- [[Employee Benefit Ledger]] — triggers: one ledger entry created per accrual arrear component (transaction_type "Accrual"), and deleted on cancel via `delete_employee_benefit_ledger_entry`.
 - [[Payroll Period]] — linked from; bounds valid `arrear_start_date`.
 
 ## Logic — What Happens and Why
@@ -57,8 +57,8 @@ Captures back-pay owed to an employee when a new Salary Structure is assigned re
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit | No cancel listed in JSON. |
-| HR Manager | read/write/create/delete/submit/cancel | Full lifecycle control. |
+| [[System Manager]] | read/write/create/delete/submit | No cancel listed in JSON. |
+| [[HR Manager]] | read/write/create/delete/submit/cancel | Full lifecycle control. |
 
 ## Mermaid: State/Flow
 

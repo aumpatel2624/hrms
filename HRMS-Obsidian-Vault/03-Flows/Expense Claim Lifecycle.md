@@ -30,7 +30,7 @@ flowchart TD
 
 | Step | Role |
 |---|---|
-| Define Expense Claim Type | [[HR User]] / [[HR Manager]] |
+| Define [[Expense Claim Type]] | [[HR User]] / [[HR Manager]] |
 | Create and submit claim | [[Employee]] (self only) |
 | Approve/reject | [[Expense Approver]] (scoped) |
 | Record payment | Accounts-side role (outside HRMS proper) |
@@ -41,13 +41,13 @@ flowchart TD
   accounting classification (which GL account a "Travel" expense hits) is decided once
   centrally and stays consistent across every employee's claims, rather than each
   employee's claim needing correct accounting knowledge.
-- **Expense Claim Advance exists as its own link** because employees are sometimes
+- **[[Expense Claim Advance]] exists as its own link** because employees are sometimes
   given a cash/travel advance *before* incurring the expense — the claim then only
   needs to reconcile the difference, and keeping the advance as a separate linked
   record (rather than netting it silently) preserves an audit trail of "how much was
   advanced vs. how much was actually spent and reimbursed."
 - **Approval is a distinct step from payment** (see the two separate `on_submit`
-  hooks: Expense Claim's own approval workflow, and Payment Entry/Journal Entry's
+  hooks: [[Expense Claim]]'s own approval workflow, and Payment Entry/Journal Entry's
   `update_payment_for_expense_claim` hook back onto it) because "is this a legitimate
   expense" (a line-management judgment) and "has it actually been paid" (an accounting
   fact) are decided by different people at different times, and the system needs both

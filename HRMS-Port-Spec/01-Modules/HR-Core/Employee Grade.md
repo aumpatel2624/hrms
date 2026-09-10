@@ -10,7 +10,7 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| default_salary_structure | Default Salary Structure | Link | Salary Structure | No | — | No | Client-side query filter (see Port Notes) restricts choices to submitted (`docstatus: 1`), active (`is_active: "Yes"`) Salary Structures — not enforced server-side. |
+| default_salary_structure | Default Salary Structure | Link | [[Salary Structure]] | No | — | No | Client-side query filter (see Port Notes) restricts choices to submitted (`docstatus: 1`), active (`is_active: "Yes"`) Salary Structures — not enforced server-side. |
 | default_base_pay | Default Base Pay | Currency | `options: "currency"` (uses the sibling `currency` field for the currency symbol/precision) | No | — | No | `depends_on: "default_salary_structure"` (only shown/relevant once a structure is chosen). `non_negative: 1`. |
 | currency | Currency | Link | Currency | No | — | Yes | Hidden. `fetch_from: "default_salary_structure.currency"` — auto-populated from the linked Salary Structure's currency. |
 
@@ -58,9 +58,13 @@ None.
 
 None found in `hrms/hooks.py`. `Employee Grade` does appear in `hrms/hooks.py`'s `global_search_doctypes["Default"]` list (index 37) — this only affects global-search indexing/ranking, not scheduled processing.
 
+## Related Doctypes
+
+- [[Salary Structure]] — via `default_salary_structure`: Client-side query filter (see Port Notes) restricts choices to submitted (`docstatus: 1`), active (`is_active: "Yes"`) Salary Structures — not enforced server-side.
+
 ## Port Notes
 
 - **Dashboard / linked-document map** (`employee_grade_dashboard.py::get_data()`): defines the "Connections" panel shown on the Employee Grade form in the Frappe desk UI. It groups links as: transaction group 1 → `["Employee", "Leave Period"]`; transaction group 2 → `["Employee Onboarding Template", "Employee Separation Template"]`. This is purely a UI affordance (which doctypes link back to this Employee Grade via a Link field) — it implies Employee, Leave Period, Employee Onboarding Template, and Employee Separation Template all have a Link field pointing at Employee Grade, but does not itself enforce or compute anything. No server-side logic to port beyond ensuring the equivalent doctypes in the new stack have a foreign key to Employee Grade if a similar "related records" view is desired.
 - **`default_leave_policy` client-script reference with no matching field** — see Validation Rules above. Do not add this field to the schema without independent confirmation; call this out to stakeholders as a likely stale/orphaned reference in the source `employee_grade.js`.
-- **Frappe framework behaviors relied on implicitly**: `autoname: "Prompt"` / `naming_rule: "Set by user"` means the primary key is freely typed by the user at creation (must build explicit "insert with caller-supplied PK, reject duplicates" semantics); `allow_rename: 1` permits later PK renames that cascade to all Link references (e.g. every Employee/Salary Structure Assignment pointing at this grade) — this cascade must be built explicitly in a relational port; `track_changes: 1` gives automatic version/audit history for free in Frappe.
+- **Frappe framework behaviors relied on implicitly** (see [[Naming and Autoname Rules]] and [[Implicit Framework Behaviors]]): `autoname: "Prompt"` / `naming_rule: "Set by user"` means the primary key is freely typed by the user at creation (must build explicit "insert with caller-supplied PK, reject duplicates" semantics); `allow_rename: 1` permits later PK renames that cascade to all Link references (e.g. every Employee/Salary Structure Assignment pointing at this grade) — this cascade must be built explicitly in a relational port; `track_changes: 1` gives automatic version/audit history for free in Frappe.
 - Employee Grade is consumed elsewhere in the HRMS codebase (e.g. Salary Structure Assignment default lookups, Employee master `grade` field) — those consumers are out of scope for this file (owned by their respective doctype specs) but should be cross-referenced when building the relational schema (`Employee Grade` as an FK target).

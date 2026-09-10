@@ -13,7 +13,7 @@ A shared child doctype used in THREE different parent contexts:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| criteria | Criteria | Link | Employee Feedback Criteria | yes | — | — | in_list_view |
+| criteria | Criteria | Link | [[Employee Feedback Criteria]] | yes | — | — | in_list_view |
 | per_weightage | Weightage (%) | Percent | — | yes | — | — | non_negative; in_list_view |
 | rating | Rating | Rating | — | no | — | — | in_list_view; `depends_on: eval: doc.parenttype != "Appraisal Template"` — hidden/unused when this row's parent document is an `Appraisal Template` (a template only carries criteria+weightage; the actual 0..N-star rating is only meaningful once copied into an `Appraisal.self_ratings` or `Employee Performance Feedback.feedback_ratings` row) |
 
@@ -48,13 +48,20 @@ None on this child doctype directly.
 
 None.
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 Empty `permissions` array in the JSON — governed by parent (whichever of `Appraisal`, `Employee Performance Feedback`, or `Appraisal Template` owns the row at the time).
 
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Employee Feedback Criteria]] — `criteria` link; the named criterion this row rates against.
+- [[Appraisal Template]] — parent context `rating_criteria` (blueprint only; `rating` unused).
+- [[Appraisal]] — parent context `self_ratings` (employee self-appraisal).
+- [[Employee Performance Feedback]] — parent context `feedback_ratings` (reviewer's rating of another employee).
 
 ## Port Notes
 

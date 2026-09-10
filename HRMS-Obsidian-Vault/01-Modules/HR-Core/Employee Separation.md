@@ -29,7 +29,7 @@ Employee Separation manages the offboarding process for a departing employee: it
 - [[Employee Separation Template]] — linked from, supplies default activities.
 - [[Employee Boarding Activity]] — child table, one row per offboarding task.
 - [[Exit Interview]] — related process (separate doctype); not directly linked by field, but conceptually the same offboarding event; `exit_interview` field here duplicates a free-text summary independent of the Exit Interview doctype's structured record.
-- Employee, Project, Task, Holiday List — linked to (outside assigned doctype set).
+- [[Employee]], Project, Task, Holiday List — linked to (outside assigned doctype set, except Employee).
 
 ## Logic — What Happens and Why
 
@@ -51,9 +51,9 @@ The `exit_interview` field is a plain text summary with no validation logic tyin
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete, submit, cancel, amend | Full control. |
-| HR Manager | Read, write, create | No submit/cancel/delete permission granted in this doctype's permission rows (submit/cancel only available via System Manager). |
-| HR User | Read, write, create | No submit/cancel/delete. |
+| [[System Manager]] | Read, write, create, delete, submit, cancel, amend | Full control. |
+| [[HR Manager]] | Read, write, create | No submit/cancel/delete permission granted in this doctype's permission rows (submit/cancel only available via System Manager). |
+| [[HR User]] | Read, write, create | No submit/cancel/delete. |
 
 ## Mermaid: State/Flow
 

@@ -25,8 +25,8 @@ Employee Transfer records a change in an employee's job properties (department, 
 ## Relationships
 
 - [[Employee Promotion]] — sibling doctype using the same Employee Property History pattern to change employee properties.
-- Employee Property History — child table (outside assigned doctype set), holds the before/after values.
-- Employee — linked to (outside assigned doctype set); this doc reads and mutates Employee fields directly.
+- [[Employee Property History]] — child table, holds the before/after values.
+- [[Employee]] — linked to; this doc reads and mutates Employee fields directly.
 
 ## Logic — What Happens and Why
 
@@ -49,9 +49,9 @@ This guarantees cancelling a transfer restores the Employee to its pre-transfer 
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | Read | View-only, presumably to see their own transfer history. |
-| HR User | Read, write, create, submit | No cancel/delete/amend. |
-| HR Manager | Read, write, create, submit, cancel, delete, amend | Full control. |
+| [[Employee]] | Read | View-only, presumably to see their own transfer history. |
+| [[HR User]] | Read, write, create, submit | No cancel/delete/amend. |
+| [[HR Manager]] | Read, write, create, submit, cancel, delete, amend | Full control. |
 
 ## Mermaid: State/Flow
 

@@ -33,9 +33,9 @@ A master/setup doctype defining a category of expense an employee can claim (e.g
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | create/write/read | Not submittable — no submit/cancel/amend on this doctype. |
-| HR User | create/write/read | Same as HR Manager. |
-| Employee | read only | Employees can see available expense types (to pick one on a claim) but not modify them. |
+| [[HR Manager]] | create/write/read | Not submittable — no submit/cancel/amend on this doctype. |
+| [[HR User]] | create/write/read | Same as HR Manager. |
+| [[Employee]] | read only | Employees can see available expense types (to pick one on a claim) but not modify them. |
 
 ## Mermaid: State/Flow
 

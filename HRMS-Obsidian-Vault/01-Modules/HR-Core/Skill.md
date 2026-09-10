@@ -31,9 +31,9 @@ The `Skill(Document)` controller is a `pass`-only class — no validation logic.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete | Full control of the skill master. |
-| HR Manager | Read, write, create, delete | Full control of the skill master. |
-| HR User | Read | Read-only. |
+| [[System Manager]] | Read, write, create, delete | Full control of the skill master. |
+| [[HR Manager]] | Read, write, create, delete | Full control of the skill master. |
+| [[HR User]] | Read | Read-only. |
 
 ## Mermaid: State/Flow
 

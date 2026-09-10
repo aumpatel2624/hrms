@@ -48,8 +48,8 @@ No submit/cancel/validate lifecycle in the usual sense — as an `issingle` tool
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | read/write/create | Runs bulk allocation |
-| HR User | read/write/create | Runs bulk allocation |
+| [[HR Manager]] | read/write/create | Runs bulk allocation |
+| [[HR User]] | read/write/create | Runs bulk allocation |
 
 ## Mermaid: State/Flow
 

@@ -8,17 +8,17 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes (reqd) | — | No | `in_global_search`, `in_standard_filter` |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | Yes (reqd) | — | No | `in_global_search`, `in_standard_filter` |
 | employee_name | Employee Name | Read Only | — | No | — | Yes | `fetch_from: employee.employee_name`; `in_global_search` |
 | department | Department | Link | Department | No | — | Yes | `fetch_from: employee.department` |
 | course | Course | Data | — | No | — | Yes | `fetch_from: training_event.course` |
 | column_break_3 | — | Column Break | — | — | — | — | layout only |
-| training_event | Training Event | Link | Training Event | Yes (reqd) | — | No | `in_standard_filter` |
+| training_event | Training Event | Link | [[Training Event]] | Yes (reqd) | — | No | `in_standard_filter` |
 | event_name | Event Name | Data | — | No | — | Yes | `fetch_from: training_event.event_name`; shown in list view |
 | trainer_name | Trainer Name | Data | — | No | — | Yes | `fetch_from: training_event.trainer_name`; shown in list view |
 | section_break_6 | — | Section Break | — | — | — | — | layout only |
 | feedback | Feedback | Text | — | Yes (reqd) | — | No | free-text feedback body |
-| amended_from | Amended From | Link | Training Feedback | No | — | Yes | `no_copy`, `print_hide`; standard amendment field |
+| amended_from | Amended From | Link | [[Training Feedback]] | No | — | Yes | `no_copy`, `print_hide`; standard amendment field |
 
 ## Child Tables
 
@@ -26,7 +26,7 @@ None.
 
 ## State Machine
 
-Submittable doctype; standard docstatus lifecycle only (Draft -> Submitted -> Cancelled -> Amend). No independent status field on this doctype itself — but submitting/cancelling this document DOES drive the `status` field on a *different* doctype's row (`Training Event Employee`, matched by `training_event`+`employee`).
+Submittable doctype (see [[Submittable Document Lifecycle]]); standard docstatus lifecycle only (Draft -> Submitted -> Cancelled -> Amend). No independent status field on this doctype itself — but submitting/cancelling this document DOES drive the `status` field on a *different* doctype's row (`Training Event Employee`, matched by `training_event`+`employee`).
 
 ```mermaid
 stateDiagram-v2
@@ -84,6 +84,11 @@ None defined in `training_feedback.py`.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: `in_global_search`, `in_standard_filter`
+- [[Training Event]] — via `training_event`: `in_standard_filter`
 
 ## Port Notes
 

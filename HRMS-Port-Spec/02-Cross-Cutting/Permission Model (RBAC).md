@@ -19,7 +19,8 @@ role_permissions(role, doctype, can_read, can_write, can_create, can_delete,
                   can_submit, can_cancel, can_amend, if_owner_only)
 ```
 Check on every request: does the user hold a role with the needed permission bit set
-for this doctype?
+for this doctype? The `can_submit`/`can_cancel`/`can_amend` bits gate the transitions
+defined generically in [[Submittable Document Lifecycle]].
 
 ## Layer 2 — `if_owner` (Row-Level, Ownership-Based)
 
@@ -39,17 +40,20 @@ Frappe lets an app register a `get_permission_query_conditions` hook per doctype
 injects an extra SQL `WHERE` clause for list views and reports, on top of Layer 1/2.
 HRMS's real self-service and approver scoping is implemented here, not via `if_owner`:
 
-- **Self-only doctypes** (Leave Application, Expense Claim, Attendance Request, Shift
-  Request, Employee Checkin, Employee Tax Exemption Declaration, etc.): condition is
-  effectively `employee = (SELECT name FROM Employee WHERE user_id = current_user)`
-  UNLESS the user also holds a role with unscoped access (HR User/HR Manager/System
+- **Self-only doctypes** ([[Leave Application]], [[Expense Claim]], [[Attendance Request]],
+  [[Shift Request]], [[Employee Checkin]], [[Employee Tax Exemption Declaration]], etc.):
+  condition is effectively `employee = (SELECT name FROM Employee WHERE user_id =
+  current_user)` — see [[Employee Core Model]] for the `user_id` field this join keys
+  off — UNLESS the user also holds a role with unscoped access (HR User/HR Manager/System
   Manager), in which case no extra condition is added.
 - **Approver-scoped doctypes** (same list, for Leave Approver/Expense Approver): the
   condition becomes `employee IN (SELECT name FROM Employee WHERE leave_approver =
   current_user OR department IN (SELECT department FROM "Department Approver" WHERE
   approver = current_user AND department = Employee.department))` — the OR'd
-  Department Approver fallback is a real correlated condition, not just "my named
-  reports."
+  [[Department Approver]] fallback is a real correlated condition, not just "my named
+  reports." The `leave_approver`/`expense_approver` fields themselves, and the hooks
+  that keep their role assignment consistent, are documented in
+  [[Cross-Doctype Hooks (doc_events)]] (`User`/`Employee` validate/on_update hooks).
 - Global roles (HR User, HR Manager, System Manager) get no additional condition —
   they see every row that Layer 1 already permits doctype-level access to.
 

@@ -18,7 +18,7 @@ Not a `doc_events` hook — installed via `create_custom_fields()` (Frappe frame
 - [[Employee Tax Exemption Declaration]] and [[Employee Tax Exemption Proof Submission]] — the HRA input/output fields (`monthly_house_rent`, `rented_in_metro_city`, `house_rent_payment_amount`, `rented_from_date`/`rented_to_date`, computed exemption amounts) consumed/produced by [[India - HRA Exemption]].
 - [[Income Tax Slab]] — `marginal_relief_limit`, consumed by [[India - Marginal Relief Tax Calculation]]; only shown when `tax_relief_limit > 0` and `currency == 'INR'`.
 
-`add_custom_roles_for_reports()` (also called from `setup()`) additionally registers `Custom Role` records granting **HR User**, **HR Manager**, and **Employee** access to three standard reports: "Professional Tax Deductions", "Provident Fund Deductions", "Income Tax Deductions" — otherwise these reports would default to System Manager-only visibility.
+`add_custom_roles_for_reports()` (also called from `setup()`) additionally registers `Custom Role` records granting **[[HR User]]**, **[[HR Manager]]**, and **[[Employee]]** access to three standard reports: "Professional Tax Deductions", "Provident Fund Deductions", "Income Tax Deductions" — otherwise these reports would default to System Manager-only visibility.
 
 ## Logic — What Happens and Why
 
@@ -28,5 +28,5 @@ No mermaid flow — this is static fixture registration, not a decision-driven p
 
 ## Roles & Permissions
 
-- The three statutory reports (Professional Tax Deductions, Provident Fund Deductions, Income Tax Deductions) are explicitly granted to **HR User**, **HR Manager**, and **Employee** via `add_custom_roles_for_reports()`.
+- The three statutory reports (Professional Tax Deductions, Provident Fund Deductions, Income Tax Deductions) are explicitly granted to **[[HR User]]**, **[[HR Manager]]**, and **[[Employee]]** via `add_custom_roles_for_reports()`.
 - The custom fields themselves carry no field-level permission changes beyond standard doctype permissions; several are `print_hide: 1` (IFSC, MICR, PAN) so they don't leak onto printed documents by default.

@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** Single (`issingle: 1` — exactly one record ever exists, no name/autoname)
 **Module:** HR
 
-Global configuration singleton for HR-module-wide behavior toggles (employee naming, leave/expense approval rules, reminders, shift/attendance defaults, exit questionnaires, hiring reminders). Referenced throughout this module and others (`prevent_self_expense_approval` is read directly by `Expense Claim.py`, see `Expense Claim.md`).
+Global configuration singleton for HR-module-wide behavior toggles (employee naming, leave/expense approval rules, reminders, shift/attendance defaults, exit questionnaires, hiring reminders). Referenced throughout this module and others (`prevent_self_expense_approval` is read directly by `Expense Claim.py`, see [[Expense Claim]]).
 
 ## Schema
 
@@ -14,7 +14,7 @@ Grouped by tab, in JSON field order. Section/Column/Tab breaks noted as headings
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| emp_created_by | Employee Naming By | Select | `Naming Series`/`Employee Number`/`Full Name` | - | Naming Series | - | drives `Employee` naming rule (see Business Logic #1) |
+| emp_created_by | Employee Naming By | Select | `Naming Series`/`Employee Number`/`Full Name` | - | Naming Series | - | drives [[Employee Core Model]] naming rule (see [[Naming and Autoname Rules]], Business Logic #1) |
 | standard_working_hours | Standard Working Hours | Float | - | - | - | - | `non_negative` |
 | retirement_age | Retirement Age (In Years) | Data | - | - | - | - | |
 | *(section: Reminders)* | | | | | | | |
@@ -116,7 +116,7 @@ Calls ERPNext core `set_by_naming_series("Employee", "employee_number", is_namin
 |---|---|---|---|---|
 | `set_proceed_with_frequency_change` | Confirm-and-retry gate for the reminder-frequency-change warning | none | none | Sets module-global `PROCEED_WITH_FREQUENCY_CHANGE = True` so the NEXT `validate()` call on this Single skips `validate_frequency_change()`'s blocking warning |
 
-## Permissions
+## Permissions (see [[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -127,7 +127,13 @@ Calls ERPNext core `set_by_naming_series("Employee", "employee_number", is_namin
 
 ## Scheduled Jobs Touching This Doctype
 
-None directly scheduled against `HR Settings`, but its `frequency`, `send_holiday_reminders`, `send_birthday_reminders`, `send_work_anniversary_reminders` values are READ by the scheduled reminder jobs `hrms.controllers.employee_reminders.send_reminders_in_advance_weekly` / `..._monthly` (their existence is checked in `validate_frequency_change`, above; their actual run cadence is defined in `hrms/hooks.py` `scheduler_events` — outside this doctype's own file).
+None directly scheduled against `HR Settings`, but its `frequency`, `send_holiday_reminders`, `send_birthday_reminders`, `send_work_anniversary_reminders` values are READ by the scheduled reminder jobs `hrms.controllers.employee_reminders.send_reminders_in_advance_weekly` / `..._monthly` (their existence is checked in `validate_frequency_change`, above; their actual run cadence is defined in `hrms/hooks.py` `scheduler_events` — see [[Background Jobs (Scheduler Events)]] — outside this doctype's own file).
+
+## Related Doctypes
+
+- [[Employee Core Model]] — `emp_created_by` drives the Employee naming rule (naming series / employee number / full name); consumed via `set_by_naming_series` meta-programming on `Employee.employee_number`.
+- [[Expense Claim]] — `prevent_self_expense_approval` and `expense_approver_mandatory_in_expense_claim` are read directly by `Expense Claim`'s controller/client logic (a key consumer of this settings singleton).
+- [[Background Jobs (Scheduler Events)]] — the scheduled reminder jobs (`send_reminders_in_advance_weekly`/`..._monthly`) read this doctype's reminder toggles and `frequency` field.
 
 ## Port Notes
 

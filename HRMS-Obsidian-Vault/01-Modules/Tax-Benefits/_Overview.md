@@ -56,3 +56,17 @@ Payroll tax withholding needs to happen every pay period, but actual investment 
 - [[Employee Tax Exemption Proof Submission]] — the employee's evidence-backed actuals, supersedes the declaration once submitted.
 - [[Employee Tax Exemption Proof Submission Detail]] — one proof row (sub-category, actual amount, attached document) inside a Proof Submission.
 - [[Employee Other Income]] — non-salary taxable income folded into the payroll period's total taxable earnings.
+
+## Benefit & Gratuity Doctypes (also conceptually part of this module)
+
+The "Benefits" half of this module's name covers flexible-benefit allocation/claims and end-of-service gratuity — both, like the tax doctypes above, physically live under `hrms/payroll/doctype/` and feed into the [[Payroll Run Lifecycle]] rather than being computed here:
+
+- [[Employee Benefit Application]] — an employee's annual flexible-benefit plan allocation across benefit components.
+- [[Employee Benefit Application Detail]] — one benefit component amount row inside an Application.
+- [[Employee Benefit Claim]] — an employee's claim against their allocated benefit amount, read by [[Salary Slip]] to pay out.
+- [[Employee Benefit Detail]] — one claimed-component row inside a Benefit Claim.
+- [[Employee Benefit Ledger]] — running ledger tracking claimed amounts against a Benefit Application's allocation.
+- [[Gratuity]] — the end-of-service benefit payout computed against a [[Gratuity Rule]] at employee separation.
+- [[Gratuity Rule]] — the slab-based formula (e.g. India's 15/26, UAE's 21/30 or 30/30) a Gratuity payout is calculated against.
+- [[Gratuity Rule Slab]] — one tenure-range/fraction row inside a Gratuity Rule.
+- [[Gratuity Applicable Component]] — the salary components counted as "applicable earnings" for a Gratuity Rule's calculation.

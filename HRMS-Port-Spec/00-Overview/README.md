@@ -16,8 +16,8 @@ opposite direction: *what exactly to build*, mechanically, to clone it.
    fields) that every module's spec assumes and relies on without re-explaining. Skipping
    this will make individual doctype specs look like they're missing context — they're
    not, the context is here.
-2. Build in the dependency order in `02-Cross-Cutting/Build Order.md` — HR Setup and
-   HR Core (Employee) first, since almost every other doctype foreign-keys to Employee.
+2. Build in the dependency order in [[Build Order]] (`02-Cross-Cutting/Build Order.md`) — HR Setup and
+   HR Core ([[Employee Core Model|Employee]]) first, since almost every other doctype foreign-keys to Employee.
 3. Each module folder under `01-Modules/` has a `_Module-Spec.md` with a recommended
    relational schema shape, followed by one file per doctype with: full field table,
    state machine, exact validation rules (quoted, in order), full calculation
@@ -33,7 +33,7 @@ opposite direction: *what exactly to build*, mechanically, to clone it.
 
 ## Modules, in Recommended Build Order
 
-1. [[HR-Setup]] (see `01-Modules/HR-Setup/_Module-Spec.md`) — global config, employment
+1. **HR Setup** `01-Modules/HR-Setup/` (see `01-Modules/HR-Setup/_Module-Spec.md`) — global config, employment
    type, employee grade. Nothing else works without these existing first.
 2. **HR Core** (`01-Modules/HR-Core/`) — Employee itself isn't separately specified
    here (see `02-Cross-Cutting/Employee Core Model.md` — it's core ERPNext, not an

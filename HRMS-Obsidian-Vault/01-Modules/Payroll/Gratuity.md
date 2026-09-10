@@ -67,8 +67,8 @@ Calculates and pays out the statutory/contractual end-of-service gratuity owed t
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | read/write/create/delete | No submit/cancel permission listed in the JSON's `permissions` array despite `is_submittable: 1` — submission would need to come from a role with that grant elsewhere (e.g. System Manager by default) or this is a gap in the fixture; not enforced beyond what's shown. |
-| HR User | read/write/create/delete | Same as HR Manager — no submit right listed. |
+| [[HR Manager]] | read/write/create/delete | No submit/cancel permission listed in the JSON's `permissions` array despite `is_submittable: 1` — submission would need to come from a role with that grant elsewhere (e.g. System Manager by default) or this is a gap in the fixture; not enforced beyond what's shown. |
+| [[HR User]] | read/write/create/delete | Same as HR Manager — no submit right listed. |
 
 ## Mermaid: State/Flow
 

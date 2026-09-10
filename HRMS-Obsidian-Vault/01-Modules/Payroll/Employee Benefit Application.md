@@ -80,10 +80,10 @@ this controller — cancelling an application does not appear to retroactively c
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/submit/cancel/delete/amend | Full control |
-| HR Manager | read/write/create/submit/cancel/delete/amend | Full control |
-| HR User | read/write/create/submit/cancel/delete/amend | Full control, same as HR Manager in this doctype |
-| Employee | read/write/create/delete | No submit/cancel/amend right — an employee can draft and edit their own application but cannot self-submit or self-approve it; submission requires HR (not enforced further by an approval workflow in code — no `workflow_state_field`/`states` defined). |
+| [[System Manager]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[HR Manager]] | read/write/create/submit/cancel/delete/amend | Full control |
+| [[HR User]] | read/write/create/submit/cancel/delete/amend | Full control, same as HR Manager in this doctype |
+| [[Employee]] | read/write/create/delete | No submit/cancel/amend right — an employee can draft and edit their own application but cannot self-submit or self-approve it; submission requires HR (not enforced further by an approval workflow in code — no `workflow_state_field`/`states` defined). |
 
 ## Mermaid: State/Flow
 

@@ -10,18 +10,18 @@
 |---|---|---|---|---|---|---|---|
 | attendance_details | (Section) | Section Break | — | — | — | — | layout only |
 | naming_series | Series | Select | `HR-ATT-.YYYY.-` | yes | — | no | `set_only_once` |
-| employee | Employee | Link | Employee | yes | — | no | search_index |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | no | search_index |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | working_hours | Working Hours | Float | — | no | — | yes | precision 2; `depends_on: working_hours` |
 | status | Status | Select | (blank)/Present/Absent/On Leave/Half Day/Work From Home | yes | Present | no | search_index |
-| leave_type | Leave Type | Link | Leave Type | conditionally | — | no | `depends_on`/`mandatory_depends_on: eval:in_list(["On Leave","Half Day"], doc.status)` |
-| leave_application | Leave Application | Link | Leave Application | no | — | yes | |
+| leave_type | Leave Type | Link | [[Leave Type]] | conditionally | — | no | `depends_on`/`mandatory_depends_on: eval:in_list(["On Leave","Half Day"], doc.status)` |
+| leave_application | Leave Application | Link | [[Leave Application]] | no | — | yes | |
 | column_break0 | (Column) | Column Break | — | — | — | — | |
 | attendance_date | Attendance Date | Date | — | yes | — | no | search_index; in_list_view |
 | company | Company | Link | Company | yes | — | yes | fetch_from `employee.company` |
 | department | Department | Link | Department | no | — | yes | fetch_from `employee.department` |
-| shift | Shift | Link | Shift Type | no | — | no | |
-| attendance_request | Attendance Request | Link | Attendance Request | no | — | yes | no_copy |
+| shift | Shift | Link | [[Shift Type]] | no | — | no | |
+| attendance_request | Attendance Request | Link | [[Attendance Request]] | no | — | yes | no_copy |
 | amended_from | Amended From | Link | Attendance | no | — | yes | no_copy; standard amend-chain field |
 | late_entry | Late Entry | Check | — | no | 0 | no | |
 | early_exit | Early Exit | Check | — | no | 0 | no | |
@@ -66,7 +66,7 @@ Executed in `validate()`:
 2. `validate_active_employee(self.employee)` -> IF Employee.status == "Inactive" THEN `frappe.throw(_("Transactions cannot be created for an Inactive Employee {0}.").format(...))`, `exc=InactiveEmployeeStatusError` (source: `hrms.hr.utils.validate_active_employee`).
 3. `validate_attendance_date`: fetch Employee's `date_of_joining`; IF set AND `attendance_date < date_of_joining` THEN `frappe.throw(_("Attendance date {0} can not be less than employee {1}'s joining date: {2}").format(attendance_date, employee, date_of_joining))` (source: `validate_attendance_date`).
 4. `validate_duplicate_record` -> `get_duplicate_attendance_record()`: query existing Attendance where `employee = self.employee AND docstatus < 2 AND attendance_date = self.attendance_date AND name != self.name AND (half_day_status IS NULL OR half_day_status = '' OR modify_half_day_status = 0)`; additionally if `self.shift` is set, restrict to rows where shift is unset OR shift equals `self.shift`. IF a match exists THEN `frappe.throw(_("Attendance for employee {0} is already marked for the date {1}: {2}").format(employee, attendance_date, link))`, `title=_("Duplicate Attendance")`, `exc=DuplicateAttendanceError` (source: `validate_duplicate_record`/`get_duplicate_attendance_record`).
-5. `validate_overlapping_shift_attendance` -> `get_overlapping_shift_attendance()`: for other non-cancelled Attendance rows on the same employee+date with a different shift, check `has_overlapping_timings(self.shift, other.shift)` (see `Shift Assignment.md`); IF True for any THEN `frappe.throw(_("Attendance for employee {0} is already marked for an overlapping shift {1}: {2}").format(...))`, `title=_("Overlapping Shift Attendance")`, `exc=OverlappingShiftAttendanceError` (source: `validate_overlapping_shift_attendance`/`get_overlapping_shift_attendance`). Only runs if `self.shift` is set.
+5. `validate_overlapping_shift_attendance` -> `get_overlapping_shift_attendance()`: for other non-cancelled Attendance rows on the same employee+date with a different shift, check `has_overlapping_timings(self.shift, other.shift)` (see [[Shift Assignment]]); IF True for any THEN `frappe.throw(_("Attendance for employee {0} is already marked for an overlapping shift {1}: {2}").format(...))`, `title=_("Overlapping Shift Attendance")`, `exc=OverlappingShiftAttendanceError` (source: `validate_overlapping_shift_attendance`/`get_overlapping_shift_attendance`). Only runs if `self.shift` is set.
 6. `validate_employee_status`: IF Employee.status == "Inactive" THEN `frappe.throw(_("Cannot mark attendance for an Inactive employee {0}").format(self.employee))` (source: `validate_employee_status`) — NOTE: this duplicates check #2's intent via a slightly different query/message; both run.
 7. `check_leave_record`:
    a. Query approved, submitted Leave Applications for this employee covering `attendance_date` (`from_date <= attendance_date <= to_date`, `status="Approved"`, `docstatus=1`).
@@ -79,7 +79,7 @@ Executed in `validate()`:
 
 ## Business Logic / Calculations
 
-Attendance itself does not compute working hours/status — that logic lives in `Shift Type.get_attendance` and `Employee Checkin.calculate_working_hours` (see `Shift Type.md` and `Employee Checkin.md`), which then call into this doctype's creation/update helpers described below.
+Attendance itself does not compute working hours/status — that logic lives in `Shift Type.get_attendance` and `Employee Checkin.calculate_working_hours` (see [[Shift Type]] and [[Employee Checkin]]), which then call into this doctype's creation/update helpers described below.
 
 ### `mark_attendance(employee, attendance_date, status, shift=None, leave_type=None, late_entry=False, early_exit=False, half_day_status=None)` — module-level helper, savepoint-safe insert+submit
 
@@ -146,8 +146,8 @@ Used by `Shift Type.mark_absent_for_dates_with_no_attendance` (see `Shift Type.m
 
 ## Scheduled Jobs Touching This Doctype
 
-Indirectly touched by the `hourly_long` jobs documented fully in `Shift Type.md`:
-- `hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts` creates/updates Attendance records via `Employee Checkin.mark_attendance_and_link_log` / `create_or_update_attendance` (see `Employee Checkin.md`) and via `Shift Type.mark_absent_for_dates_with_no_attendance` / `mark_absent_for_half_day_dates` (see `Shift Type.md`).
+Indirectly touched by the `hourly_long` jobs documented fully in [[Shift Type]]:
+- `hrms.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts` creates/updates Attendance records via `Employee Checkin.mark_attendance_and_link_log` / `create_or_update_attendance` (see [[Employee Checkin]]) and via `Shift Type.mark_absent_for_dates_with_no_attendance` / `mark_absent_for_half_day_dates` (see `Shift Type.md`).
 
 No scheduler job reads/writes Attendance directly by name in `hrms/hooks.py` outside of that chain.
 
@@ -159,3 +159,13 @@ No scheduler job reads/writes Attendance directly by name in `hrms/hooks.py` out
 - **`track_changes: 1`** — full version/audit history is automatic in Frappe; must be built explicitly in the target stack if required.
 - **`amended_from` / amend workflow** is a Frappe-standard pattern (cancel a submitted doc, then "amend" clones it into a new Draft linked via `amended_from`) — this needs to be an explicit workflow/state feature in the port, not just a nullable FK.
 - **Currency/float precision**: `working_hours` has explicit `precision: 2`; other float fields (`standard_working_hours`, `actual_overtime_duration`) have no explicit precision override (falls back to site-wide default, typically 3 in Frappe) — a port should pick and document an explicit precision for these rather than relying on an implicit framework default.
+
+## Related Doctypes
+
+- [[Employee Core Model]] — the attendance record is filed against this employee.
+- [[Shift Type]] — resolves the shift this attendance falls under; auto-attendance pipeline reads/writes Attendance records via this doctype.
+- [[Attendance Request]] — parent request that can create/update Attendance rows for a date range and link back via `attendance_request`.
+- [[Employee Checkin]] — auto-attendance processing links Checkin rows back to the Attendance record via `Employee Checkin.attendance`.
+- [[Leave Type]] / [[Leave Application]] — `check_leave_record` sets these from an approved Leave Application covering the attendance date.
+- [[Shift Assignment]] — overlap validation consults shift-timing overlap logic defined there.
+- Overtime Type — referenced by `overtime_type`, but no matching doctype file exists in this repo to wikilink.

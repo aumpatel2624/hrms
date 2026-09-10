@@ -46,6 +46,7 @@ The master record that defines a category of leave (Casual, Sick, Earned, Compen
 - [[Leave Block List]] — linked from, optionally scoping a block list to one leave type.
 - [[Leave Ledger Entry]] — linked from; every ledger row carries a leave_type.
 - [[Leave Adjustment]] — linked from; adjustments read `max_leaves_allowed` and `is_lwp`.
+- [[Salary Component]] (Payroll module) — links to via `earning_component`, the component [[Leave Encashment]] pays the encashed amount under.
 
 ## Logic — What Happens and Why
 
@@ -62,9 +63,9 @@ There is no submit/cancel lifecycle — Leave Type is a plain (non-submittable) 
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create/delete | Full master maintenance |
-| HR Manager | read/write/create/delete | Full master maintenance |
-| Employee | read | Can view leave type definitions (e.g. when applying) but not edit |
+| [[HR User]] | read/write/create/delete | Full master maintenance |
+| [[HR Manager]] | read/write/create/delete | Full master maintenance |
+| [[Employee]] | read | Can view leave type definitions (e.g. when applying) but not edit |
 
 ## Mermaid: State/Flow
 

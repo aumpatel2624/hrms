@@ -49,8 +49,12 @@ None.
 
 ## Port Notes
 
-- `autoname: "field:source_name"` — same "name is a natural key" caveat as `Job Opening Template`: renaming a source in true Frappe semantics renames the record identity and cascades to all links. Verify whether the target stack needs an equivalent rename-cascade for any `Job Applicant.source` (or similarly-named) link field — that field lives on `Job Applicant`, owned by another agent, but is the primary consumer of this doctype.
+- `autoname: "field:source_name"` — same "name is a natural key" caveat as [[Job Opening Template]] (see [[Naming and Autoname Rules]]): renaming a source in true Frappe semantics renames the record identity and cascades to all links. Verify whether the target stack needs an equivalent rename-cascade for any `Job Applicant.source` (or similarly-named) link field — that field lives on [[Job Applicant]], owned by another agent, but is the primary consumer of this doctype.
 - `quick_entry: 1` in the JSON enables Frappe's lightweight "Quick Entry" creation dialog (just `source_name` prompted) instead of the full form — a UI/UX detail, not a data-layer rule, but worth replicating as a lightweight "add new source inline" affordance since this doctype exists mainly to be picked from a dropdown while filling out a Job Applicant.
 - `allow_import: 1` permits bulk import via Frappe's Data Import tool — no special server logic beyond standard CRUD to replicate.
 - Frappe automatic behaviors relied on implicitly: `creation`/`modified`/`modified_by`/`owner` audit columns; `sort_field`/`sort_order` = `creation DESC` for default list ordering; `editable_grid: 1` is a UI setting (allows inline grid editing in list views) with no data-layer implication.
 - No cross-doctype controller logic (overrides/controllers/hooks) references `Job Applicant Source` anywhere in `hrms/overrides/`, `hrms/controllers/`, or `hrms/hooks.py` — its only consumer relationship is as a Link-field option source for `Job Applicant.source` (and a dashboard chart `hrms/hr/dashboard_chart/job_applicant_source/job_applicant_source.json`, and the `Job Application` web form), both outside this agent's scope.
+
+## Related Doctypes
+
+- [[Job Applicant]] — the sole consumer; `Job Applicant.source` links to a Job Applicant Source record.

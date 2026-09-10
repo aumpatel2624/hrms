@@ -30,9 +30,9 @@ code — must be seeded as fixture/setup data).
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read/Write/Create/Delete/Share/Report | No email/export/print. |
-| HR User | Read/Write/Create | No delete. |
-| HR Manager | Full CRUD + email/export/print/report/share | — |
+| [[System Manager]] | Read/Write/Create/Delete/Share/Report | No email/export/print. |
+| [[HR User]] | Read/Write/Create | No delete. |
+| [[HR Manager]] | Full CRUD + email/export/print/report/share | — |
 
 ## Mermaid: State/Flow
 ```mermaid

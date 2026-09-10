@@ -128,6 +128,12 @@ record, each with its own approval trail, side effects, and audit history:
   the trip is complete, not something Travel Request enforces automatically
   in code.
 
+## Related Flows
+
+- [[Hire to Retire Overview]] — the end-to-end employee lifecycle this module's doctypes plug into.
+- [[Recruitment to Onboarding]] — the handoff from Job Applicant/Job Offer into [[Employee Onboarding]].
+- [[Employee Exit Lifecycle]] — the offboarding flow spanning [[Employee Separation]], [[Exit Interview]], and [[Full and Final Statement]].
+
 ## Doctypes in This Module
 
 - [[Employee Onboarding]] — checklist-driven process for bringing a new hire to Active status.

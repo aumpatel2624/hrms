@@ -8,17 +8,17 @@ This module tracks when employees actually work (via `Employee Checkin` device/a
 
 | Doctype | Purpose |
 |---|---|
-| `Shift Type` | Defines a shift's time window, grace periods/margins, and all auto-attendance configuration (thresholds, holiday behavior, sync watermarks); hosts the core auto-attendance algorithm. |
-| `Shift Assignment` | Assigns one employee to one Shift Type for a date range; submittable; hosts the shared shift-window time-resolution engine used across the module. |
-| `Shift Request` | Employee-initiated, approver-gated request for a (usually temporary) shift change; on approval, generates a `Shift Assignment`. |
-| `Shift Schedule` | A reusable named recurrence pattern (frequency + days-of-week) tied to one Shift Type, used to auto-generate a rolling series of `Shift Assignment` records. |
-| `Shift Schedule Assignment` | Binds one employee to one `Shift Schedule`; the scheduled job walks these to auto-create upcoming `Shift Assignment` records on a rolling 90-day horizon. |
-| `Shift Assignment Tool` | Single-doctype bulk UI/RPC tool: mass-assign shifts, mass-assign shift schedules, or mass-approve/reject Shift Requests. |
-| `Shift Location` | A geofenced physical location (lat/long + radius) attachable to a Shift Assignment, enforced at checkin time. |
-| `Employee Checkin` | One IN/OUT punch record (device, mobile, or manual); resolves and caches which shift occurrence it belongs to; feeds the auto-attendance pipeline; links back to the `Attendance` it produced. |
-| `Attendance` | The daily per-employee record of Present/Absent/On Leave/Half Day/Work From Home status; submittable; created either by the auto-attendance pipeline, an Attendance Request, the Employee Attendance Tool, or manually. |
-| `Attendance Request` | Submittable correction request (Work From Home / On Duty, optionally half-day) that creates or updates Attendance records for a date range on submit. |
-| `Employee Attendance Tool` | Virtual single-doctype bulk UI/RPC tool for HR to mass-mark attendance (and resolve pending Half Day "other half" statuses) for a filtered set of employees on one date. |
+| [[Shift Type]] | Defines a shift's time window, grace periods/margins, and all auto-attendance configuration (thresholds, holiday behavior, sync watermarks); hosts the core auto-attendance algorithm. |
+| [[Shift Assignment]] | Assigns one employee to one Shift Type for a date range; submittable; hosts the shared shift-window time-resolution engine used across the module. |
+| [[Shift Request]] | Employee-initiated, approver-gated request for a (usually temporary) shift change; on approval, generates a `Shift Assignment`. |
+| [[Shift Schedule]] | A reusable named recurrence pattern (frequency + days-of-week) tied to one Shift Type, used to auto-generate a rolling series of `Shift Assignment` records. |
+| [[Shift Schedule Assignment]] | Binds one employee to one `Shift Schedule`; the scheduled job walks these to auto-create upcoming `Shift Assignment` records on a rolling 90-day horizon. |
+| [[Shift Assignment Tool]] | Single-doctype bulk UI/RPC tool: mass-assign shifts, mass-assign shift schedules, or mass-approve/reject Shift Requests. |
+| [[Shift Location]] | A geofenced physical location (lat/long + radius) attachable to a Shift Assignment, enforced at checkin time. |
+| [[Employee Checkin]] | One IN/OUT punch record (device, mobile, or manual); resolves and caches which shift occurrence it belongs to; feeds the auto-attendance pipeline; links back to the `Attendance` it produced. |
+| [[Attendance]] | The daily per-employee record of Present/Absent/On Leave/Half Day/Work From Home status; submittable; created either by the auto-attendance pipeline, an Attendance Request, the Employee Attendance Tool, or manually. |
+| [[Attendance Request]] | Submittable correction request (Work From Home / On Duty, optionally half-day) that creates or updates Attendance records for a date range on submit. |
+| [[Employee Attendance Tool]] | Virtual single-doctype bulk UI/RPC tool for HR to mass-mark attendance (and resolve pending Half Day "other half" statuses) for a filtered set of employees on one date. |
 
 ## Recommended Target Schema Shape
 

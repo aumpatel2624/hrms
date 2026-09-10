@@ -65,10 +65,10 @@ The whitelisted `set_appraisal_template` looks up the `Appraisee` child row on t
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | read, write, create | No submit/cancel/delete — an employee can prepare their own appraisal draft (e.g. self-ratings/reflections) but cannot finalize it. |
-| System Manager | read, write, create, submit, cancel, delete, amend | Full control. |
-| HR User | read, write, create, submit, cancel, delete, amend | Same as System Manager. |
-| HR Manager | read, write, create, submit, delete, amend, export | Has submit but this permission row omits explicit `cancel: 1` — not enforced in code beyond the JSON (cancel not listed for HR Manager). |
+| [[Employee]] | read, write, create | No submit/cancel/delete — an employee can prepare their own appraisal draft (e.g. self-ratings/reflections) but cannot finalize it. |
+| [[System Manager]] | read, write, create, submit, cancel, delete, amend | Full control. |
+| [[HR User]] | read, write, create, submit, cancel, delete, amend | Same as System Manager. |
+| [[HR Manager]] | read, write, create, submit, delete, amend, export | Has submit but this permission row omits explicit `cancel: 1` — not enforced in code beyond the JSON (cancel not listed for HR Manager). |
 
 ## Mermaid: State/Flow
 

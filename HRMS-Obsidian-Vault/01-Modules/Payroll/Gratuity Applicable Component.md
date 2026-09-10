@@ -19,7 +19,7 @@ A single row identifying one Salary Component that counts toward an employee's "
 
 - [[Gratuity Rule]] — parent, via the Table MultiSelect field `applicable_earnings_component`.
 - [[Salary Component]] — linked from; the rule's description notes the component "should be part of the Salary Structure" (not enforced in code — only a UI hint).
-- [[Gratuity]] — read indirectly: `get_applicable_components()` fetches all rows where `parent = gratuity_rule`, then `get_total_component_amount()` sums the matching earning rows from the employee's last Salary Slip.
+- [[Gratuity]] — read indirectly: `get_applicable_components()` fetches all rows where `parent = gratuity_rule`, then `get_total_component_amount()` sums the matching earning rows from the employee's last [[Salary Slip]].
 
 ## Logic — What Happens and Why
 

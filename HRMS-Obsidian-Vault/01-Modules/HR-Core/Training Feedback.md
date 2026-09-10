@@ -45,9 +45,9 @@ Controller: `TrainingFeedback(Document)` in `training_feedback.py`.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, write, create, delete, submit, cancel, amend | Full lifecycle control. |
-| Employee | Read (own, via standard employee-user restrictions), write, create, submit, cancel, amend | Lets employees self-submit their own feedback; no delete. |
-| HR User | Read, write | Cannot create, submit, or delete. |
+| [[HR Manager]] | Read, write, create, delete, submit, cancel, amend | Full lifecycle control. |
+| [[Employee]] | Read (own, via standard employee-user restrictions), write, create, submit, cancel, amend | Lets employees self-submit their own feedback; no delete. |
+| [[HR User]] | Read, write | Cannot create, submit, or delete. |
 
 ## Mermaid: State/Flow
 

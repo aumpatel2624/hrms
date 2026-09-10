@@ -1,7 +1,7 @@
 # Appraisal
 
 **Source:** `hrms/hr/doctype/appraisal/appraisal.json`, `appraisal.py`, `appraisal.js`
-**Submittable:** yes   **Tree:** no   **Naming:** `naming_series:` — series `HR-APR-.YYYY.-` (e.g. `HR-APR-2026-00001`)
+**Submittable:** yes ([[Submittable Document Lifecycle]])   **Tree:** no   **Naming:** `naming_series:` ([[Naming and Autoname Rules]]) — series `HR-APR-.YYYY.-` (e.g. `HR-APR-2026-00001`)
 **Module:** HR
 
 ## Schema
@@ -12,32 +12,32 @@ Tabs/Sections are noted as comments; layout-only fields (Column Break/Section Br
 |---|---|---|---|---|---|---|---|
 | *(Tab: Overview)* | | | | | | | |
 | naming_series | Series | Select | `HR-APR-.YYYY.-` | yes | — | — | `set_only_once` |
-| employee | Employee | Link | Employee | yes | — | — | in_global_search, in_standard_filter, search_index |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | — | in_global_search, in_standard_filter, search_index |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name` |
 | department | Department | Link | Department | no | — | yes | fetch_from `employee.department` |
 | company | Company | Link | Company | yes | — | — | remember_last_selected_value |
 | designation | Designation | Link | Designation | no | — | yes | fetch_from `employee.designation` |
-| appraisal_cycle | Appraisal Cycle | Link | Appraisal Cycle | yes | — | — | in_list_view, in_standard_filter |
+| appraisal_cycle | Appraisal Cycle | Link | [[Appraisal Cycle]] | yes | — | — | in_list_view, in_standard_filter |
 | start_date | Start Date | Date | — | no | — | yes | not fetched via `fetch_from` in JSON; set programmatically (see Port Notes) |
 | end_date | End Date | Date | — | no | — | yes | same as above |
 | employee_image | Employee Image | Attach Image | — | no | — | — | hidden, fetch_from `employee.image`, `allow_on_submit` |
 | *(Tab: KRAs)* | | | | | | | |
-| appraisal_template | Appraisal Template | Link | Appraisal Template | conditionally | — | — | `mandatory_depends_on: eval:!doc.__islocal` (required once the doc has been saved once); in_standard_filter |
+| appraisal_template | Appraisal Template | Link | [[Appraisal Template]] | conditionally | — | — | `mandatory_depends_on: eval:!doc.__islocal` (required once the doc has been saved once); in_standard_filter |
 | rate_goals_manually | Rate Goals Manually | Check | — | no | 0 | yes (UI read-only; set only by server logic) | Governs whether `appraisal_kra` (auto) or `goals` (manual) table is used |
-| appraisal_kra | KRA vs Goals | Table (Appraisal KRA) | Appraisal KRA | no | — | — | `depends_on: eval: !doc.rate_goals_manually` |
+| appraisal_kra | KRA vs Goals | Table (Appraisal KRA) | [[Appraisal KRA]] | no | — | — | `depends_on: eval: !doc.rate_goals_manually` |
 | goal_score_percentage | Goal Score (%) | Float | — | no | — | yes | `depends_on: eval: !doc.rate_goals_manually`; sum of all `appraisal_kra.goal_score` |
-| goals | Goals | Table (Appraisal Goal) | Appraisal Goal | no | — | — | `depends_on: rate_goals_manually` |
+| goals | Goals | Table (Appraisal Goal) | [[Appraisal Goal]] | no | — | — | `depends_on: rate_goals_manually` |
 | remarks | Remarks | Text | — | no | — | — | `depends_on: rate_goals_manually`; free text notes |
 | total_score | Total Goal Score | Float | — | no | — | yes | in_list_view, no_copy; computed |
 | *(Tab: Feedback)* | | | | | | | |
 | feedback_html | Feedback HTML | HTML | — | no | — | — | client-rendered feedback history widget (see Port Notes) |
 | avg_feedback_score | Average Feedback Score | Float | — | no | — | yes | hidden; computed average of submitted `Employee Performance Feedback.total_score` |
 | *(Tab: Self Appraisal)* | | | | | | | |
-| self_ratings | (no label) | Table (Employee Feedback Rating) | Employee Feedback Rating | no | — | — | rating criteria + self rating |
+| self_ratings | (no label) | Table (Employee Feedback Rating) | [[Employee Feedback Rating]] | no | — | — | rating criteria + self rating |
 | self_score | Total Self Score | Float | — | no | — | yes | computed |
 | reflections | (no label) | Text Editor | — | no | — | — | free-form self-reflection notes |
 | final_score | Final Score | Float | — | no | — | yes | `depends_on: appraisal_cycle`; in_list_view; "Average of Goal Score, Feedback Score, and Self Appraisal Score" (or custom formula) |
-| amended_from | Amended From | Link | Appraisal | no | — | yes | no_copy, print_hide — standard Frappe amendment link |
+| amended_from | Amended From | Link | [[Appraisal]] | no | — | yes | no_copy, print_hide — standard Frappe amendment link |
 
 ## Child Tables
 
@@ -225,7 +225,7 @@ Called from `validate()` (without `update`) and externally by `Goal.update_goal_
 | on_submit | *(none defined — `hrms/hooks.py` wires a separate telemetry hook `hrms.telemetry.on_appraisal_submit`, analytics-only, out of scope for the port — see Port Notes)* | telemetry only |
 | on_cancel | *(none defined on this doctype)* | — |
 
-Cross-doctype triggers into Appraisal (defined on the *other* doctype, but affecting Appraisal state):
+Cross-doctype triggers into Appraisal ([[Cross-Doctype Hooks (doc_events)]], defined on the *other* doctype, but affecting Appraisal state):
 - `Goal.on_update` / `Goal.after_delete` → `update_goal_progress_in_appraisal()` → looks up the matching Appraisal by `(employee, appraisal_cycle)` and calls `appraisal.set_goal_score(update=True)`.
 - `Employee Performance Feedback.on_submit` / `on_cancel` → `update_avg_feedback_score_in_appraisal()` → `appraisal.calculate_avg_feedback_score(update=True)`.
 
@@ -239,7 +239,7 @@ Cross-doctype triggers into Appraisal (defined on the *other* doctype, but affec
 | `get_feedback_history(employee, appraisal)` (module-level) | Fetch feedback list + rating-distribution stats for the feedback-history widget | `employee: str`, `appraisal: str` | `{feedback_history: [...], reviews_per_rating: [pct,...] (5 buckets, ratings 1..5), avg_feedback_score: float}` | Requires read permission on the target Appraisal (`frappe.has_permission(..., throw=True)`). Lists submitted feedback docs (fields: feedback, reviewer, user, owner, reviewer_name, reviewer_designation, added_on, employee, total_score, name), ordered by `added_on desc`. Computes, for each rating bucket 1..5, `round(count_in_bucket / total_count * 100, 0)` where a bucket is `total_score BETWEEN i AND i+0.99`; 0 for all buckets if `feedback_count` is 0 (division-by-zero guard). Also returns the Appraisal's stored `avg_feedback_score`. |
 | `get_kras_for_employee(doctype, txt, searchfield, start, page_len, filters)` (module-level, `@frappe.validate_and_sanitize_search_inputs`) | Link-field query (autocomplete) source for the `Goal.kra` field | standard Frappe search-query args; `filters: {appraisal_cycle, employee}` | list of `(kra,)` tuples | Finds the Appraisal for `(appraisal_cycle, employee)`, then returns distinct `Appraisal KRA.kra` values (LIKE `txt%`) whose `parent` is that Appraisal — i.e. an employee can only select a KRA on their Goal that's already part of their own Appraisal's KRA table. |
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -254,10 +254,23 @@ No `if_owner` or `permlevel` restrictions defined.
 
 None found in `hrms/hooks.py` `scheduler_events` referencing Appraisal directly.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — `employee` link; the employee being appraised (also validated for Active status).
+- [[Appraisal Cycle]] — `appraisal_cycle` link; the time-boxed cycle this Appraisal belongs to (also governs weightage-method immutability and the Completed-cycle guard).
+- [[Appraisal Template]] — `appraisal_template` link; source of the KRA/goal and rating-criteria rows copied in via `set_kras_and_rating_criteria`.
+- [[Appraisal KRA]] — `appraisal_kra` child table; auto-computed KRA scores (used in "Automated" mode).
+- [[Appraisal Goal]] — `goals` child table; manually-rated goal/score lines (used in "Manual Rating" mode).
+- [[Employee Feedback Rating]] — `self_ratings` child table; the employee's self-appraisal ratings against template criteria.
+- [[Employee Feedback Criteria]] — indirectly, via each `self_ratings` row's `criteria` link.
+- [[Appraisal]] — `amended_from` self-link; standard Frappe amendment chain.
+- [[Goal]] — read (not a schema link) by `set_goal_score`/`get_kras_for_employee` to roll up goal progress into KRA scores.
+- [[Employee Performance Feedback]] — read (not a schema link) by `calculate_avg_feedback_score`/`add_feedback`/`get_feedback_history`; peer feedback that feeds `avg_feedback_score`.
+
 ## Port Notes
 
 - **Naming series**: `HR-APR-.YYYY.-` — Frappe auto-increments a per-year counter and formats as `HR-APR-<YYYY>-<n>`; a new stack must implement equivalent per-year sequence generation (e.g. a Postgres sequence keyed by year, or a counters table).
-- **`track_changes: 1`**: Frappe automatically keeps a version/audit history of every field change. A port must build an explicit audit-log table if this behavior is required.
+- **`track_changes: 1`** ([[Implicit Framework Behaviors]]): Frappe automatically keeps a version/audit history of every field change. A port must build an explicit audit-log table if this behavior is required.
 - **`start_date`/`end_date`**: read-only, no `fetch_from` set in the JSON despite mirroring the Appraisal Cycle's dates — in practice these are populated at appraisal-creation time from the Appraisal Cycle (see `AppraisalCycle.create_appraisals_for_cycle`, which does not explicitly set them either — actual population of `start_date`/`end_date` on Appraisal was not found in the read source, only `appraisal_cycle.start_date/end_date` exist on the Cycle; **flagging as a gap**: no explicit code path sets `Appraisal.start_date`/`end_date` in the files reviewed. A re-implementer should treat these as either legacy fields, populated by a client-side script not covered here, or should default them from the linked cycle explicitly.).
 - **`employee_image`**: `fetch_from: employee.image`, `allow_on_submit: 1` — Frappe auto-copies the Employee's image field whenever Employee is set/changed, and (unusually) allows this one field to still update after submission. The controller has UI code (`appraisal.js refresh`) that hides the "remove image" sidebar action so it can't be cleared by the user, but the field can still be refreshed by Employee data changing.
 - **`feedback_html`**: pure UI. The client script loads a bundled `performance.bundle.js` widget (`hrms.PerformanceFeedback`) into this field's wrapper to render feedback history and a form to add new feedback (backed by `get_feedback_history` and `add_feedback` whitelisted methods). A port's UI must reproduce this as a normal component/panel — no server schema implication beyond the two API methods above.

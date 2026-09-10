@@ -35,9 +35,9 @@ There is no submit/cancel lifecycle — this is a plain (non-submittable) setup/
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read, write, create | No delete. |
-| HR Manager | read, write, create, delete, export | Full control. |
-| Employee | read | View-only, e.g. to see what they're evaluated against. |
+| [[HR User]] | read, write, create | No delete. |
+| [[HR Manager]] | read, write, create, delete, export | Full control. |
+| [[Employee]] | read | View-only, e.g. to see what they're evaluated against. |
 
 ## Mermaid: State/Flow
 

@@ -58,3 +58,7 @@ Attendance can't be trusted as a single manual entry point in any organization w
 - [[Shift Schedule Assignment]] — attaches an employee to a Shift Schedule and rolls it forward into real, dated Shift Assignment records via a scheduled job.
 - [[Shift Assignment Tool]] — virtual bulk tool for mass-assigning shifts/schedules or bulk-processing Shift Requests.
 - [[Shift Location]] — named site with coordinates and a check-in radius, used to geofence Employee Checkin.
+
+## See Also
+
+- [[Attendance and Shift Lifecycle]] — end-to-end flow tying shift assignment, checkins, auto-attendance, and correction requests together.

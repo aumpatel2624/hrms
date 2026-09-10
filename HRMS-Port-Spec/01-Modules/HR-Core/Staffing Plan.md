@@ -14,11 +14,11 @@
 | from_date | From Date | Date | — | yes | — | no | |
 | to_date | To Date | Date | — | yes | — | no | |
 | *(staffing_plan_details)* | Details | Section Break | — | — | — | — | section heading — groups: staffing_details |
-| staffing_details | Staffing Details | Table | Staffing Plan Detail | yes | — | no | See `Staffing Plan Detail.md`. Client-side filters out designations already chosen in this same table when picking a new row's designation (UI-only). |
+| staffing_details | Staffing Details | Table | [[Staffing Plan Detail]] | yes | — | no | See `Staffing Plan Detail.md`. Client-side filters out designations already chosen in this same table when picking a new row's designation (UI-only). |
 | get_job_requisitions | Get Job Requisitions | Button | — | — | — | — | Pure UI trigger (`.js` opens a MultiSelectDialog then calls whitelisted `set_job_requisitions`); not a persisted data field. |
 | *(section_break_8)* | — | Section Break | — | — | — | — | layout only |
 | total_estimated_budget | Total Estimated Budget | Currency | `options: "Company:company:default_currency"` | no | `0.00` | yes | Computed in `set_total_estimated_budget()` — see Business Logic. |
-| amended_from | Amended From | Link | Staffing Plan | no | — | yes | `no_copy: 1`, `print_hide: 1` |
+| amended_from | Amended From | Link | [[Staffing Plan]] | no | — | yes | `no_copy: 1`, `print_hide: 1` |
 
 `sort_field`: `creation` DESC. `track_changes: 1`. `quick_entry: 1`. No `title_field` specified.
 
@@ -27,6 +27,8 @@
 - `staffing_details` -> `Staffing Plan Detail` (see `Staffing Plan Detail.md`)
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]).
 
 ```mermaid
 stateDiagram-v2
@@ -138,6 +140,10 @@ No `before_insert`, `after_insert`, `on_update`, `before_submit`, `on_submit`, `
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` (`scheduler_events` or `doc_events`) — no cron/job/hook references `Staffing Plan`.
+
+## Related Doctypes
+
+- [[Staffing Plan Detail]] — via `staffing_details`: See `Staffing Plan Detail.md`. Client-side filters out designations already chosen in this same table when picking a new row's designation (UI-only).
 
 ## Port Notes
 

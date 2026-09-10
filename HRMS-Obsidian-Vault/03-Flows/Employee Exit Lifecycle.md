@@ -32,29 +32,29 @@ flowchart TD
 |---|---|
 | Initiate Separation | [[HR User]] / manager |
 | Fill Exit Interview | [[Employee]] (self) |
-| Decide on Salary Withholding | [[HR Manager]] |
-| Compile Full and Final Statement | [[HR User]] |
+| Decide on [[Salary Withholding]] | [[HR Manager]] |
+| Compile [[Full and Final Statement]] | [[HR User]] |
 | Submit Full and Final Statement | [[HR Manager]] |
 
 ## Why Exit Is Its Own Multi-Doctype Process, Not a Status Flag
 
-- **Employee Separation is a full document, not just setting Employee's status to
+- **[[Employee Separation]] is a full document, not just setting Employee's status to
   "Left"**, because an exit has its own workflow (notice period, offboarding
   checklist, clearance) that needs to complete *before* the employee's status
   actually changes — the [[Employee]] `on_trash`/status-change hooks
   (`update_employee_transfer`, related overrides) depend on Separation reaching the
   right state first, not the other way around.
-- **Full and Final Statement aggregates multiple otherwise-independent balances**
+- **[[Full and Final Statement]] aggregates multiple otherwise-independent balances**
   (leave encashment, gratuity, outstanding loans/advances, unreturned assets) because
   final settlement legally/financially has to net *all* of these against each other in
   one document — you can't gratuity-pay someone who still owes the company for an
   unreturned laptop without that showing up in the same settlement.
-- **Salary Withholding exists as an explicit pause mechanism** rather than just delaying
+- **[[Salary Withholding]] exists as an explicit pause mechanism** rather than just delaying
   Full and Final Statement creation, because sometimes a separation needs to proceed
   (record the departure, run offboarding) while the *payment* specifically stays on
   hold pending an investigation — decoupling "employee has left" from "employee has
   been paid out" is necessary because those can legitimately happen at different times.
-- **Gratuity computation is rule-driven** ([[Gratuity Rule]] + [[Gratuity Rule Slab]],
+- **[[Gratuity]] computation is rule-driven** ([[Gratuity Rule]] + [[Gratuity Rule Slab]],
   with country-specific presets seeded by [[India - Gratuity Rule Setup]] and
   [[UAE - Gratuity Rules]]) rather than a fixed formula, because gratuity eligibility
   and calculation are statutory and vary by country/region — encoding it as

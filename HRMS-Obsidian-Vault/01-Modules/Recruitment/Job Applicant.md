@@ -98,9 +98,9 @@ and a sitewide hire-rate metric (`Accepted` count / total applicants).
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + email/export/print/report/share | — |
-| HR User | Read/Write/Create/Print/Report/Share/Email | No delete. |
-| HR Manager | Full CRUD + email/export/print/report/share | — |
+| [[System Manager]] | Full CRUD + email/export/print/report/share | — |
+| [[HR User]] | Read/Write/Create/Print/Report/Share/Email | No delete. |
+| [[HR Manager]] | Full CRUD + email/export/print/report/share | — |
 
 Not enforced in code: no role is restricted to only creating/editing applicants for
 themselves — all three roles above have blanket read/write across all applicants (no

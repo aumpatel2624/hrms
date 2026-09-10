@@ -50,9 +50,9 @@ doctype. Its logic lives in how other doctypes consume it:
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | Full CRUD + email/export/print/report/share | — |
-| HR Manager | Full CRUD + email/export/print/report/share | — |
-| Interviewer | Full CRUD (create/delete/write) + `select` | Interviewers can define/maintain interview round rubrics themselves, not just execute them. |
+| [[HR User]] | Full CRUD + email/export/print/report/share | — |
+| [[HR Manager]] | Full CRUD + email/export/print/report/share | — |
+| [[Interviewer (Role)]] | Full CRUD (create/delete/write) + `select` | Interviewers can define/maintain interview round rubrics themselves, not just execute them. |
 
 ## Mermaid: State/Flow
 ```mermaid

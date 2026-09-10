@@ -10,7 +10,11 @@ files themselves.
 
 Source: `hrms/hooks.py` lines 169–246. Grouped below by the doctype that FIRES the
 event (not by which module the handler function lives in — that's the point: it's
-cross-cutting).
+cross-cutting). Many of the events below (`on_submit`, `on_cancel`,
+`on_update_after_submit`) are the submit/cancel transitions defined generically in
+[[Submittable Document Lifecycle]]; several handlers also touch
+[[Employee Core Model|Employee]] fields directly, and the time-triggered counterpart
+to this event-driven layer is [[Background Jobs (Scheduler Events)]].
 
 ## `User`
 
@@ -44,7 +48,7 @@ cross-cutting).
 
 | Event | Handler | Effect |
 |---|---|---|
-| on_submit, on_cancel, on_update_after_submit | `hrms.hr.doctype.expense_claim.expense_claim.update_payment_for_expense_claim` | Recomputes the linked `Expense Claim`'s paid/outstanding amount and payment status. Same function for submit and cancel — it checks `docstatus` to decide direction. Full algorithm in `01-Modules/Expenses/Expense Claim.md`. |
+| on_submit, on_cancel, on_update_after_submit | `hrms.hr.doctype.expense_claim.expense_claim.update_payment_for_expense_claim` | Recomputes the linked [[Expense Claim]]'s paid/outstanding amount and payment status. Same function for submit and cancel — it checks `docstatus` to decide direction. Full algorithm in `01-Modules/Expenses/Expense Claim.md`. |
 
 ## `Unreconcile Payment` (core ERPNext)
 
@@ -58,11 +62,11 @@ cross-cutting).
 |---|---|---|
 | validate | `hrms.hr.doctype.expense_claim.expense_claim.validate_expense_claim_in_jv` | Validates a manually-created Journal Entry referencing an Expense Claim is consistent with it. |
 | on_submit | `hrms.hr.doctype.expense_claim.expense_claim.update_payment_for_expense_claim` | Same as Payment Entry's hook — a JE can also be the payment instrument for an Expense Claim. |
-| on_submit | `hrms.hr.doctype.full_and_final_statement.full_and_final_statement.update_full_and_final_statement_status` | Marks a `Full and Final Statement` as paid once its settlement JE is submitted. |
-| on_submit | `hrms.payroll.doctype.salary_withholding.salary_withholding.update_salary_withholding_payment_status` | Marks a `Salary Withholding` as released/paid once its JE is submitted. |
+| on_submit | `hrms.hr.doctype.full_and_final_statement.full_and_final_statement.update_full_and_final_statement_status` | Marks a [[Full and Final Statement]] as paid once its settlement JE is submitted. |
+| on_submit | `hrms.payroll.doctype.salary_withholding.salary_withholding.update_salary_withholding_payment_status` | Marks a [[Salary Withholding]] as released/paid once its JE is submitted. |
 | on_update_after_submit | `hrms.hr.doctype.expense_claim.expense_claim.update_payment_for_expense_claim` | Re-syncs if a submitted JE's amount/status is edited after submit. |
 | on_cancel | `hrms.hr.doctype.expense_claim.expense_claim.update_payment_for_expense_claim` | Reverses the payment-applied state on the Expense Claim. |
-| on_cancel | `hrms.payroll.doctype.salary_slip.salary_slip.unlink_ref_doc_from_salary_slip` | Removes the JE reference from any `Salary Slip` it was linked to. |
+| on_cancel | `hrms.payroll.doctype.salary_slip.salary_slip.unlink_ref_doc_from_salary_slip` | Removes the JE reference from any [[Salary Slip]] it was linked to. |
 | on_cancel | `hrms.hr.doctype.full_and_final_statement.full_and_final_statement.update_full_and_final_statement_status` | Reverses the F&F Statement's paid status. |
 | on_cancel | `hrms.payroll.doctype.salary_withholding.salary_withholding.update_salary_withholding_payment_status` | Reverses the Salary Withholding's paid status. |
 
@@ -80,26 +84,30 @@ firing doctype, several unrelated subscriber doctypes).
 
 ## `Employee` (core ERPNext, HRMS attaches most of its lifecycle logic here)
 
+See [[Employee Core Model]] for the field-level detail behind the handlers below, and
+[[Permission Model (RBAC)]] for how `leave_approver`/`expense_approver` role syncing
+feeds into approver-scoped row filtering.
+
 | Event | Handler | Effect |
 |---|---|---|
-| validate | `hrms.overrides.employee_master.validate_onboarding_process` | Blocks certain Employee edits/status changes while an `Employee Onboarding` is still in progress for them. |
+| validate | `hrms.overrides.employee_master.validate_onboarding_process` | Blocks certain Employee edits/status changes while an [[Employee Onboarding]] is still in progress for them. |
 | on_update | `hrms.overrides.employee_master.update_approver_role` | Ensures a newly-set `leave_approver`/`expense_approver` on this Employee holds the matching role (Employee-side trigger of the same policy as the `User` validate hook above). |
 | on_update | `hrms.overrides.employee_master.publish_update` | Publishes a realtime update event (e.g. for live-updating open UI showing this employee). |
-| after_insert | `hrms.overrides.employee_master.update_job_applicant_and_offer` | If this Employee was created from a hired candidate, links back to and updates the originating `Job Applicant`/`Job Offer` records. Full logic in `01-Modules/Recruitment/_Module-Spec.md`. |
+| after_insert | `hrms.overrides.employee_master.update_job_applicant_and_offer` | If this Employee was created from a hired candidate, links back to and updates the originating [[Job Applicant]]/[[Job Offer]] records. Full logic in `01-Modules/Recruitment/_Module-Spec.md`. |
 | after_insert | `hrms.telemetry.on_milestone_insert` | Internal analytics only. |
-| on_trash | `hrms.overrides.employee_master.update_employee_transfer` | Cleans up/updates any `Employee Transfer` records referencing this Employee if it's deleted. |
+| on_trash | `hrms.overrides.employee_master.update_employee_transfer` | Cleans up/updates any [[Employee Transfer]] records referencing this Employee if it's deleted. |
 | after_delete | `hrms.overrides.employee_master.publish_update` | Same realtime publish, for deletion. |
 
 ## `Project` / `Task` (core ERPNext, used as the Employee Onboarding/Separation checklist engine)
 
 | Event | Handler | Effect |
 |---|---|---|
-| Project validate | `hrms.controllers.employee_boarding_controller.update_employee_boarding_status` | Keeps an `Employee Onboarding`/`Employee Separation` record's overall status synced to the completion state of its underlying Project (HRMS models the onboarding/offboarding checklist AS a Project with Tasks). |
-| Task on_update | `hrms.controllers.employee_boarding_controller.update_task` | Syncs an `Employee Boarding Activity` row's completion state when its linked Task's status changes. |
+| Project validate | `hrms.controllers.employee_boarding_controller.update_employee_boarding_status` | Keeps an Employee Onboarding/[[Employee Separation]] record's overall status synced to the completion state of its underlying Project (HRMS models the onboarding/offboarding checklist AS a Project with Tasks). |
+| Task on_update | `hrms.controllers.employee_boarding_controller.update_task` | Syncs an [[Employee Boarding Activity]] row's completion state when its linked Task's status changes. |
 
 **Port note:** a port does not need to model onboarding as a generic "Project" — that's
 Frappe reusing an existing core doctype opportunistically. A port can model
-`Employee Onboarding`/`Employee Separation` with their own first-class checklist/task
+Employee Onboarding/Employee Separation with their own first-class checklist/task
 child table and skip the Project/Task indirection entirely; see
 `01-Modules/HR-Core/Employee Onboarding.md` Port Notes for the recommended direct
 shape.

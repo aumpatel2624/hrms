@@ -61,9 +61,9 @@ submit feedback), reusing the same source of truth as the validation.
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read/Export/Print/Report/Share/Email | Read-only — cannot create, edit, or submit feedback themselves; oversight only. |
-| Interviewer | Full CRUD + submit/cancel/export/print/report/share/email | The role expected to actually author feedback. |
-| HR User | Read/Export/Print/Report/Share/Email | Read-only, same as HR Manager. |
+| [[HR Manager]] | Read/Export/Print/Report/Share/Email | Read-only — cannot create, edit, or submit feedback themselves; oversight only. |
+| [[Interviewer (Role)]] | Full CRUD + submit/cancel/export/print/report/share/email | The role expected to actually author feedback. |
+| [[HR User]] | Read/Export/Print/Report/Share/Email | Read-only, same as HR Manager. |
 
 Enforced additionally in code (beyond the permission table): even an Interviewer with
 broad doctype-level rights can only submit feedback for interviews they are explicitly

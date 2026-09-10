@@ -44,9 +44,9 @@ An employee's self-service request to be put on a (non-default) shift for a peri
 
 | Role | Can Do | Notes |
 |---|---|---|
-| Employee | Create/Read/Write | Can raise and edit their own request while Draft; no submit right — `validate_status_change` additionally hard-blocks a non-approver from changing status away from Draft even via write, so an employee can't self-approve by editing the field. |
-| HR Manager | Full CRUD + Submit/Cancel/Amend | Can act as approver/administrator for any request. |
-| HR User | Create/Read/Submit | No delete/cancel/amend — mirrors Shift Assignment's HR User rights: can push requests through but not unwind them. |
+| [[Employee]] | Create/Read/Write | Can raise and edit their own request while Draft; no submit right — `validate_status_change` additionally hard-blocks a non-approver from changing status away from Draft even via write, so an employee can't self-approve by editing the field. |
+| [[HR Manager]] | Full CRUD + Submit/Cancel/Amend | Can act as approver/administrator for any request. |
+| [[HR User]] | Create/Read/Submit | No delete/cancel/amend — mirrors Shift Assignment's HR User rights: can push requests through but not unwind them. |
 
 ## Mermaid: State/Flow
 

@@ -4,7 +4,7 @@
 **Submittable:** no   **Tree:** no   **Naming:** `field:employee_type_name` (name = value of `employee_type_name`)
 **Module:** HR
 
-Simple master/lookup doctype: named categories of employment (e.g. "Full-time", "Contract", "Intern"), linked from `Employee.employment_type` (Employee doctype owned by HR-Core agent — referenced by name only).
+Simple master/lookup doctype: named categories of employment (e.g. "Full-time", "Contract", "Intern"), linked from `Employee.employment_type` (Employee doctype — see [[Employee Core Model]] — owned by HR-Core agent, referenced by name only).
 
 ## Schema
 
@@ -38,7 +38,7 @@ None (no-op controller).
 
 None.
 
-## Permissions
+## Permissions (see [[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -49,6 +49,10 @@ None.
 
 None.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — `Employee.employment_type` links to this doctype by name; renaming an `Employment Type` record cascades to every referencing Employee record.
+
 ## Port Notes
 
-- Naming-by-field (`field:employee_type_name`) means the primary key is the human-entered label; renaming cascades to every `Employee.employment_type` reference automatically under Frappe. A port using a surrogate integer/UUID key must instead expose a unique `name`/`code` column and handle rename-cascade (or FK-on-update-cascade) explicitly if it wants the same UX.
+- Naming-by-field (`field:employee_type_name`, see [[Naming and Autoname Rules]]) means the primary key is the human-entered label; renaming cascades to every `Employee.employment_type` reference automatically under Frappe. A port using a surrogate integer/UUID key must instead expose a unique `name`/`code` column and handle rename-cascade (or FK-on-update-cascade) explicitly if it wants the same UX.

@@ -12,27 +12,29 @@ Full field list, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes | — | No | |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | Yes | — | No | |
 | employee_name | Employee Name | Data | — | No | — | Yes | `fetch_from: employee.employee_name`. `in_list_view`. |
 | department | Department | Link | Department | No | — | Yes | `fetch_from: employee.department`. `in_list_view`. |
 | designation | Designation | Link | Designation | No | — | Yes | `fetch_from: employee.designation`. |
-| employee_grade | Employee Grade | Link | Employee Grade | No | — | Yes | `fetch_from: employee.grade`. |
+| employee_grade | Employee Grade | Link | [[Employee Grade]] | No | — | Yes | `fetch_from: employee.grade`. |
 | company | Company | Link | Company | Yes | — | No | *(column_break_7)* `fetch_from: employee.company`. |
 | boarding_status | Status | Select | Pending / In Process / Completed | No | `Pending` | Yes (`allow_on_submit:1`) | Same semantics as Employee Onboarding's `boarding_status` — driven by linked Project's `percent_complete` and by direct `db_set` on submit. |
 | resignation_letter_date | Resignation Letter Date | Date | — | No | — | Yes | `fetch_from: employee.resignation_letter_date`. `in_list_view`. Used as the linked Project's `expected_start_date` (see shared `on_submit` logic). |
 | boarding_begins_on | Separation Begins On | Date | — | Yes | — | No | Equivalent role to Onboarding's `boarding_begins_on` — base date for activity task-date offsets. |
 | project | Project | Link | Project | No | — | Yes | Set on submit, same as Onboarding. |
-| employee_separation_template | Employee Separation Template | Link | Employee Separation Template | No | — | No | Selecting this in the client script copies its activities into `activities` via `get_onboarding_details` (parenttype `Employee Separation Template`), and `frm.add_fetch` wires `company`/`department`/`designation`/`employee_grade` fetches from it (see Port Notes — this duplicates/could conflict with the `employee.*` fetch_from on those same fields; JSON-declared `fetch_from` wins server-side since `add_fetch` is a client-only convenience). |
-| activities | Activities | Table | Employee Boarding Activity | No | — | No | `allow_on_submit: 1`. See `Employee Boarding Activity.md`. |
+| employee_separation_template | Employee Separation Template | Link | [[Employee Separation Template]] | No | — | No | Selecting this in the client script copies its activities into `activities` via `get_onboarding_details` (parenttype `Employee Separation Template`), and `frm.add_fetch` wires `company`/`department`/`designation`/`employee_grade` fetches from it (see Port Notes — this duplicates/could conflict with the `employee.*` fetch_from on those same fields; JSON-declared `fetch_from` wins server-side since `add_fetch` is a client-only convenience). |
+| activities | Activities | Table | [[Employee Boarding Activity]] | No | — | No | `allow_on_submit: 1`. See `Employee Boarding Activity.md`. |
 | notify_users_by_email | Notify users by email | Check | — | No | `0` | No | `allow_on_submit: 1`. |
 | exit_interview | Exit Interview Summary | Text Editor | — | No | — | No | *(section_break_14)* Free-text field on this doctype — distinct from, and NOT automatically linked to, the separate `Exit Interview` doctype/records. No code in `employee_separation.py` populates this from an actual `Exit Interview` document. |
-| amended_from | Amended From | Link | Employee Separation | No | — | Yes | `no_copy`. |
+| amended_from | Amended From | Link | [[Employee Separation]] | No | — | Yes | `no_copy`. |
 
 ## Child Tables
 
 - `activities` → `Employee Boarding Activity` — see `Employee Boarding Activity.md` (identical schema/behavior to its use on Employee Onboarding; the only visibility difference is that `required_for_employee_creation` is hidden per its `depends_on` condition since `Employee Separation` is not in that condition's parenttype list, but the field/column still exists and is not read by any Employee Separation logic).
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]) run alongside the `boarding_status` field below.
 
 ```mermaid
 stateDiagram-v2
@@ -76,6 +78,8 @@ Identical formula to Employee Onboarding's task-date computation — see `Employ
 
 ## Lifecycle Hooks (exact)
 
+Includes cross-doctype [[Cross-Doctype Hooks (doc_events)|`doc_events`]] hooks (rows below prefixed "Cross-doctype:").
+
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
 | `validate` | `super().validate()` only (clear activity.task on amendment) | None. |
@@ -105,6 +109,13 @@ No `if_owner` or `permlevel` restrictions present in the JSON.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: linked via `employee`.
+- [[Employee Grade]] — via `employee_grade`: `fetch_from: employee.grade`.
+- [[Employee Separation Template]] — via `employee_separation_template`: Selecting this in the client script copies its activities into `activities` via `get_onboarding_details` (parenttype `Employee Separation Template`), and `frm.add_fetch` wires `company`/`department`/`designation`/`emp...
+- [[Employee Boarding Activity]] — via `activities`: `allow_on_submit: 1`. See `Employee Boarding Activity.md`.
 
 ## Port Notes
 

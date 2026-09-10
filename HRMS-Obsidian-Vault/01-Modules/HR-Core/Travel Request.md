@@ -45,7 +45,7 @@ A submittable record capturing an employee's request to travel for work — dome
 
 **Cancel/Amend.** No custom `on_cancel` logic; cancellation follows the standard Frappe pattern, and `amended_from` supports the standard cancel → amend → resubmit trail.
 
-**Cross-doctype note.** `hrms/overrides/dashboard_overrides.py` groups "Travel Request" together with "Expense Claim" and "Employee Advance" under an "Expense" dashboard link group — this is a UI/reporting grouping only, not a triggered business process.
+**Cross-doctype note.** `hrms/overrides/dashboard_overrides.py` groups "Travel Request" together with [[Expense Claim]] and "Employee Advance" under an "Expense" dashboard link group — this is a UI/reporting grouping only, not a triggered business process.
 
 Not enforced in code: there is no validation tying `costings` totals to `cost_center` budgets, no check that itinerary dates are sequential, and no linkage that automatically creates an Expense Claim or Employee Advance from this document.
 
@@ -53,7 +53,7 @@ Not enforced in code: there is no validation tying `costings` totals to `cost_ce
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, Write, Create, Delete, Submit/Cancel (via submittable doctype), Email, Print, Export, Report, Share | Only role defined in the doctype's own permissions; no HR-specific role (e.g., HR Manager/Employee) is granted access at the doctype level in this JSON — broader access, if any, would come from role permission managers or standard Employee self-service rules outside this file.
+| [[System Manager]] | Read, Write, Create, Delete, Submit/Cancel (via submittable doctype), Email, Print, Export, Report, Share | Only role defined in the doctype's own permissions; no HR-specific role (e.g., HR Manager/Employee) is granted access at the doctype level in this JSON — broader access, if any, would come from role permission managers or standard Employee self-service rules outside this file.
 
 ## Mermaid: State/Flow
 

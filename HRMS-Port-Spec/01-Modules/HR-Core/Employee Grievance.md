@@ -11,17 +11,17 @@ Field order per JSON `field_order` (note actual JSON field-array declaration ord
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | subject | Subject | Data | — | yes | — | no | |
-| raised_by | Raised By | Link | Employee | yes | — | no | |
+| raised_by | Raised By | Link | [[Employee Core Model|Employee]] | yes | — | no | |
 | employee_name | Employee Name | Data | — | no | — | yes | `fetch_from: "raised_by.employee_name"` |
 | designation | Designation | Link | Designation | no | — | yes | `fetch_from: "raised_by.designation"` |
 | *(column_break_3)* | — | Column Break | — | — | — | — | layout only |
 | date | Date  | Date | — | yes | — | no | |
 | status | Status | Select | `Open\nInvestigated\nResolved\nInvalid\nCancelled` | yes | `Open` | no | In list view |
-| reports_to | Reports To | Link | Employee | no | — | yes | `fetch_from: "raised_by.reports_to"`, `ignore_user_permissions: 1` |
+| reports_to | Reports To | Link | [[Employee Core Model|Employee]] | no | — | yes | `fetch_from: "raised_by.reports_to"`, `ignore_user_permissions: 1` |
 | *(grievance_details_section)* | Grievance Details | Section Break | — | — | — | — | section heading — groups: grievance_against_party, grievance_against, grievance_type |
 | grievance_against_party | Grievance Against Party | Link | DocType | yes | — | no | In list view. Client script restricts selectable DocTypes to `Company, Department, Employee Group, Employee Grade, Employee` (client-side query filter only — see Port Notes for required server-side equivalent). |
 | grievance_against | Grievance Against | Dynamic Link | dynamic — target doctype named by `grievance_against_party` | yes | — | no | Client script excludes `raised_by`'s own Employee record from the picklist when `grievance_against_party == "Employee"` (client-only filter — see Port Notes). |
-| grievance_type | Grievance Type | Link | Grievance Type | yes | — | no | In list view |
+| grievance_type | Grievance Type | Link | [[Grievance Type]] | yes | — | no | In list view |
 | *(column_break_11)* | — | Column Break | — | — | — | — | layout only |
 | associated_document_type | Associated Document Type | Link | DocType | no | — | no | Client script restricts to non-table, non-single DocTypes outside an "ignore modules" list (`Setup, Core, Integrations, Automation, Website, Utilities, Event Streaming, Social, Chat, Data Migration, Printing, Desk, Custom`) — client-only filter, see Port Notes. |
 | associated_document | Associated Document | Dynamic Link | dynamic — target doctype named by `associated_document_type` | no | — | no | |
@@ -32,10 +32,10 @@ Field order per JSON `field_order` (note actual JSON field-array declaration ord
 | *(resolution_details_section)* | Resolution Details | Section Break | — | — | — | — | section heading — groups: resolved_by, resolution_date, employee_responsible, resolution_detail |
 | resolved_by | Resolved By | Link | User | conditionally (see Notes) | — | no | `mandatory_depends_on: "eval: doc.status == \"Resolved\""` |
 | resolution_date | Resolution Date | Date | — | conditionally (see Notes) | — | no | `mandatory_depends_on: "eval: doc.status == \"Resolved\""` |
-| employee_responsible | Employee Responsible  | Link | Employee | no | — | no | |
+| employee_responsible | Employee Responsible  | Link | [[Employee Core Model|Employee]] | no | — | no | |
 | *(column_break_16)* | — | Column Break | — | — | — | — | layout only |
 | resolution_detail | Resolution Details | Small Text | — | conditionally (see Notes) | — | no | `mandatory_depends_on: "eval: doc.status == \"Resolved\""` |
-| amended_from | Amended From | Link | Employee Grievance | no | — | yes | `no_copy: 1`, `print_hide: 1` |
+| amended_from | Amended From | Link | [[Employee Grievance]] | no | — | yes | `no_copy: 1`, `print_hide: 1` |
 
 `title_field`: `subject`. `search_fields`: `subject,raised_by,grievance_against_party`. `sort_field`: `creation` DESC. `track_changes: 1` (version history is tracked by the framework — see Port Notes). `index_web_pages_for_search: 1`.
 
@@ -44,6 +44,8 @@ Field order per JSON `field_order` (note actual JSON field-array declaration ord
 None.
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]) run alongside the independent `status` field below.
 
 ```mermaid
 stateDiagram-v2
@@ -115,6 +117,11 @@ No `permlevel`-restricted fields on this doctype (unlike Employee Referral).
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` (`scheduler_events`) — no cron/job references `Employee Grievance`. No `doc_events` entry for `Employee Grievance` in `hooks.py` either.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `raised_by`: linked via `raised_by`.
+- [[Grievance Type]] — via `grievance_type`: In list view
 
 ## Port Notes
 

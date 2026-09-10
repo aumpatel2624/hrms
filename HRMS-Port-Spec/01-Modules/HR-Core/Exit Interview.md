@@ -11,7 +11,7 @@ Full field list, in JSON `field_order`:
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | naming_series | Naming Series | Select | `HR-EXIT-INT-` (single option) | No | — | No | Drives autoname. |
-| employee | Employee | Link | Employee | Yes | — | No | `in_list_view`, `in_standard_filter`. |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | Yes | — | No | `in_list_view`, `in_standard_filter`. |
 | employee_name | Employee Name | Data | — | No | — | Yes | `fetch_from: employee.employee_name`. |
 | email | Email ID | Data | Email | No | — | Yes | Set programmatically in `validate()` via `set_employee_email()` — NOT a `fetch_from` field. Also the doctype's `sender_field` (used for email-thread/append-to matching, `email_append_to: 1`). |
 | company | Company | Link | Company | Yes | — | No | *(column_break_5)* `in_standard_filter`. |
@@ -19,16 +19,16 @@ Full field list, in JSON `field_order`:
 | date | Date | Date | — | No (conditionally required) | — | No | `mandatory_depends_on: "eval:doc.status==='Scheduled';"`. `in_list_view`, `in_standard_filter`. This is the scheduled interview date; also written into `Employee.held_on` on submit. |
 | department | Department | Link | Department | No | — | Yes | *(employee_details_section)* `fetch_from: employee.department`. |
 | designation | Designation | Link | Designation | No | — | Yes | `fetch_from: employee.designation`. |
-| reports_to | Reports To | Link | Employee | No | — | Yes | `fetch_from: employee.reports_to`. `in_standard_filter`. |
+| reports_to | Reports To | Link | [[Employee Core Model|Employee]] | No | — | Yes | `fetch_from: employee.reports_to`. `in_standard_filter`. |
 | date_of_joining | Date of Joining | Date | — | No | — | Yes | *(column_break_9)* `fetch_from: employee.date_of_joining`. |
 | relieving_date | Relieving Date | Date | — | No | — | Yes | `fetch_from: employee.relieving_date`. `in_list_view`, `in_standard_filter`. Presence of a non-empty value on the linked Employee is a hard precondition validated in `validate()` (see below). |
 | ref_doctype | Reference Document Type | Link | DocType | No | — | No | *(exit_questionnaire_section)* Generic polymorphic reference — used together with `reference_document_name` (e.g. to link the interview to whatever record originated it). Not auto-populated by any code in this file. |
 | reference_document_name | Reference Document Name | Dynamic Link | (dynamic, per `ref_doctype`) | No | — | No | `in_list_view`. |
 | questionnaire_email_sent | Questionnaire Email Sent | Check | — | No | `0` | Yes | *(column_break_10)* `no_copy: 1`, `in_standard_filter`. Set to `1` via `db_set` only inside `send_exit_questionnaire` after a successful send. |
-| interviewers | Interviewers | Table MultiSelect | Interviewer | No (conditionally required) | — | No | `mandatory_depends_on: "eval:doc.status==='Scheduled';"`. Child rows are `Interviewer` (single field: `user` Link to User) — see Child Tables. |
+| interviewers | Interviewers | Table MultiSelect | [[Interviewer]] | No (conditionally required) | — | No | `mandatory_depends_on: "eval:doc.status==='Scheduled';"`. Child rows are `Interviewer` (single field: `user` Link to User) — see Child Tables. |
 | interview_summary | Interview Summary | Text Editor | — | No | — | No | *(interview_summary_section)* Free text; no validation tied to it. |
 | employee_status | Final Decision | Select | (blank) / Employee Retained / Exit Confirmed | No (conditionally required) | — | No | *(employee_status_section)* `mandatory_depends_on: "eval:doc.status==='Completed';"`. `in_list_view`, `in_standard_filter`. |
-| amended_from | Amended From | Link | Exit Interview | No | — | Yes | `no_copy`, `print_hide`. |
+| amended_from | Amended From | Link | [[Exit Interview]] | No | — | Yes | `no_copy`, `print_hide`. |
 
 ## Child Tables
 
@@ -43,6 +43,8 @@ Full field list, in JSON `field_order`:
   This is a module-scoped, single-purpose child doctype used only by this multiselect field; no dedicated file is written for it per the port spec's guidance to inline simple child schemas (it is documented here in full).
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]) run alongside the `status` field below.
 
 ```mermaid
 stateDiagram-v2
@@ -145,6 +147,11 @@ No `if_owner` or `permlevel` restrictions present in the JSON.
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py` `scheduler_events`.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: `in_list_view`, `in_standard_filter`.
+- [[Interviewer]] — via `interviewers`: `mandatory_depends_on: "eval:doc.status==='Scheduled';"`. Child rows are `Interviewer` (single field: `user` Link to User) — see Child Tables.
 
 ## Port Notes
 

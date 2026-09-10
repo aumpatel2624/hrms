@@ -28,7 +28,7 @@ Employee Grievance records a formal complaint raised by an employee against a pa
 ## Relationships
 
 - [[Grievance Type]] — linked to; categorizes the grievance.
-- Employee — linked to (outside assigned doctype set) via `raised_by`, `employee_responsible`, `reports_to`.
+- [[Employee]] — linked to via `raised_by`, `employee_responsible`, `reports_to`.
 - Any DocType (via `grievance_against_party`/`grievance_against` and `associated_document_type`/`associated_document`) — dynamically linked to, not a fixed doctype.
 
 ## Logic — What Happens and Why
@@ -45,10 +45,10 @@ There is no `on_cancel` override — cancelling a submitted grievance does not t
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete, submit, cancel, amend, select | Full control. |
-| HR Manager | Read, write, create, delete, submit, cancel, amend, select | Full control. |
-| HR User | Read, write, create, delete | No submit/cancel/amend. |
-| Employee | Read, write, create, delete | No submit/cancel/amend — can raise/edit their own grievances but not finalize them. |
+| [[System Manager]] | Read, write, create, delete, submit, cancel, amend, select | Full control. |
+| [[HR Manager]] | Read, write, create, delete, submit, cancel, amend, select | Full control. |
+| [[HR User]] | Read, write, create, delete | No submit/cancel/amend. |
+| [[Employee]] | Read, write, create, delete | No submit/cancel/amend — can raise/edit their own grievances but not finalize them. |
 
 ## Mermaid: State/Flow
 

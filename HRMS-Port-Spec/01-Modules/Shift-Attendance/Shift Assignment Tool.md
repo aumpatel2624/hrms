@@ -12,15 +12,15 @@
 | column_break_dnmy | (Column) | Column Break | — | — | — | — | |
 | company | Company | Link | Company | yes | — | no | in_list_view |
 | shift_assignment_details_section | Shift Assignment Details | Section Break | — | — | — | — | `depends_on: eval:doc.action === "Assign Shift" || doc.action === "Assign Shift Schedule"` |
-| shift_type | Shift Type | Link | Shift Type | conditionally (`mandatory_depends_on` action=="Assign Shift") | — | no | in_list_view |
-| shift_schedule | Shift Schedule | Link | Shift Schedule | conditionally (`mandatory_depends_on` action=="Assign Shift Schedule") | — | no | `depends_on` same condition |
-| shift_location | Shift Location | Link | Shift Location | no | — | no | applies to both Assign Shift and Assign Shift Schedule actions |
+| shift_type | Shift Type | Link | [[Shift Type]] | conditionally (`mandatory_depends_on` action=="Assign Shift") | — | no | in_list_view |
+| shift_schedule | Shift Schedule | Link | [[Shift Schedule]] | conditionally (`mandatory_depends_on` action=="Assign Shift Schedule") | — | no | `depends_on` same condition |
+| shift_location | Shift Location | Link | [[Shift Location]] | no | — | no | applies to both Assign Shift and Assign Shift Schedule actions |
 | status | Status | Select | Active/Inactive | no | Active | no | description: "When set to 'Inactive', employees with conflicting active shifts will not be excluded." |
 | column_break_ybmd | (Column) | Column Break | — | — | — | — | |
 | start_date | Start Date | Date | — | conditionally (mandatory for Assign Shift / Assign Shift Schedule) | — | no | in_list_view |
 | end_date | End Date | Date | — | no | — | no | |
 | shift_request_filters_section | Shift Request Filters | Section Break | — | — | — | — | `depends_on: eval:doc.action === "Process Shift Requests"` |
-| shift_type_filter | Shift Type | Link | Shift Type | no | — | no | filters the Shift Request list for "Process Shift Requests" |
+| shift_type_filter | Shift Type | Link | [[Shift Type]] | no | — | no | filters the Shift Request list for "Process Shift Requests" |
 | approver | Approver | Link | User | no | — | no | filters the Shift Request list |
 | column_break_gwjg | (Column) | Column Break | — | — | — | — | |
 | from_date | From Date | Date | — | no | — | no | description: "Shift Requests ending before this date will be excluded." |
@@ -30,8 +30,8 @@
 | department | Department | Link | Department | no | — | no | quick filter |
 | designation | Designation | Link | Designation | no | — | no | quick filter |
 | column_break_zius | (Column) | Column Break | — | — | — | — | |
-| grade | Employee Grade | Link | Employee Grade | no | — | no | quick filter |
-| employment_type | Employment Type | Link | Employment Type | no | — | no | quick filter |
+| grade | Employee Grade | Link | [[Employee Grade]] | no | — | no | quick filter |
+| employment_type | Employment Type | Link | [[Employment Type]] | no | — | no | quick filter |
 | advanced_filters_section | Advanced Filters | Section Break | — | — | — | — | collapsible |
 | filter_list | Filter List | HTML | — | — | — | — | client-rendered filter-group builder (`hrms.setup_employee_filter_group`) |
 | select_rows_section | Select Employees | Section Break | — | — | — | — | |
@@ -76,13 +76,13 @@ No `validate()` override on the controller. Validation happens inline inside the
 
 ### `get_query_for_employees_with_shifts()` — subquery of employees who already have a conflicting Shift Assignment
 
-1. Distinct `employee` from Active, submitted Shift Assignments where the date range overlaps `[start_date, end_date or open-ended]` (`end_date >= start_date` OR end_date unset; AND if `end_date` given, `start_date <= end_date`).
+1. Distinct `employee` from Active, submitted [[Shift Assignment]]s where the date range overlaps `[start_date, end_date or open-ended]` (`end_date >= start_date` OR end_date unset; AND if `end_date` given, `start_date <= end_date`).
 2. IF `allow_multiple_shifts` is enabled: further restrict this exclusion subquery to ONLY those existing assignments whose Shift Type timing actually overlaps the tool's selected `shift_type` (via `get_query_checking_overlapping_shift_timings`) — i.e. when multiple shifts are globally allowed, an employee is only excluded from the "assignable" list if their existing shift's time window would truly clash with the new one, not merely because they have *any* other active shift.
 
 ### `get_query_for_employees_with_same_shift_schedule()` — analogous exclusion for "Assign Shift Schedule" action
 
 1. `days = Assignment Rule Day` rows where `parent = self.shift_schedule` (the days this new schedule would repeat on).
-2. Distinct `employee` from enabled `Shift Schedule Assignment` rows whose linked `Shift Schedule`'s `repeat_on_days` includes ANY of `days` (i.e. any day-of-week overlap between the new schedule and an existing enabled schedule assignment for that employee).
+2. Distinct `employee` from enabled [[Shift Schedule Assignment]] rows whose linked `Shift Schedule`'s `repeat_on_days` includes ANY of `days` (i.e. any day-of-week overlap between the new schedule and an existing enabled schedule assignment for that employee).
 3. IF `allow_multiple_shifts` enabled: further restrict via `get_query_checking_overlapping_shift_timings` comparing the new schedule's `shift_type` timing against the existing schedule's `shift_type` timing.
 
 ### `get_query_checking_overlapping_shift_timings(query, doctype, shift_type)` — shared overlap-timing filter builder
@@ -93,7 +93,7 @@ No `validate()` override on the controller. Validation happens inline inside the
 
 ### `get_shift_requests(filters)` — for "Process Shift Requests" action
 
-1. Inner-join Employee (matching `filters`) to `Shift Request` where `status == "Draft"`.
+1. Inner-join Employee (matching `filters`) to [[Shift Request]] where `status == "Draft"`.
 2. Optionally filter by `shift_type_filter`, `approver`, `from_date` (`to_date >= from_date` OR to_date unset), `to_date` (`from_date <= to_date`).
 3. Apply Employee row-level permission conditions.
 4. For each result row, prefix `employee_name` with `"{employee}: "` and attach a rendered link (`get_link_to_form`) as `shift_request`.
@@ -154,3 +154,13 @@ None. (This tool's bulk actions are always user-triggered, either synchronously 
 - **`get_query_for_employees_with_shifts`/`get_query_for_employees_with_same_shift_schedule`'s exclusion logic changes shape entirely based on the site-wide `HR Settings.allow_multiple_shift_assignments` toggle** — without it, ANY existing active shift (regardless of timing) excludes an employee from the assignable list; with it, only a *timing-overlapping* existing shift excludes them. A port must implement both branches, not just the timing-aware one, since disabling the setting is a valid, common configuration.
 - **Bulk-assigning a Shift Schedule via this tool immediately calls `create_shifts` synchronously** (inside `_bulk_assign`, itself possibly already running as a background job for >30 employees) — meaning the port's initial Shift Assignment records for a new schedule are generated eagerly at assignment time, not solely by the deferred `process_auto_shift_creation` scheduler job; the two paths must produce assignments using the exact same `create_shifts` algorithm (see `Shift Schedule Assignment.md`) to avoid divergent behavior between "assign now via tool" and "let the schedule catch up via cron".
 - **Per-item savepoint + continue-on-error semantics** for both bulk operations — a port's batch-job runner needs equivalent per-row transaction isolation (one employee/request's failure doesn't roll back or block the others), with a final success/failure summary surfaced back to the initiating user (source uses Frappe's realtime pub/sub for this; a port needs an equivalent async progress/notification channel).
+
+## Related Doctypes
+
+- [[Shift Type]] — `shift_type`/`shift_type_filter` select the shift to assign or the shift used to filter Shift Requests.
+- [[Shift Schedule]] — `shift_schedule` selects the recurring schedule to bulk-assign.
+- [[Shift Location]] — optional geofence location applied to bulk-created assignments.
+- [[Shift Assignment]] — this tool bulk-creates these via `create_shift_assignment`.
+- [[Shift Schedule Assignment]] — this tool bulk-creates these via `create_shift_schedule_assignment` for the "Assign Shift Schedule" action.
+- [[Shift Request]] — this tool bulk-approves/rejects these via the "Process Shift Requests" action.
+- [[Employee Grade]] / [[Employment Type]] — optional quick filters for the employee candidate list.

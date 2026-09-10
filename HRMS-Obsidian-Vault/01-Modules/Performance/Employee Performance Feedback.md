@@ -46,10 +46,10 @@ A submittable record of one reviewer's feedback (ratings across criteria plus fr
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read, write, create, submit, cancel, delete, amend, export | Full control. |
-| Employee | read, write, create, submit, cancel | Can create and submit feedback (as a reviewer) but not delete or amend. |
-| HR Manager | read, write, create, submit, cancel, export | Same operational rights as Employee plus export; no delete/amend listed. |
-| HR User | read, export | Read-only visibility. |
+| [[System Manager]] | read, write, create, submit, cancel, delete, amend, export | Full control. |
+| [[Employee]] | read, write, create, submit, cancel | Can create and submit feedback (as a reviewer) but not delete or amend. |
+| [[HR Manager]] | read, write, create, submit, cancel, export | Same operational rights as Employee plus export; no delete/amend listed. |
+| [[HR User]] | read, export | Read-only visibility. |
 
 ## Mermaid: State/Flow
 

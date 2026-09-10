@@ -89,9 +89,9 @@ There is no submit/cancel workflow — `Open`/`Closed` are plain field values.
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + email/export/print/report/share | — |
-| HR User | Read/Write/Create/Print/Report/Share/Email | No delete. |
-| HR Manager | Full CRUD + email/export/print/report/share | — |
+| [[System Manager]] | Full CRUD + email/export/print/report/share | — |
+| [[HR User]] | Read/Write/Create/Print/Report/Share/Email | No delete. |
+| [[HR Manager]] | Full CRUD + email/export/print/report/share | — |
 | Guest | Read (via `allow_guest_to_view: 1`, website generator) | Public candidates view published openings without login; gated by `is_published_field: publish`. |
 
 ## Mermaid: State/Flow

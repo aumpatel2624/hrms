@@ -58,9 +58,9 @@ Records the final financial settlement between the company and an employee who i
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, Write, Create, Delete | Full access, no submit/cancel rights explicitly granted. |
-| HR User | Read, Write, Create, Delete | Same as System Manager — no submit right. |
-| HR Manager | Read, Write, Create, Delete, Submit, Cancel | Only role that can submit/cancel — enforces that final settlement finalization is an HR Manager action. |
+| [[System Manager]] | Read, Write, Create, Delete | Full access, no submit/cancel rights explicitly granted. |
+| [[HR User]] | Read, Write, Create, Delete | Same as System Manager — no submit right. |
+| [[HR Manager]] | Read, Write, Create, Delete, Submit, Cancel | Only role that can submit/cancel — enforces that final settlement finalization is an HR Manager action. |
 
 ## Mermaid: State/Flow
 

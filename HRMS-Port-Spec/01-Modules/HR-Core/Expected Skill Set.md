@@ -10,7 +10,7 @@ This doctype folder exists exactly as named under `hrms/hr/doctype/expected_skil
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| skill | Skill | Link | Skill | yes (`reqd: 1`) | — | no | `in_list_view: 1` |
+| skill | Skill | Link | [[Skill]] | yes (`reqd: 1`) | — | no | `in_list_view: 1` |
 | description | Description | Small Text | — | no | — | no | `in_list_view: 1`; `fetch_from: "skill.description"` — auto-copied from the linked `Skill.description` |
 
 `field_order`: `["skill", "description"]`.
@@ -56,6 +56,10 @@ None defined directly on this child doctype. Note (cross-doctype, for context on
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Skill]] — via `skill`: `in_list_view: 1`
 
 ## Port Notes
 

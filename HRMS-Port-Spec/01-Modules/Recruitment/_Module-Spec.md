@@ -10,14 +10,14 @@ applicants are scheduled through one or more interview rounds (`Interview`, driv
 reusable `Interview Type`, staffed by `Interviewer` rows and scored via `Interview
 Detail` / `Interview Feedback`), and a selected applicant receives a formal offer
 (`Job Offer`, built from `Job Offer Term` lines optionally seeded from a `Job Offer
-Term Template`). Accepting the offer (via Employee creation) feeds back into
-`Job Applicant`/`Job Offer` status through an Employee-side hook. A public, unauthenticated
+Term Template`). Accepting the offer (via [[Employee Core Model|Employee]] creation) feeds back into
+`Job Applicant`/`Job Offer` status through an Employee-side [[Cross-Doctype Hooks (doc_events)|hook]]. A public, unauthenticated
 job board (`hrms/www/jobs/index.py`) exposes open, published Job Openings to external
 candidates. A daily scheduled job auto-closes expired Job Openings and cascades that
 back to the Job Requisition's fill status.
 
 > [!note] Skill Assessment / Expected Skill Set live under HR-Core's output folder
-> `Skill Assessment` and `Expected Skill Set` are functionally part of this module's
+> [[Skill Assessment]] and [[Expected Skill Set]] are functionally part of this module's
 > Interview Feedback / Interview Type flow (assessing a candidate/interviewer against
 > expected skills), but they physically sit under `hr/doctype` alongside HR-Core's
 > skill doctypes and were documented there (`01-Modules/HR-Core/Skill Assessment.md`,
@@ -29,19 +29,19 @@ back to the Job Requisition's fill status.
 
 | Doctype | Purpose |
 |---|---|
-| `Job Requisition` | Internal request to hire for a Designation; approval gate before a Job Opening can reference it; tracks time-to-fill. |
-| `Job Opening` | A postable vacancy (internal and/or public job-board listing) for a Designation/Department; can auto-close on `closes_on`. |
-| `Job Opening Template` | Reusable template of description/salary-range/employment defaults to prefill a new Job Opening. |
-| `Job Applicant` | A candidate record captured against a Job Opening/Designation; central pipeline status field driving Interview/Job Offer creation. |
-| `Job Applicant Source` | Simple lookup list of where an applicant came from (referral, website, agency, etc.). |
-| `Interview Type` | Reusable interview-round definition (name, interviewer list defaults, skill list) — as of v16 this doctype absorbed the former `Interview Round` doctype via a merge patch. |
-| `Interviewer` | Child table row (interviewer Employee/User) attached to `Interview Type` and to `Interview`. |
-| `Interview` | A single scheduled interview round instance for a Job Applicant against an Interview Type; submittable; aggregates `Interview Feedback` into an average rating. |
-| `Interview Detail` | Child table on `Interview` listing the interviewers assigned to that specific interview instance and their individual feedback linkage. |
-| `Interview Feedback` | Submittable per-interviewer scorecard for one `Interview`, with per-skill ratings and an overall recommendation (result). |
-| `Job Offer` | Submittable formal offer document issued to a Job Applicant; carries offer terms; status flow through Awaiting/Accepted/Rejected/Withdrawn. |
-| `Job Offer Term` | Child table row on `Job Offer` (term label + value), also the row shape used inside `Job Offer Term Template`. |
-| `Job Offer Term Template` | Reusable named set of `Job Offer Term` rows to prefill a new Job Offer. |
+| [[Job Requisition]] | Internal request to hire for a Designation; approval gate before a Job Opening can reference it; tracks time-to-fill. |
+| [[Job Opening]] | A postable vacancy (internal and/or public job-board listing) for a Designation/Department; can auto-close on `closes_on`. |
+| [[Job Opening Template]] | Reusable template of description/salary-range/employment defaults to prefill a new Job Opening. |
+| [[Job Applicant]] | A candidate record captured against a Job Opening/Designation; central pipeline status field driving Interview/Job Offer creation. |
+| [[Job Applicant Source]] | Simple lookup list of where an applicant came from (referral, website, agency, etc.). |
+| [[Interview Type]] | Reusable interview-round definition (name, interviewer list defaults, skill list) — as of v16 this doctype absorbed the former `Interview Round` doctype via a merge patch. |
+| [[Interviewer]] | Child table row (interviewer Employee/User) attached to `Interview Type` and to `Interview`. |
+| [[Interview]] | A single scheduled interview round instance for a Job Applicant against an Interview Type; submittable; aggregates `Interview Feedback` into an average rating. |
+| [[Interview Detail]] | Child table on `Interview` listing the interviewers assigned to that specific interview instance and their individual feedback linkage. |
+| [[Interview Feedback]] | Submittable per-interviewer scorecard for one `Interview`, with per-skill ratings and an overall recommendation (result). |
+| [[Job Offer]] | Submittable formal offer document issued to a Job Applicant; carries offer terms; status flow through Awaiting/Accepted/Rejected/Withdrawn. |
+| [[Job Offer Term]] | Child table row on `Job Offer` (term label + value), also the row shape used inside `Job Offer Term Template`. |
+| [[Job Offer Term Template]] | Reusable named set of `Job Offer Term` rows to prefill a new Job Offer. |
 
 Confirmed: there is **no** separate `Interview Round` doctype folder under
 `hrms/hr/doctype/` — `hrms/patches/v16_0/merge_interview_round_with_interview_type.py`
@@ -194,16 +194,19 @@ Notes on the schema above:
   and any series on `Interview`/`Interview Feedback`/`Job Offer` — confirm exact prefix
   per file) as an application-level auto-incrementing formatted ID generator; this is
   not automatic in a generic RDBMS and must be implemented explicitly (e.g. a sequence
-  table keyed by prefix+fiscal segment, guarded against races).
+  table keyed by prefix+fiscal segment, guarded against races). See
+  [[Naming and Autoname Rules]].
 - `docstatus` (submittable lifecycle: 0 Draft / 1 Submitted / 2 Cancelled) plus the
   `amended_from` self-link (a cancelled submitted doc can be "amended" into a fresh
   Draft copy that links back to the cancelled one) apply to `Interview`,
   `Interview Feedback`, and `Job Offer`. This three-state lifecycle plus amend-chain
   must be built explicitly in a new stack — Frappe provides `docstatus`,
-  auto-numbering, `amended_from` linking, and cancel-permission checks for free.
+  auto-numbering, `amended_from` linking, and cancel-permission checks for free. See
+  [[Submittable Document Lifecycle]].
 - `track_changes` (Frappe's automatic field-level audit trail) is relied on implicitly
   wherever a doctype JSON sets it — check each per-doctype file's Port Notes for
-  whether it's enabled; if so, a port needs an explicit version/audit table.
+  whether it's enabled; if so, a port needs an explicit version/audit table. See
+  [[Implicit Framework Behaviors]].
 
 ## Module-Wide Invariants
 

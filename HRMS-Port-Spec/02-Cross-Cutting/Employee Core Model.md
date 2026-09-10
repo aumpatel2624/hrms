@@ -23,16 +23,16 @@ real, exact fields a port MUST include on its Employee table:
 | `health_insurance_provider` | Link | Employee Health Insurance | |
 | `health_insurance_no` | Data | — | `depends_on: eval:doc.health_insurance_provider` |
 | `approvers_section` | Section Break | — | UI grouping only. |
-| `expense_approver` | Link | User | `ignore_user_permissions: 1` — the field driving `Expense Approver` scoping (see `Permission Model (RBAC).md`). |
+| `expense_approver` | Link | User | `ignore_user_permissions: 1` — the field driving `Expense Approver` scoping (see [[Permission Model (RBAC)]]). |
 | `leave_approver` | Link | User | Same pattern, drives `Leave Approver` scoping. |
 | `shift_request_approver` | Link | User | Same pattern, for Shift Request approval. |
 | `employee_advance_account` | Link | Account | |
 | `payroll_cost_center` | Link | Cost Center | `fetch_from: department.payroll_cost_center`, `fetch_if_empty: 1` — auto-populated from the Employee's Department when empty, NOT force-overwritten if manually set. |
 
 Also on **Department** (`hrms/setup.py`, same function): `leave_approvers` (Table,
-options `Department Approver`) and `expense_approvers` (Table, options
+options [[Department Approver]]) and `expense_approvers` (Table, options
 `Department Approver`) — these back the "Department Approver fallback" scoping rule
-documented in `Permission Model (RBAC).md` and in `01-Modules/HR-Core/Department Approver.md`.
+documented in [[Permission Model (RBAC)]] and in `01-Modules/HR-Core/Department Approver.md`.
 
 Also on **Designation**: `appraisal_template` (Link to Appraisal Template — a
 Designation can suggest a default appraisal template) and `skills` (Table, options
@@ -50,16 +50,16 @@ sufficient, since it covers everything this app's own logic touches.
 
 | Field (fieldname) | Likely Type | Notes |
 |---|---|---|
-| `employee` / `name` | Data (naming series or field-based) | Primary key, referenced as `employee` Link target from virtually every doctype in this app. |
+| `employee` / `name` | Data (naming series or field-based) | Primary key, generated per [[Naming and Autoname Rules]], referenced as `employee` Link target from virtually every doctype in this app. |
 | `employee_name` | Data | Denormalized full name, `fetch_from`'d onto most child/related doctypes for display. |
 | `user_id` | Link (User) | Connects an Employee record to a login account — this is what `frappe.session.user` is resolved against for all self-service scoping. |
-| `status` | Select | Active / Inactive / Suspended / Left — gates `validate_active_employee` checks across Timesheet, Leave, Attendance, etc. |
+| `status` | Select | Active / Inactive / Suspended / Left — gates `validate_active_employee` checks across Timesheet, Leave, [[Attendance]], etc. (see also [[Cross-Doctype Hooks (doc_events)]]'s `Timesheet` validate hook). |
 | `company` | Link (Company) | Scopes almost every transaction; used in `company_data_to_be_ignored` cleanup logic. |
 | `department` | Link (Department) | Drives Department Approver fallback and `payroll_cost_center` fetch. |
 | `designation` | Link (Designation) | Drives `appraisal_template` default and `Designation Skill` expected-skills matching. |
 | `branch` | Link (Branch) | Referenced in HR Setup workspace; `grade` field is inserted `after: branch`. |
 | `reports_to` | Link (Employee, self-referential) | Org chart hierarchy; likely used for a manager-based approval fallback in some contexts. |
-| `date_of_joining` | Date | Used for proration in Salary Slip, tenure checks for Gratuity eligibility, "New Hires" dashboard counts. |
+| `date_of_joining` | Date | Used for proration in [[Salary Slip]], tenure checks for Gratuity eligibility, "New Hires" dashboard counts. |
 | `relieving_date` | Date | Set on separation; used for F&F Statement and final Salary Slip proration. |
 | `holiday_list` | Link (Holiday List) | Per-employee override of which Holiday List applies; `default_shift` field is inserted `after: holiday_list`. |
 | `salary_mode` | Select | Bank/Cash/Cheque; `employee_advance_account` field inserted `after: salary_mode`. |
@@ -77,7 +77,7 @@ feature set actually reads — cross-check each module's own doctype specs under
 `01-Modules/` for the exact subset of Employee fields THAT module's logic reads, and
 make sure your Employee table has all of them before wiring that module up.
 
-See also: `Permission Model (RBAC).md` (self/approver scoping keys off `user_id`,
-`leave_approver`, `expense_approver`), `Cross-Doctype Hooks (doc_events).md` (the
+See also: [[Permission Model (RBAC)]] (self/approver scoping keys off `user_id`,
+`leave_approver`, `expense_approver`), [[Cross-Doctype Hooks (doc_events)]] (the
 `Employee` event handlers), `HRMS-Obsidian-Vault/03-Flows/Hire to Retire Overview.md`
 (narrative context for why Employee is the hub).

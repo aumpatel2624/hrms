@@ -69,9 +69,9 @@ A one-off or recurring adjustment to an employee's pay outside their normal Sala
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/submit/cancel/amend | Full control. |
-| HR User | read/write/create/submit | No delete/cancel/amend rights per the doctype JSON. |
-| HR Manager | read/write/create/submit | Same rights as HR User in this doctype's permission list (no delete/cancel listed). |
+| [[System Manager]] | read/write/create/delete/submit/cancel/amend | Full control. |
+| [[HR User]] | read/write/create/submit | No delete/cancel/amend rights per the doctype JSON. |
+| [[HR Manager]] | read/write/create/submit | Same rights as HR User in this doctype's permission list (no delete/cancel listed). |
 
 ## Mermaid: State/Flow
 

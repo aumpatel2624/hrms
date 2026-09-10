@@ -29,14 +29,14 @@ check in the controller, not just the role alone.
 | [[Goal]], [[Appraisal]] (self-appraisal section) | read/update own | as participant in the active [[Appraisal Cycle]] |
 | [[Employee Performance Feedback]] | give feedback | when nominated as a reviewer for a peer |
 | [[Exit Interview]] | fill own | when triggered by their own [[Employee Separation]] |
-| Salary Slip, F&F Statement | read only | own record, never write |
+| [[Salary Slip]], [[Full and Final Statement\|F&F Statement]] | read only | own record, never write |
 
 ## What This Role Cannot Do
 
 - Cannot approve their own [[Leave Application]], [[Expense Claim]], [[Attendance Request]],
   or [[Shift Request]] — approval requires [[Leave Approver]] / [[Expense Approver]] role
   and being named on the Employee's `leave_approver`/`expense_approver` field (or
-  Department Approver fallback — see [[Department Approver]]).
+  [[Department Approver]] fallback).
 - Cannot create/edit [[Salary Structure]], [[Salary Component]], [[Leave Policy]], or any
   master/setup doctype.
 - Cannot run [[Payroll Entry]] or view other employees' Salary Slips.

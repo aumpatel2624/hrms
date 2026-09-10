@@ -9,14 +9,14 @@
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(details_section)* | Details | Section Break | — | — | — | — | |
-| interview | Interview | Link | Interview | yes (`reqd`) | — | no | in list view + standard filter; `allow_in_quick_entry: 1` |
-| interview_type | Interview Type | Link | Interview Type | yes (`reqd`) | — | yes (read_only) | `fetch_from: interview.interview_type`; `allow_in_quick_entry: 1`; in list view + standard filter |
-| job_applicant | Job Applicant | Link | Job Applicant | no | — | yes (read_only) | `fetch_from: interview.job_applicant`; in list view + standard filter |
+| interview | Interview | Link | [[Interview]] | yes (`reqd`) | — | no | in list view + standard filter; `allow_in_quick_entry: 1` |
+| interview_type | Interview Type | Link | [[Interview Type]] | yes (`reqd`) | — | yes (read_only) | `fetch_from: interview.interview_type`; `allow_in_quick_entry: 1`; in list view + standard filter |
+| job_applicant | Job Applicant | Link | [[Job Applicant]] | no | — | yes (read_only) | `fetch_from: interview.job_applicant`; in list view + standard filter |
 | *(column_break_3)* | — | Column Break | — | — | — | — | |
 | interviewer | Interviewer | Link | User | yes (`reqd`) | — | no | in list view + standard filter; `allow_in_quick_entry: 1`; also the doctype's `title_field` |
 | result | Result | Select | (blank) / Cleared / Rejected | yes (`reqd`) | — | no | in list view + standard filter |
 | *(section_break_4)* | Skill Assessment | Section Break | — | — | — | — | |
-| skill_assessment | (unlabeled, inherits section label "Skill Assessment") | Table | Skill Assessment (child) | yes (`reqd`) | — | no | `allow_in_quick_entry: 1`; see Child Tables |
+| skill_assessment | (unlabeled, inherits section label "Skill Assessment") | Table | [[Skill Assessment]] (child) | yes (`reqd`) | — | no | `allow_in_quick_entry: 1`; see Child Tables |
 | average_rating | Average Rating | Rating | — | no | — | yes (read_only) | in list view; computed — see Business Logic |
 | *(section_break_7)* | Feedback | Section Break | — | — | — | — | |
 | feedback | (unlabeled, inherits section label "Feedback") | Text | — | no | — | no | `allow_in_quick_entry: 1` |
@@ -30,7 +30,7 @@ Doctype-level flags: `editable_grid: 1`, `index_web_pages_for_search: 1`, `quick
 
   | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
   |---|---|---|---|---|---|---|---|
-  | skill | Skill | Link | Skill | yes (`reqd: 1`) | — | yes (read_only) | in_list_view |
+  | skill | Skill | Link | [[Skill]] | yes (`reqd: 1`) | — | yes (read_only) | in_list_view |
   | rating | Rating | Rating | — | yes (`reqd: 1`) | — | no | in_list_view; the per-skill score the interviewer assigns |
 
   Rows are typically seeded from `Interview Type.expected_skill_set` (via `Interview.get_expected_skill_set`, called from `interview_feedback.js`'s `interview_type` handler) and then each row's `rating` is filled in by the interviewer.
@@ -53,6 +53,8 @@ Plain list of (from_state, event, to_state, guard condition):
 | 0 (Draft) | `submit` | 1 (Submitted) | `validate_interview_date` additionally enforced with `self.docstatus == 1` context (see Rule 2) — no separate `on_submit`/`before_submit` guard beyond `validate` re-running |
 | 1 (Submitted) | `cancel` | 2 (Cancelled) | none beyond standard Frappe cancel permission checks |
 | 2 (Cancelled) | `amend` | 0 (Draft, new doc) | standard Frappe amend flow |
+
+See [[Submittable Document Lifecycle]] for the general draft/submit/cancel/amend mechanics this doctype follows.
 
 No explicit `status`/`workflow_state` field on this doctype — its `result` field (Cleared/Rejected) is a business-outcome field, not a workflow state, and docstatus is the only state machine.
 
@@ -91,7 +93,7 @@ No explicit `status`/`workflow_state` field on this doctype — its `result` fie
 
 ### Scheduled Job: `send_daily_feedback_reminder`
 
-**Source:** the function itself lives in `hrms/hr/doctype/interview/interview.py` (not in `interview_feedback.py` — cross-referenced here per the assignment's routing since it is conceptually about interview-feedback compliance nagging; see `Interview.md` for the sibling `send_interview_reminder` job which lives in the same source file). Registered in `hrms/hooks.py` under `scheduler_events["daily"]` — runs **once per day** (Frappe's default daily cron time, typically midnight site time unless reconfigured).
+**Source:** the function itself lives in `hrms/hr/doctype/interview/interview.py` (not in `interview_feedback.py` — cross-referenced here per the assignment's routing since it is conceptually about interview-feedback compliance nagging; see [[Interview]] for the sibling `send_interview_reminder` job which lives in the same source file). Registered in `hrms/hooks.py` under `scheduler_events["daily"]` (see [[Background Jobs (Scheduler Events)]]) — runs **once per day** (Frappe's default daily cron time, typically midnight site time unless reconfigured).
 
 Exact logic, in order:
 1. Read HR Settings singleton fields: `send_interview_feedback_reminder`, `feedback_reminder_notification_template`, `hiring_sender_email`.
@@ -136,3 +138,11 @@ No `permlevel` restrictions declared. Not submittable? — it IS submittable (`i
 - Because `average_rating` on the parent `Interview` is written via `db_set` from this doctype's `on_submit`/`on_cancel`, a port implementing Interview Feedback submission/cancellation must trigger the equivalent recompute-and-write against the Interview record as part of the same transaction (or an immediately-following one) to avoid the parent's displayed average going stale.
 - `track_changes: 1` — same audit-trail caveat as other doctypes in this module.
 - `quick_entry: 1` plus several `allow_in_quick_entry: 1` fields describe a specific fast-creation dialog affordance in Frappe Desk; functionally this doesn't change the data model, only which fields a "quick create" form surfaces — no separate backend behavior to reproduce beyond the schema itself.
+
+## Related Doctypes
+
+- [[Interview]] — parent interview this feedback is scored against; this doctype writes back `Interview.average_rating` on submit/cancel.
+- [[Interview Type]] — fetched (`interview_type`) from the parent Interview; supplies the expected skill set.
+- [[Job Applicant]] — fetched (`job_applicant`) from the parent Interview, for display/filtering.
+- [[Skill Assessment]] — child table (`skill_assessment`) holding the per-skill ratings.
+- [[Permission Model (RBAC)]] — role-based access (HR Manager/Interviewer/HR User) as detailed in Permissions above.

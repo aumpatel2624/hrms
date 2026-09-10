@@ -48,8 +48,8 @@ Defines the approved hiring budget and headcount targets for a company (optional
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, Write, Create, Delete, Submit, Cancel, Amend | Full lifecycle control. |
-| HR User | Read, Write, Create, Submit | Can create and submit but not delete or amend — cancellation/deletion is an HR Manager-only action. |
+| [[HR Manager]] | Read, Write, Create, Delete, Submit, Cancel, Amend | Full lifecycle control. |
+| [[HR User]] | Read, Write, Create, Submit | Can create and submit but not delete or amend — cancellation/deletion is an HR Manager-only action. |
 
 ## Mermaid: State/Flow
 

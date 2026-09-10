@@ -8,18 +8,18 @@ The Performance module implements a KRA/goal-based employee performance appraisa
 
 | Doctype | Purpose |
 |---|---|
-| `Appraisal` | The per-employee, per-cycle submittable record aggregating KRA/goal scores, self-appraisal score, average peer feedback score, and a computed final score. |
-| `Appraisal Cycle` | A named, time-boxed HR-managed cycle (e.g. "H1 2026") that generates and tracks Appraisals for a filtered population of employees. |
-| `Appraisal Goal` | Child table row of `Appraisal.goals` — a single manually-rated goal/score line (used only when the cycle's evaluation method is "Manual Rating"). |
-| `Appraisal KRA` | Child table row of `Appraisal.appraisal_kra` — a KRA with weightage and an auto-computed goal-completion/goal-score (used when the cycle's evaluation method is "Automated Based on Goal Progress", the default). |
-| `Appraisal Template` | Reusable, named blueprint of KRAs (with weightages) and rating criteria (with weightages), assignable per-Designation or per-Appraisee. |
-| `Appraisal Template Goal` | Child table row of `Appraisal Template.goals` — one KRA + weightage entry in a template. |
-| `Goal` | An employee's individual (optionally nested/grouped) goal, with a progress percentage, status, and optional link to an Appraisal Cycle + KRA for automated scoring. |
-| `Employee Performance Feedback` | A single reviewer's submitted feedback + criteria ratings for a given employee's Appraisal; contributes to that Appraisal's average feedback score. |
-| `Employee Feedback Criteria` | Simple named master list of rating criteria (e.g. "Communication") referenced by rating rows. |
-| `Employee Feedback Rating` | Shared child table row (criteria + weightage + optional rating) used across `Appraisal Template.rating_criteria`, `Appraisal.self_ratings`, and `Employee Performance Feedback.feedback_ratings`. |
+| [[Appraisal]] | The per-employee, per-cycle submittable record aggregating KRA/goal scores, self-appraisal score, average peer feedback score, and a computed final score. |
+| [[Appraisal Cycle]] | A named, time-boxed HR-managed cycle (e.g. "H1 2026") that generates and tracks Appraisals for a filtered population of employees. |
+| [[Appraisal Goal]] | Child table row of `Appraisal.goals` — a single manually-rated goal/score line (used only when the cycle's evaluation method is "Manual Rating"). |
+| [[Appraisal KRA]] | Child table row of `Appraisal.appraisal_kra` — a KRA with weightage and an auto-computed goal-completion/goal-score (used when the cycle's evaluation method is "Automated Based on Goal Progress", the default). |
+| [[Appraisal Template]] | Reusable, named blueprint of KRAs (with weightages) and rating criteria (with weightages), assignable per-Designation or per-Appraisee. |
+| [[Appraisal Template Goal]] | Child table row of `Appraisal Template.goals` — one KRA + weightage entry in a template. |
+| [[Goal]] | An employee's individual (optionally nested/grouped) goal, with a progress percentage, status, and optional link to an Appraisal Cycle + KRA for automated scoring. |
+| [[Employee Performance Feedback]] | A single reviewer's submitted feedback + criteria ratings for a given employee's Appraisal; contributes to that Appraisal's average feedback score. |
+| [[Employee Feedback Criteria]] | Simple named master list of rating criteria (e.g. "Communication") referenced by rating rows. |
+| [[Employee Feedback Rating]] | Shared child table row (criteria + weightage + optional rating) used across `Appraisal Template.rating_criteria`, `Appraisal.self_ratings`, and `Employee Performance Feedback.feedback_ratings`. |
 
-Doctypes referenced by this module but owned elsewhere (do not create files for these; reference by name only): `Employee`, `Department`, `Designation` (including `Designation.appraisal_template`), `Company`, `Branch`, `KRA`, `Appraisal Cycle`'s `Appraisee` child doctype, `User`.
+Doctypes referenced by this module but owned elsewhere (do not create files for these; reference by name only): [[Employee Core Model]] (`Employee`), `Department`, `Designation` (including `Designation.appraisal_template`), `Company`, `Branch`, `KRA`, `Appraisal Cycle`'s `Appraisee` child doctype, `User`.
 
 No `Self Appraisal` or `Energy Point` doctype exists in this repository — confirmed via directory listing of `hrms/hr/doctype/`; skipped per prior-pass guidance.
 

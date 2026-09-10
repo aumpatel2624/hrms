@@ -55,10 +55,10 @@ Why: separating proof from declaration lets the system distinguish "what the emp
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
-| HR Manager | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
-| HR User | create/read/write/delete/submit/cancel/amend | Full lifecycle control, same as HR Manager. |
-| Employee | create/read/write/delete/submit/cancel/amend | Full rights per DocType permission row; no `if_owner` restriction present in JSON, so "only for self" is not enforced in code at the doctype-permission level. |
+| [[System Manager]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
+| [[HR Manager]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control. |
+| [[HR User]] | create/read/write/delete/submit/cancel/amend | Full lifecycle control, same as HR Manager. |
+| [[Employee]] | create/read/write/delete/submit/cancel/amend | Full rights per DocType permission row; no `if_owner` restriction present in JSON, so "only for self" is not enforced in code at the doctype-permission level. |
 
 ## Mermaid: State/Flow
 

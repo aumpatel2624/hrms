@@ -52,10 +52,10 @@ A Payroll Period defines a fiscal tax-computation window (typically a full year,
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Create, Read, Write, Delete, Email, Export, Print, Report, Share | Full rights. |
-| HR Manager | Create, Read, Write, Delete, Email, Export, Print, Report, Share | Full rights, same as System Manager. |
-| HR User | Create, Read, Write, Delete, Email, Export, Print, Report, Share | Full rights, same as System Manager. |
-| Employee | Read, Email, Export, Print, Report, Share | Read-only visibility; cannot create/write/delete. |
+| [[System Manager]] | Create, Read, Write, Delete, Email, Export, Print, Report, Share | Full rights. |
+| [[HR Manager]] | Create, Read, Write, Delete, Email, Export, Print, Report, Share | Full rights, same as System Manager. |
+| [[HR User]] | Create, Read, Write, Delete, Email, Export, Print, Report, Share | Full rights, same as System Manager. |
+| [[Employee]] | Read, Email, Export, Print, Report, Share | Read-only visibility; cannot create/write/delete. |
 
 ## Mermaid: State/Flow
 

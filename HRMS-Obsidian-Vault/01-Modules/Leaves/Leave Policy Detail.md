@@ -20,7 +20,7 @@ A pure child-table row of [[Leave Policy]] stating one leave type's annual alloc
 
 - [[Leave Policy]] — parent; this is one row in `leave_policy_details`.
 - [[Leave Type]] — links to; the `max_leaves_allowed` on the referenced type caps this row's value (enforced in Leave Policy's `validate()`).
-- [[Leave Allocation]] — read indirectly by `Leave Allocation.get_monthly_earned_leave()` and `create_leave_adjustment` flows, and by Leave Policy Assignment when computing pro-rated/earned allocations.
+- [[Leave Allocation]] — read indirectly by `Leave Allocation.get_monthly_earned_leave()` and `create_leave_adjustment` flows, and by [[Leave Policy Assignment]] when computing pro-rated/earned allocations.
 
 ## Logic — What Happens and Why
 

@@ -29,8 +29,8 @@ flowchart TD
 
 | Step | Role |
 |---|---|
-| Define Shift Type / Shift Schedule | [[HR User]] |
-| Assign shifts to employees | [[HR User]] (or automated via Shift Schedule Assignment) |
+| Define [[Shift Type]] / [[Shift Schedule]] | [[HR User]] |
+| Assign shifts to employees | [[HR User]] (or automated via [[Shift Schedule Assignment]]) |
 | Punch in/out | [[Employee]] (self) |
 | Request shift change | [[Employee]] → routed to [[Leave Approver]] |
 | Request attendance correction | [[Employee]] → routed to [[Leave Approver]] |
@@ -42,7 +42,7 @@ flowchart TD
   the system has an immutable source record before any interpretation happens —
   reclassifying how attendance is computed later doesn't require re-entering data,
   just re-running the classification against the same checkins.
-- **Shift Type owns the interpretation rules** (grace period, minimum working hours for
+- **[[Shift Type]] owns the interpretation rules** (grace period, minimum working hours for
   Half Day vs Present, whether auto-attendance is even enabled) because these rules
   are genuinely per-shift — a night shift and a flexible-hours shift shouldn't share
   the same Present/Absent threshold logic, so the rule lives with the shift definition
@@ -51,12 +51,12 @@ flowchart TD
   classifying attendance for a shift requires *all* of that shift's checkins for the
   day to be in, which usually isn't known until well after the shift's start — running
   it per-checkin would produce premature/wrong classifications.
-- **Shift Schedule Assignment is separate from Shift Assignment** because a recurring
+- **[[Shift Schedule Assignment]] is separate from [[Shift Assignment]]** because a recurring
   rota (e.g. "week on / week off" or rotating night shifts) needs to keep generating
   future Shift Assignments indefinitely without HR manually creating each one — the
   Assignment is the atomic unit Attendance logic reads from; the Schedule is the
   generator that keeps producing them.
-- **Attendance Request routes through the same approver as Leave**, not a separate
+- **[[Attendance Request]] routes through the same approver as Leave**, not a separate
   approval role, because a correction to attendance ("I was actually working, my
   checkin failed") is the same kind of line-management judgment call as approving
   leave — reusing [[Leave Approver]] avoids a redundant role for a structurally

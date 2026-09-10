@@ -33,9 +33,9 @@ Employee Onboarding Template is a reusable checklist master — a named, reusabl
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Read, write, create, delete | Full control. |
-| HR Manager | Read, write, create, delete | Full control except sharing/export configured. |
-| HR User | Read, write, create | No delete. |
+| [[System Manager]] | Read, write, create, delete | Full control. |
+| [[HR Manager]] | Read, write, create, delete | Full control except sharing/export configured. |
+| [[HR User]] | Read, write, create | No delete. |
 
 ## Mermaid: State/Flow
 

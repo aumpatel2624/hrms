@@ -53,11 +53,18 @@ None defined in `skill.py`.
 | HR Manager | 1 | 1 | 1 | 1 | 0 | 0 | 0 | 1 | 1 | also `email: 1`, `print: 1`, `share: 1` |
 | HR User | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | read-only |
 
-`track_changes: 1` — every field-level change is versioned in Frappe's Version doctype (audit trail must be built explicitly in a new stack if this behavior is required).
+`track_changes: 1` — every field-level change is versioned in Frappe's Version doctype (audit trail must be built explicitly in a new stack if this behavior is required). See [[Implicit Framework Behaviors]].
 
 ## Scheduled Jobs Touching This Doctype
 
 None found in `hrms/hooks.py`.
+
+## Related Doctypes
+
+- [[Designation Skill]] — consumer via its `skill` Link field.
+- [[Employee Skill]] — consumer via its `skill` Link field.
+- [[Expected Skill Set]] — consumer via its `skill` Link field.
+- [[Skill Assessment]] — consumer via its `skill` Link field.
 
 ## Port Notes
 

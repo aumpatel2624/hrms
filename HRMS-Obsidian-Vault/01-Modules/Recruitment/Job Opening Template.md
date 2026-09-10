@@ -38,9 +38,9 @@ for the user to review/save.
 ## Roles & Permissions
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Full CRUD + email/export/print/report/share | — |
-| HR Manager | Read/Write/Create/Delete | No email/export/print/report/share. |
-| HR User | Read/Write/Create | No delete. |
+| [[System Manager]] | Full CRUD + email/export/print/report/share | — |
+| [[HR Manager]] | Read/Write/Create/Delete | No email/export/print/report/share. |
+| [[HR User]] | Read/Write/Create | No delete. |
 
 ## Mermaid: State/Flow
 ```mermaid

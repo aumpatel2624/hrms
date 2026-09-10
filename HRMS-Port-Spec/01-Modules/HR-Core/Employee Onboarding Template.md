@@ -12,8 +12,8 @@
 | company | Company | Link | Company | No | — | No | |
 | department | Department | Link | Department | No | — | No | `in_list_view`. Client script filters this field's picker to `company == frm.doc.company`. |
 | designation | Designation | Link | Designation | No | — | No | *(column_break_7)* `in_list_view`. |
-| employee_grade | Employee Grade | Link | Employee Grade | No | — | No | `in_list_view`. |
-| activities | Activities | Table | Employee Boarding Activity | No | — | No | *(section_break_7, labeled "Activities")* — see `Employee Boarding Activity.md`. |
+| employee_grade | Employee Grade | Link | [[Employee Grade]] | No | — | No | `in_list_view`. |
+| activities | Activities | Table | [[Employee Boarding Activity]] | No | — | No | *(section_break_7, labeled "Activities")* — see `Employee Boarding Activity.md`. |
 
 The controller class body is `pass` — no server-side logic beyond the auto-generated type stubs.
 
@@ -59,9 +59,14 @@ No `if_owner` or `permlevel` restrictions present in the JSON.
 
 None.
 
+## Related Doctypes
+
+- [[Employee Grade]] — via `employee_grade`: `in_list_view`.
+- [[Employee Boarding Activity]] — via `activities`: *(section_break_7, labeled "Activities")* — see `Employee Boarding Activity.md`.
+
 ## Port Notes
 
-- `naming_rule` key is absent from this JSON (only `autoname` is set); Frappe infers the naming style from the `autoname` pattern (`"HR-EMP-ONT-.#####"` → simple incrementing counter with fixed prefix, no date component). A port should implement this as a persistent counter (e.g., a dedicated sequence or counter row) scoped globally to this doctype (not per-company or per-year).
+- `naming_rule` key is absent from this JSON (only `autoname` is set); see [[Naming and Autoname Rules]]. Frappe infers the naming style from the `autoname` pattern (`"HR-EMP-ONT-.#####"` → simple incrementing counter with fixed prefix, no date component). A port should implement this as a persistent counter (e.g., a dedicated sequence or counter row) scoped globally to this doctype (not per-company or per-year).
 - `track_changes: 1` — implicit audit trail via Frappe's Version mechanism; a port needs an explicit audit log table to reproduce history if required.
 - `show_title_field_in_link: 1` + `title_field: "title"` — when this doctype is referenced from a Link field elsewhere (e.g. `Employee Onboarding.employee_onboarding_template`), the UI shows `title` instead of the raw `name`/autoname. This is purely a display convention; the actual foreign-key value stored is still the auto-generated `name`.
 - `quick_entry` is NOT set on this doctype (only on `Employee Separation`, `Employee Transfer`, `Employee Promotion`) — no notable behavioral difference besides the desk "Quick Entry" dialog availability, which is UI-only.

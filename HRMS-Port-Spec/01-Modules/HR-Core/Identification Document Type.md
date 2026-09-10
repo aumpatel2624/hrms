@@ -50,6 +50,10 @@ None.
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Travel Request]] — consumer via its `personal_id_type` Link field.
+
 ## Port Notes
 
 - **`identification_document_type` field is not marked `reqd: 1`** even though it is both the sole visible field and the `autoname` source. In Frappe, `autoname: "field:X"` implicitly requires `X` to be set at save time (the framework raises its own naming error if the field is empty when trying to derive the document name) even without an explicit `reqd` flag on the field. A port must therefore still enforce "value required" as an effective validation rule, sourced from the `autoname` mechanism rather than a `reqd` flag — do not skip this check just because `reqd` is absent from the JSON.

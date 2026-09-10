@@ -8,23 +8,23 @@
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | yes | — | no | In list view |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | yes | — | no | In list view |
 | employee_name | Employee Name | Data | — | no | — | yes | `fetch_from: "employee.employee_name"` |
 | designation | Designation | Link | Designation | no | — | yes | `fetch_from: "employee.designation"` |
 | *(column_break_4)* | — | Column Break | — | — | — | — | layout only |
 | status | Status | Select | `Paid\nUnpaid\nCancelled` | no | `Unpaid` | yes | Forced to `"Unpaid"` in `before_insert`; thereafter changed only via `db_set` (see State Machine) |
 | department | Department | Link | Department | no | — | yes | `fetch_from: "employee.department"` |
-| amended_from | Amended From | Link | Full and Final Statement | no | — | yes | `no_copy: 1`, `print_hide: 1` |
+| amended_from | Amended From | Link | [[Full and Final Statement]] | no | — | yes | `no_copy: 1`, `print_hide: 1` |
 | *(section_break_8)* | Payables | Section Break | — | — | — | — | section heading — groups: payables |
 | *(section_break_10)* | Receivables | Section Break | — | — | — | — | section heading — groups: receivables |
-| assets_allocated | (no label) | Table | Full and Final Asset | no | — | no | See `Full and Final Asset.md` |
+| assets_allocated | (no label) | Table | [[Full and Final Asset]] | no | — | no | See `Full and Final Asset.md` |
 | relieving_date | Relieving Date  | Date | — | no | — | yes | `fetch_from: "employee.relieving_date"`. Must be set (see Validation Rule 1) before most workflow steps can proceed. |
 | date_of_joining | Date of Joining | Date | — | no | — | yes | `fetch_from: "employee.date_of_joining"` |
 | *(section_break_15)* | Assets Allocated | Section Break | — | — | — | — | `description: "Automatically fetches all assets allocated to the employee, if any"`. Groups: assets_allocated |
 | company | Company | Link | Company | no | — | yes | `fetch_from: "employee.company"`. In list view, in standard filter. |
 | *(column_break_12)* | — | Column Break | — | — | — | — | layout only |
-| payables | (no label) | Table | Full and Final Outstanding Statement | no | — | no | See `Full and Final Outstanding Statement.md` |
-| receivables | (no label) | Table | Full and Final Outstanding Statement | no | — | no | Same child doctype as `payables`, different logical table — see that file's Port Notes |
+| payables | (no label) | Table | [[Full and Final Outstanding Statement]] | no | — | no | See `Full and Final Outstanding Statement.md` |
+| receivables | (no label) | Table | [[Full and Final Outstanding Statement]] | no | — | no | Same child doctype as `payables`, different logical table — see that file's Port Notes |
 | *(employee_details_section)* | Employee Details | Section Break | — | — | — | — | section heading — groups: date_of_joining, relieving_date, designation, department |
 | transaction_date | Transaction Date | Date | — | yes | — | no | In standard filter |
 | *(totals_section)* | Totals | Section Break | — | — | — | — | section heading — groups: total_payable_amount, total_receivable_amount |
@@ -44,6 +44,8 @@
 - `receivables` -> `Full and Final Outstanding Statement` (same child doctype as `payables`; see `Full and Final Outstanding Statement.md`)
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]) run alongside the `status` field below.
 
 ```mermaid
 stateDiagram-v2
@@ -200,7 +202,7 @@ Only **HR Manager** can submit/cancel/amend this doctype — System Manager and 
 
 ## Scheduled Jobs Touching This Doctype
 
-No `scheduler_events` (cron) entries touch this doctype directly. However, `hrms/hooks.py` registers `doc_events` on **`Journal Entry`** (not on this doctype) that read/write Full and Final Statement records:
+No [[Background Jobs (Scheduler Events)|`scheduler_events`]] (cron) entries touch this doctype directly. However, `hrms/hooks.py` registers [[Cross-Doctype Hooks (doc_events)|`doc_events`]] on **`Journal Entry`** (not on this doctype) that read/write Full and Final Statement records:
 
 ```
 "Journal Entry": {
@@ -217,6 +219,12 @@ No `scheduler_events` (cron) entries touch this doctype directly. However, `hrms
 }
 ```
 This means every time ANY Journal Entry is submitted or cancelled anywhere in the system, this function runs and scans that JE's `accounts` rows for any referencing a Full and Final Statement, updating that statement's `status` field accordingly (see Lifecycle Hooks section above for exact behavior). This is not scheduler-triggered (not a cron job) — it is an event hook fired synchronously as part of Journal Entry's own submit/cancel transaction.
+
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: In list view
+- [[Full and Final Asset]] — via `assets_allocated`: See `Full and Final Asset.md`
+- [[Full and Final Outstanding Statement]] — via `payables`: See `Full and Final Outstanding Statement.md`
 
 ## Port Notes
 

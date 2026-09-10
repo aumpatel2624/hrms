@@ -53,6 +53,10 @@ None.
 
 None found in `hrms/hooks.py`.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — this child table is embedded on the Employee master (per `_Module-Spec.md`'s Doctype List), one row per health insurance policy held by the employee.
+
 ## Port Notes
 
 - **Referenced from ERPNext core `Employee`, not from this repo.** This doctype is used as a Link-target/option list for health-insurance data captured on the Employee master (a table field on Employee, e.g. `health_insurance` with a `health_insurance_name` Link and `health_insurance_no` Data field) — that consuming schema lives in ERPNext's `Employee` doctype (`erpnext.setup.doctype.employee.employee`), which is not present in this repository/environment and therefore could not be traced here. When porting, source the Employee-side health-insurance table schema and its validation from ERPNext directly.

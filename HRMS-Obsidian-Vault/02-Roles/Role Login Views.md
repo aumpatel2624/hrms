@@ -81,7 +81,7 @@ My/Team list views **are** the approval inbox.
 
 ## Interviewer — no portal screen, Desk-only, scoped to assigned interviews
 
-The [[Interviewer]] role has no presence in the `frontend/` app at all — an
+The [[Interviewer (Role)|Interviewer]] role has no presence in the `frontend/` app at all — an
 interviewer works entirely in Desk, opening their assigned [[Interview]] document
 (usually reached via a link in a reminder email/notification, not a workspace
 shortcut, since Interviewer isn't a role interview workspaces are built around) and
@@ -97,15 +97,15 @@ the doctypes each workspace links to:
 
 | Workspace | Key Pages/Shortcuts | Data Scope |
 |---|---|---|
-| **HR Setup** | Employee (list), Organizational Chart, Company, Branch, Department, Designation, Employee Group, Employee Grade | All employees, all departments — company-wide. |
-| **Tenure** | Employee Onboarding, Employee Separation, Employee Grievance, Employee Exits report, Employee Birthday, Employee Skill Map, Training Program/Event/Feedback/Result, Grievance Type | All employees' lifecycle records. |
-| **Leaves** | Leave Application, Leave Encashment, Leave Control Panel, Leave Policy Assignment, Leave Allocation, Leave Balance reports, Holiday List | All employees' leave data — not scoped to "my team" like the approver's portal Team tab. |
-| **Shift & Attendance** | Roster, Employee Attendance Tool, Employee Checkin, Shift Request, Attendance Request, Overtime, Shift Type/Location/Schedule, Timesheet | All employees. |
-| **Payroll** | Payroll Entry, Salary Structure Assignment, Salary Slip, Additional Salary, Salary Withholding, Salary Register, Income/Professional Tax Deduction reports, GL reports | All employees' pay data (subject to the HR User/HR Manager split on submit rights — see [[HR Manager]]). |
-| **Recruitment** | Job Opening, Job Applicant, Interview, Job Offer, Appointment Letter, Job Requisition, Staffing Plan, Employee Referral | All open and closed requisitions/candidates. |
-| **Performance** | Goal, Appraisal Cycle, Appraisal, Employee Performance Feedback, Employee Promotion, Appraisal Template, KRA, Employee Feedback Criteria | All employees' appraisal data. |
-| **Tax & Benefits** | Exemption Declaration, Exemption Submission Proof, Benefit Application, Benefit Claim, Income Tax Computation/Deductions, Income Tax Slab, Exemption Category | All employees' tax/benefit records. |
-| **Expenses** | Employee Advance, Expense Claim, Travel Request, Purpose of Travel, Vehicle Log, Accounting Entries (Payment/Journal Entry), Expense Claim Type, Driver, Vehicle | All employees' claims and travel. |
+| **HR Setup** | [[Employee]] (list), Organizational Chart, Company, Branch, Department, Designation, Employee Group, [[Employee Grade]] | All employees, all departments — company-wide. |
+| **Tenure** | [[Employee Onboarding]], [[Employee Separation]], [[Employee Grievance]], Employee Exits report, Employee Birthday, [[Employee Skill Map]], [[Training Program]]/[[Training Event]]/[[Training Feedback]]/[[Training Result]], [[Grievance Type]] | All employees' lifecycle records. |
+| **Leaves** | [[Leave Application]], [[Leave Encashment]], [[Leave Control Panel]], [[Leave Policy Assignment]], [[Leave Allocation]], Leave Balance reports, Holiday List | All employees' leave data — not scoped to "my team" like the approver's portal Team tab. |
+| **Shift & Attendance** | Roster, [[Employee Attendance Tool]], [[Employee Checkin]], [[Shift Request]], [[Attendance Request]], Overtime, [[Shift Type]]/[[Shift Location]]/[[Shift Schedule]], Timesheet | All employees. |
+| **Payroll** | [[Payroll Entry]], [[Salary Structure Assignment]], [[Salary Slip]], [[Additional Salary]], [[Salary Withholding]], Salary Register, Income/Professional Tax Deduction reports, GL reports | All employees' pay data (subject to the HR User/HR Manager split on submit rights — see [[HR Manager]]). |
+| **Recruitment** | [[Job Opening]], [[Job Applicant]], [[Interview]], [[Job Offer]], Appointment Letter, [[Job Requisition]], [[Staffing Plan]], [[Employee Referral]] | All open and closed requisitions/candidates. |
+| **Performance** | [[Goal]], [[Appraisal Cycle]], [[Appraisal]], [[Employee Performance Feedback]], [[Employee Promotion]], [[Appraisal Template]], KRA, [[Employee Feedback Criteria]] | All employees' appraisal data. |
+| **Tax & Benefits** | [[Employee Tax Exemption Declaration\|Exemption Declaration]], [[Employee Tax Exemption Proof Submission\|Exemption Submission Proof]], [[Employee Benefit Application\|Benefit Application]], [[Employee Benefit Claim\|Benefit Claim]], Income Tax Computation/Deductions, [[Income Tax Slab]], [[Employee Tax Exemption Category\|Exemption Category]] | All employees' tax/benefit records. |
+| **Expenses** | Employee Advance, [[Expense Claim]], [[Travel Request]], [[Purpose of Travel]], Vehicle Log, Accounting Entries (Payment/Journal Entry), [[Expense Claim Type]], Driver, Vehicle | All employees' claims and travel. |
 
 **Data scope: company-wide on every list, no self/team restriction** — this is the
 opposite of the portal's My/Team split, because [[HR User]]'s whole job requires

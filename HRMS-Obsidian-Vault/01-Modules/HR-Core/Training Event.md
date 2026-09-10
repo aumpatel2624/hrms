@@ -56,8 +56,8 @@ Controller: `TrainingEvent(Document)` in `training_event.py`.
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR Manager | Read, write, create, delete, submit, cancel, amend | Full lifecycle control. |
-| HR User | Read, write | Cannot create, submit, or delete. |
+| [[HR Manager]] | Read, write, create, delete, submit, cancel, amend | Full lifecycle control. |
+| [[HR User]] | Read, write | Cannot create, submit, or delete. |
 
 ## Mermaid: State/Flow
 

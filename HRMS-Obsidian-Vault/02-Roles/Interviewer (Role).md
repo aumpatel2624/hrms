@@ -6,7 +6,7 @@ tags: [hrms, role]
 # Interviewer
 
 A narrow, recruitment-only role for employees who sit on interview panels but aren't
-HR staff. Scope is per-[[Interview]] via the [[Interviewer]] child-table/link record
+HR staff. Scope is per-[[Interview]] via the [[Interviewer (Role)|Interviewer]] child-table/link record
 naming them on that specific interview round, not company-wide.
 
 ## What This Role Can Do

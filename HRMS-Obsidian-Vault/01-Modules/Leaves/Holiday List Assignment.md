@@ -44,8 +44,8 @@ No `on_submit`/`on_cancel` side effects beyond the standard submittable lifecycl
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | full incl. submit/cancel/select | Full |
-| HR Manager | full incl. submit/cancel/select | Full |
+| [[System Manager]] | full incl. submit/cancel/select | Full |
+| [[HR Manager]] | full incl. submit/cancel/select | Full |
 
 ## Mermaid: State/Flow
 

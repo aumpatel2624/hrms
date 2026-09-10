@@ -61,6 +61,10 @@ None on this doctype directly. Note: the client-side handler for this child doct
 
 None.
 
+## Related Doctypes
+
+- [[Full and Final Statement]] — parent via both the `payables` and `receivables` tables (same child doctype reused for both).
+
 ## Port Notes
 
 - **`status` never programmatically set to "Settled"**: no source file in this build spec's assigned doctypes ever transitions a row from Unsettled to Settled — this is presumably a manual user action in the grid UI (ticking the Select from Unsettled to Settled) before the parent is submitted. A port must expose this as a plain editable field with no server-side auto-transition, and rely on the parent's before_submit guard to enforce that all rows are Settled before allowing submission.

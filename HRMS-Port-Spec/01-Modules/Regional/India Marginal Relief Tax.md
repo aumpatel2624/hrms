@@ -34,7 +34,7 @@ value, `tax_amount` is left unchanged; only a truthy (nonzero) returned value re
 
 ## 2. Full Algorithm (numbered pseudocode)
 
-Inputs: `tax_slab` (an `Income Tax Slab` record/object with `tax_relief_limit` and
+Inputs: `tax_slab` (an `[[Income Tax Slab]]` record/object with `tax_relief_limit` and
 `marginal_relief_limit` fields), `tax_amount` (the base tax computed from bracket rates before
 marginal relief), `annual_taxable_earning` (the employee's projected annual taxable income).
 
@@ -64,7 +64,7 @@ large tax bill.
 
 | DocType | Fieldname | Label | Type | Insert After | Notes |
 |---|---|---|---|---|---|
-| Income Tax Slab | `marginal_relief_limit` | Marginal Relief Threshold Limit | Currency | `column_break_pdmy` | Description: "Maximum taxable income for which marginal relief can be applied. Beyond this limit, normal tax slabs are used for tax calculation." `depends_on: eval:doc.tax_relief_limit > 0 && doc.currency == 'INR'` |
+| [[Income Tax Slab]] | `marginal_relief_limit` | Marginal Relief Threshold Limit | Currency | `column_break_pdmy` | Description: "Maximum taxable income for which marginal relief can be applied. Beyond this limit, normal tax slabs are used for tax calculation." `depends_on: eval:doc.tax_relief_limit > 0 && doc.currency == 'INR'` |
 
 This is the only custom field tied to this feature (from `hrms/regional/india/setup.py::get_custom_fields()`).
 
@@ -94,3 +94,7 @@ None.
   truthy-check semantics at the call site to stay faithful: a returned `0` is treated as "no
   marginal relief" (tax_amount stays as originally computed) even though 0 could theoretically be
   the "correct" relieved amount — reproduce this literally rather than fixing the edge case.
+
+## Related Doctypes
+
+- [[Income Tax Slab]] — carries the `tax_relief_limit` and `marginal_relief_limit` fields this override reads, and is the doctype whose `calculate_tax_by_tax_slab` calls this override.

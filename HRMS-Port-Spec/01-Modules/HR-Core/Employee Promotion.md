@@ -12,22 +12,24 @@ Full field list, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| employee | Employee | Link | Employee | Yes | — | No | `in_list_view`. Client script filters picker to `status: "Active"` (shared `employee_property_update.js`). |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | Yes | — | No | `in_list_view`. Client script filters picker to `status: "Active"` (shared `employee_property_update.js`). |
 | employee_name | Employee Name | Data | — | No | — | Yes | `fetch_from: employee.employee_name`. |
 | department | Department | Link | Department | No | — | Yes | `fetch_from: employee.department`. |
 | salary_currency | Salary Currency | Link | Currency | No | — | Yes | `fetch_from: employee.salary_currency`. Drives the `options` (currency symbol context) for `current_ctc`/`revised_ctc`. |
 | promotion_date | Promotion Date | Date | — | Yes | — | No | *(column_break_3)* Anchor date for the promotion; gates submission (see Validation Rules) and passed as `date` into `update_employee_work_history`. |
 | company | Company | Link | Company | No | — | No | `fetch_from: employee.company`. |
-| promotion_details | (no label — table only) | Table | Employee Property History | No | — | No | *(details_section, "Employee Promotion Details", description: "Set the properties that should be updated in the Employee master on promotion submission")* — see `Employee Property History` schema, documented fully in `Employee Transfer.md`. **Note: unlike Employee Transfer's `transfer_details`, this field is NOT marked `reqd: 1`** — an Employee Promotion can be submitted with zero property-change rows (in which case `update_employee_work_history` immediately returns the employee unchanged — see step 1 of that shared algorithm). |
+| promotion_details | (no label — table only) | Table | [[Employee Property History]] | No | — | No | *(details_section, "Employee Promotion Details", description: "Set the properties that should be updated in the Employee master on promotion submission")* — see `Employee Property History` schema, documented fully in `Employee Transfer.md`. **Note: unlike Employee Transfer's `transfer_details`, this field is NOT marked `reqd: 1`** — an Employee Promotion can be submitted with zero property-change rows (in which case `update_employee_work_history` immediately returns the employee unchanged — see step 1 of that shared algorithm). |
 | current_ctc | Current CTC | Currency | (options: `salary_currency`) | Conditionally required | — | No | *(salary_details_section, "Salary Details")* `fetch_from: employee.ctc`, `fetch_if_empty: 1` (only auto-fills if the field is currently empty — a user-entered value is not overwritten by the fetch on subsequent saves). `non_negative: 1`. `mandatory_depends_on: "revised_ctc"` (becomes mandatory once `revised_ctc` has any value). |
 | revised_ctc | Revised CTC | Currency | (options: `salary_currency`) | No | — | No | *(column_break_12)* `depends_on: "current_ctc"` (only shown once `current_ctc` has a value). `non_negative: 1`. |
-| amended_from | Amended From | Link | Employee Promotion | No | — | Yes | `no_copy`, `print_hide`. |
+| amended_from | Amended From | Link | [[Employee Promotion]] | No | — | Yes | `no_copy`, `print_hide`. |
 
 ## Child Tables
 
 - `promotion_details` → **Employee Property History** — identical shared child doctype used by `Employee Transfer.transfer_details`; full schema documented in `Employee Transfer.md` → "Child Tables". Not repeated here to avoid divergent copies per the port spec's single-source intent.
 
 ## State Machine
+
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]).
 
 ```mermaid
 stateDiagram-v2
@@ -101,10 +103,15 @@ This permission table is byte-for-byte identical in structure to `Employee Trans
 
 None found in `hrms/hooks.py` `scheduler_events`.
 
+## Related Doctypes
+
+- [[Employee Core Model|Employee]] — via `employee`: `in_list_view`. Client script filters picker to `status: "Active"` (shared `employee_property_update.js`).
+- [[Employee Property History]] — via `promotion_details`: *(details_section, "Employee Promotion Details", description: "Set the properties that should be updated in the Employee master on promotion submission")* — see `Employee Property History` schema, documented fully in...
+
 ## Port Notes
 
 - `quick_entry: 1` — UI-only.
-- `naming_rule: "Expression (old style)"` vs. Employee Transfer's `naming_rule` key being absent entirely — both resolve to the same practical auto-increment pattern via their `autoname` string; this is a metadata/versioning artifact of how the doctype JSON was authored/migrated in Frappe, not a functional difference. A port can treat both doctypes' naming identically (yearly-scoped incrementing counter with a fixed prefix).
+- [[Naming and Autoname Rules|`naming_rule: "Expression (old style)"`]] vs. Employee Transfer's `naming_rule` key being absent entirely — both resolve to the same practical auto-increment pattern via their `autoname` string; this is a metadata/versioning artifact of how the doctype JSON was authored/migrated in Frappe, not a functional difference. A port can treat both doctypes' naming identically (yearly-scoped incrementing counter with a fixed prefix).
 - `current_ctc`'s `fetch_if_empty: 1` behavior: standard `fetch_from` normally re-syncs on every save; `fetch_if_empty` restricts that to only fill the field when it is currently blank, so once a user has entered/edited `current_ctc`, subsequent Employee CTC changes will NOT silently overwrite it. A port must implement this "fetch-once, don't clobber user edits" semantic explicitly (default `fetch_from` behavior in most ORMs will not naturally replicate this without a "fetch if empty" flag).
 - `mandatory_depends_on: "revised_ctc"` on `current_ctc` (mandatory only once `revised_ctc` has a value) and `depends_on: "current_ctc"` on `revised_ctc` (only shown once `current_ctc` has a value) together form a slightly circular-looking UI dependency: in practice, a user must first get `current_ctc` populated (typically via the auto-fetch from the Employee) before `revised_ctc` becomes visible at all, and once `revised_ctc` has any value, `current_ctc` retroactively becomes mandatory (in case it was somehow cleared). A port should implement both conditions independently rather than assuming one implies the other is automatically satisfied.
 - All the client-only "Add Employee Property" dialog caveats documented in `Employee Transfer.md` → Port Notes (field/fieldtype exclusion list, duplicate-property/no-op-change guard, clear-on-employee-change UX) apply identically here since both doctypes share `employee_property_update.js` verbatim.

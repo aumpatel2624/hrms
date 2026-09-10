@@ -1,7 +1,7 @@
 # Goal
 
 **Source:** `hrms/hr/doctype/goal/goal.json`, `goal.py`, `goal.js`, `goal_tree.js`, `goal_list.js`
-**Submittable:** no   **Tree:** yes (nested set / adjacency via `parent_goal`, `lft`/`rgt`)   **Naming:** `format:HR-GOAL-{YYYY}-{####}` (e.g. `HR-GOAL-2026-0001`)
+**Submittable:** no   **Tree:** yes (nested set / adjacency via `parent_goal`, `lft`/`rgt`)   **Naming:** `format:HR-GOAL-{YYYY}-{####}` ([[Naming and Autoname Rules]]) (e.g. `HR-GOAL-2026-0001`)
 **Module:** HR
 
 An employee's individual goal, optionally nested under a parent "group" goal, optionally tagged to an `Appraisal Cycle` + `KRA` to feed the automated KRA scoring in `Appraisal`.
@@ -12,21 +12,21 @@ An employee's individual goal, optionally nested under a parent "group" goal, op
 |---|---|---|---|---|---|---|---|
 | goal_name | Goal | Data | — | yes | — | — | in_list_view |
 | is_group | Is Group | Check | — | no | 0 | — | `set_only_once`; in_list_view; marks this Goal as a parent/container for child goals |
-| parent_goal | Parent Goal | Link | Goal | no | — | — | `depends_on: employee`; nested-set parent field (`nsm_parent_field`) |
+| parent_goal | Parent Goal | Link | [[Goal]] | no | — | — | `depends_on: employee`; nested-set parent field (`nsm_parent_field`) |
 | progress | Progress | Percent | — | no | — | conditionally | `read_only_depends_on: eval:doc.is_group || doc.status=='Closed'` — a group goal's progress is always auto-computed from children; a Closed goal can no longer have its progress edited |
 | status | Status | Select | ``\|`Pending`\|`In Progress`\|`Completed`\|`Archived`\|`Closed` | no | `Pending` | yes | in_list_view, in_standard_filter; set only via code (`set_status()` or the explicit archive/close/reopen/unarchive actions), not directly editable in the form |
-| employee | Employee | Link | Employee | yes | — | — | `set_only_once`; in_preview, in_standard_filter |
+| employee | Employee | Link | [[Employee Core Model]] | yes | — | — | `set_only_once`; in_preview, in_standard_filter |
 | employee_name | Employee Name | Data | — | no | — | yes | fetch_from `employee.employee_name`; in_list_view, in_preview |
 | company | Company | Link | Company | no | — | yes | fetch_from `employee.company` |
 | user | User | Data | — | no | — | yes | fetch_from `employee.user_id` |
 | start_date | Start Date | Date | — | yes | — | — | `depends_on: employee`; fetch_from `appraisal_cycle.start_date`, `fetch_if_empty: 1` (only auto-fills if blank, doesn't overwrite a manually-set value); in_standard_filter |
 | end_date | End Date | Date | — | no | — | — | `depends_on: employee`; fetch_from `appraisal_cycle.end_date`, `fetch_if_empty: 1`; in_list_view, in_standard_filter |
-| appraisal_cycle | Appraisal Cycle | Link | Appraisal Cycle | no | — | conditionally | `depends_on: employee`; fetch_from `parent_goal.appraisal_cycle`; `set_only_once`; `read_only_depends_on: eval: doc.parent_goal` (locked to the parent's cycle once a parent is chosen); in_standard_filter |
+| appraisal_cycle | Appraisal Cycle | Link | [[Appraisal Cycle]] | no | — | conditionally | `depends_on: employee`; fetch_from `parent_goal.appraisal_cycle`; `set_only_once`; `read_only_depends_on: eval: doc.parent_goal` (locked to the parent's cycle once a parent is chosen); in_standard_filter |
 | kra | KRA | Link | KRA | conditionally | — | conditionally | `depends_on: employee`; fetch_from `parent_goal.kra`; `mandatory_depends_on: eval: !doc.parent_goal && doc.appraisal_cycle` (required for a top-level goal that has an appraisal cycle, optional otherwise); `read_only_depends_on: eval: doc.parent_goal` |
 | description | Description | Text Editor | — | no | — | — | inside collapsible "Description" section |
 | lft | Left | Int | — | no | — | yes | hidden; nested-set left boundary, no_copy |
 | rgt | Right | Int | — | no | — | yes | hidden; nested-set right boundary, no_copy |
-| old_parent | Old Parent | Link | Goal | no | — | — | hidden; used internally by the nested-set library during re-parenting |
+| old_parent | Old Parent | Link | [[Goal]] | no | — | — | hidden; used internally by the nested-set library during re-parenting |
 
 ## Child Tables
 
@@ -146,7 +146,7 @@ THEN for each expandable (group) row: attach a "X of Y Completed" completion_cou
      (Y = total children count, X = count of children with status="Completed")
 ```
 
-## Lifecycle Hooks (exact)
+## Lifecycle Hooks (exact) ([[Cross-Doctype Hooks (doc_events)]])
 
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
@@ -165,7 +165,7 @@ THEN for each expandable (group) row: attach a "X of Y Completed" completion_cou
 | `update_status(status, goals)` | Bulk status change from the list view | `status: str`, `goals: str (JSON array) \| list` | the list of goal names processed | For each goal: load it, set `status`; IF `status == "Completed"` also force `progress = 100`; save with `ignore_mandatory=True`. (Does NOT re-validate that the *previous* status was an allowed source state — that eligibility filter is enforced only client-side in `goal_list.js`, see Port Notes.) |
 | `add_tree_node()` | Create-node handler for the tree view's "+" action | standard Frappe tree `form_dict` args | none (inserts a doc) | Normalizes `parent_goal` (treats the synthetic root label "All Goals" or a non-existent parent as no parent), then inserts a new Goal from the submitted args |
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -178,9 +178,16 @@ THEN for each expandable (group) row: attach a "X of Y Completed" completion_cou
 
 None found in `hrms/hooks.py` `scheduler_events`.
 
+## Related Doctypes
+
+- [[Employee Core Model]] — `employee` link; the goal's owner (also validated for Active status).
+- [[Appraisal Cycle]] — `appraisal_cycle` link; ties the goal to a scoring cycle (also governs the Completed-cycle guard).
+- [[Goal]] — `parent_goal`/`old_parent` self-links; nested-set parent for grouped goals.
+- [[Appraisal]] — updated (not a schema link) by `update_goal_progress_in_appraisal()` whenever a tagged Goal's progress changes or is deleted.
+
 ## Port Notes
 
-- **Nested set (`is_tree: 1`, `nsm_parent_field: parent_goal`, `lft`/`rgt`)**: Frappe's `NestedSet` base class maintains `lft`/`rgt` boundaries automatically on insert/update/trash/re-parent for fast subtree queries. A port has two reasonable choices: (a) replicate the nested-set (modified preorder tree traversal) bookkeeping for the same query performance characteristics, or (b) use plain adjacency list (`parent_goal` FK, self-referencing) with recursive CTEs for subtree queries — simpler to implement correctly, at some query-cost tradeoff. Either way, the *business logic* above (parent progress rollup, KRA propagation, status rules) is independent of which tree strategy is chosen and must be preserved.
+- **Nested set (`is_tree: 1`, `nsm_parent_field: parent_goal`, `lft`/`rgt`)** ([[Implicit Framework Behaviors]]): Frappe's `NestedSet` base class maintains `lft`/`rgt` boundaries automatically on insert/update/trash/re-parent for fast subtree queries. A port has two reasonable choices: (a) replicate the nested-set (modified preorder tree traversal) bookkeeping for the same query performance characteristics, or (b) use plain adjacency list (`parent_goal` FK, self-referencing) with recursive CTEs for subtree queries — simpler to implement correctly, at some query-cost tradeoff. Either way, the *business logic* above (parent progress rollup, KRA propagation, status rules) is independent of which tree strategy is chosen and must be preserved.
 - **`Employee` permission is broad** (full CRUD, no `if_owner`): confirm with product/business intent before the port — in the current source, any user with the Employee role can read/write/delete ANY Goal record, not just their own. This is likely intended to be scoped by a role-permission-level restriction or a separate "user permission" (Frappe's row-level restriction feature, defined outside the doctype JSON, typically on `Employee` linking to `User`) applied at the site level — not visible in this file. Flag for the target system's own row-level access design; do not assume this table is safe to expose to end-users without additional row scoping.
 - **`update_status` gap**: the whitelisted server method does not itself re-validate that a goal's current status is an allowed source for the requested transition — that guard exists only in `goal_list.js` (client). A port MUST add the equivalent server-side state-transition guard (the "applicable current statuses" table in the State Machine section above) since client-only checks are not sufficient for a real API surface.
 - **`fetch_if_empty`** on `start_date`/`end_date`/(effectively) other fetch-from fields: Frappe's fetch-from only auto-populates a field when it is currently blank, on load or when the source field's link changes — it will NOT silently overwrite a value the user has manually typed. A port's equivalent "populate from related record" logic must check "is this field already set?" before copying, not blindly assign the source value.

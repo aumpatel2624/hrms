@@ -1,7 +1,7 @@
 # Employee Feedback Criteria
 
 **Source:** `hrms/hr/doctype/employee_feedback_criteria/employee_feedback_criteria.json`, `employee_feedback_criteria.py`
-**Submittable:** no   **Tree:** no   **Naming:** `field:criteria` — document name = the `criteria` value (must be unique)
+**Submittable:** no   **Tree:** no   **Naming:** `field:criteria` ([[Naming and Autoname Rules]]) — document name = the `criteria` value (must be unique)
 **Module:** HR
 
 A simple master list of named feedback/rating criteria (e.g. "Communication", "Teamwork") referenced by `Employee Feedback Rating` rows.
@@ -38,7 +38,7 @@ None defined.
 
 None.
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -51,6 +51,10 @@ None.
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Employee Feedback Rating]] — referenced by that child doctype's `criteria` Link field, across all three of its parent contexts.
 
 ## Port Notes
 

@@ -33,12 +33,12 @@ The submittable record that links one employee to one [[Salary Structure]] effec
 - [[Salary Structure]] — links to: `salary_structure`; company must match; its `earnings`/`deductions`/`employer_contributions` are evaluated by this doc's `_evaluate_all_components()` for CTC/gross preview.
 - Employee — links to: `employee`; validated against joining/relieving dates.
 - [[Salary Component]] — linked from: `get_tax_component()` scans the structure's deductions for the tax-slab component; `upsert_employer_contribution()` reads component flags to inject regional employer-contribution rows.
-- Income Tax Slab — links to: `income_tax_slab`, required/validated when the structure has a tax component.
-- Employee Cost Center — parent/child: `payroll_cost_centers`.
-- Employee Benefit Detail — parent/child: `employee_benefits`.
+- [[Income Tax Slab]] — links to: `income_tax_slab`, required/validated when the structure has a tax component.
+- [[Employee Cost Center]] — parent/child: `payroll_cost_centers`.
+- [[Employee Benefit Detail]] — parent/child: `employee_benefits`.
 - [[Salary Structure]] / [[Bulk Salary Structure Assignment]] — linked from: both call `create_salary_structure_assignment()`/`_bulk_assign_structure()` which instantiate and submit this doctype.
 - [[Salary Slip]] — triggers: `get_assigned_salary_structure(employee, on_date)` finds the latest submitted assignment on/before a date to determine which structure a slip should use; `get_evaluated_components()`/`get_timesheet_config()` are read by slip generation for default amounts and timesheet settings.
-- Payroll Entry — linked from: `_get_component_eval_context()` uses `get_start_end_dates` from Payroll Entry's period logic to build a full-cycle evaluation context.
+- [[Payroll Entry]] — linked from: `_get_component_eval_context()` uses `get_start_end_dates` from Payroll Entry's period logic to build a full-cycle evaluation context.
 
 ## Logic — What Happens and Why
 
@@ -74,10 +74,10 @@ The submittable record that links one employee to one [[Salary Structure]] effec
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | read/write/create/delete/export/print/report/share | No submit/cancel/amend rights listed. |
-| HR Manager | read/write/create/delete/submit/cancel/amend/export/print/report/share | Full lifecycle control. |
-| HR User | read/write/create/submit/export/print/report/share | Can create and submit but not cancel/amend/delete. |
-| Employee | read/select | View-only, e.g. to see their own assignment. |
+| [[System Manager]] | read/write/create/delete/export/print/report/share | No submit/cancel/amend rights listed. |
+| [[HR Manager]] | read/write/create/delete/submit/cancel/amend/export/print/report/share | Full lifecycle control. |
+| [[HR User]] | read/write/create/submit/export/print/report/share | Can create and submit but not cancel/amend/delete. |
+| [[Employee]] | read/select | View-only, e.g. to see their own assignment. |
 
 ## Mermaid: State/Flow
 

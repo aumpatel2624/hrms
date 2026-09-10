@@ -63,8 +63,8 @@ Module-level helpers `get_previous_allocation`, `get_carry_forwarded_leaves`, `g
 
 | Role | Can Do | Notes |
 |---|---|---|
-| HR User | read/write/create/delete/submit/cancel/amend | Full |
-| HR Manager | read/write/create/delete/submit/cancel/amend/export/import | Full |
+| [[HR User]] | read/write/create/delete/submit/cancel/amend | Full |
+| [[HR Manager]] | read/write/create/delete/submit/cancel/amend/export/import | Full |
 
 ## Mermaid: State/Flow
 

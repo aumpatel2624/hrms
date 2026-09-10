@@ -12,23 +12,23 @@ Full field list, in JSON `field_order`:
 
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
-| job_applicant | Job Applicant | Link | Job Applicant | Yes | — | No | Source applicant for this onboarding. |
-| job_offer | Job Offer | Link | Job Offer | Yes | — | No | Client script filters list to job offers for the same `job_applicant` with `docstatus=1`. |
-| employee_onboarding_template | Employee Onboarding Template | Link | Employee Onboarding Template | No | — | No | *(column_break_7)* Selecting this populates `activities` client-side via `get_onboarding_details` (see Whitelisted Methods) and fetch-populates company/department/designation/employee_grade below. |
+| job_applicant | Job Applicant | Link | [[Job Applicant]] | Yes | — | No | Source applicant for this onboarding. |
+| job_offer | Job Offer | Link | [[Job Offer]] | Yes | — | No | Client script filters list to job offers for the same `job_applicant` with `docstatus=1`. |
+| employee_onboarding_template | Employee Onboarding Template | Link | [[Employee Onboarding Template]] | No | — | No | *(column_break_7)* Selecting this populates `activities` client-side via `get_onboarding_details` (see Whitelisted Methods) and fetch-populates company/department/designation/employee_grade below. |
 | company | Company | Link | Company | Yes | — | No | `fetch_from: employee_onboarding_template.company`. |
 | boarding_status | Boarding Status | Select | Pending / In Process / Completed | No | `Pending` | Yes (but `allow_on_submit: 1`) | Set by controller logic, not user-editable in UI despite allow_on_submit. |
 | project | Project | Link | Project | No | — | Yes | Set by controller on submit (linked Project record for the onboarding tasks). |
-| employee | Employee | Link | Employee | No | — | Yes | Auto-set in `validate()` if a matching Employee already exists for the `job_applicant`; otherwise created later via `make_employee`. |
+| employee | Employee | Link | [[Employee Core Model|Employee]] | No | — | Yes | Auto-set in `validate()` if a matching Employee already exists for the `job_applicant`; otherwise created later via `make_employee`. |
 | employee_name | Employee Name | Data | — | Yes | — | No | `fetch_from: job_applicant.applicant_name`. `in_list_view`. |
 | department | Department | Link | Department | No | — | No | `fetch_from: employee_onboarding_template.department`. `in_list_view`. |
 | designation | Designation | Link | Designation | No | — | No | `fetch_from: employee_onboarding_template.designation`. `in_list_view`. |
-| employee_grade | Employee Grade | Link | Employee Grade | No | — | No | `fetch_from: employee_onboarding_template.employee_grade`. |
+| employee_grade | Employee Grade | Link | [[Employee Grade]] | No | — | No | `fetch_from: employee_onboarding_template.employee_grade`. |
 | holiday_list | Holiday List | Link | Holiday List | No | — | No | Used to compute task dates only if `employee` is not yet set (see `get_holiday_list` in shared controller). |
 | date_of_joining | Date of Joining | Date | — | Yes | — | No | `in_list_view`. |
 | boarding_begins_on | Onboarding Begins On | Date | — | Yes | — | No | Base date from which activity task dates (`begin_on`/`duration` offsets) are computed. |
-| activities | Activities | Table | Employee Boarding Activity | No | — | No | `allow_on_submit: 1`. See `Employee Boarding Activity.md` (this file also documents its schema below, per spec). |
+| activities | Activities | Table | [[Employee Boarding Activity]] | No | — | No | `allow_on_submit: 1`. See `Employee Boarding Activity.md` (this file also documents its schema below, per spec). |
 | notify_users_by_email | Notify users by email | Check | — | No | `0` | No | `allow_on_submit: 1`. Passed as `notify` to `assign_to.add`. |
-| amended_from | Amended From | Link | Employee Onboarding | No | — | Yes | Standard amendment-chain field, `no_copy`. |
+| amended_from | Amended From | Link | [[Employee Onboarding]] | No | — | Yes | Standard amendment-chain field, `no_copy`. |
 
 Section-break-only fields (`column_break_7`, `details_section`, `table_for_activity`, `column_break_13`) are pure layout and omitted above except as inline notes.
 
@@ -146,6 +146,8 @@ Section-break-only fields (`column_break_7`, `details_section`, `table_for_activ
 
 ## State Machine
 
+Submittable doctype; standard docstatus transitions (see [[Submittable Document Lifecycle]]) run alongside the `boarding_status` field below.
+
 ```mermaid
 stateDiagram-v2
     [*] --> Draft: created
@@ -197,6 +199,8 @@ No monetary/tax calculation on this doctype. The only computed values are task s
 
 ## Lifecycle Hooks (exact)
 
+Includes cross-doctype [[Cross-Doctype Hooks (doc_events)|`doc_events`]] hooks registered on `Employee`, `Project`, and `Task` (rows below prefixed "Cross-doctype:").
+
 | Event | What Runs | Side Effects on Other Doctypes |
 |---|---|---|
 | `validate` | `super().validate()` (clear activity.task on amendment) → `set_employee()` → `validate_duplicate_employee_onboarding()` | None external. |
@@ -231,12 +235,21 @@ No `if_owner` or `permlevel` restrictions present in the JSON.
 
 None found in `hrms/hooks.py` `scheduler_events` that read/write Employee Onboarding directly. (The `Project`/`Task` doc_events above are triggered synchronously on document events, not on a schedule.)
 
+## Related Doctypes
+
+- [[Job Applicant]] — via `job_applicant`: Source applicant for this onboarding.
+- [[Job Offer]] — via `job_offer`: Client script filters list to job offers for the same `job_applicant` with `docstatus=1`.
+- [[Employee Onboarding Template]] — via `employee_onboarding_template`: *(column_break_7)* Selecting this populates `activities` client-side via `get_onboarding_details` (see Whitelisted Methods) and fetch-populates company/department/designation/employee_grade below.
+- [[Employee Core Model|Employee]] — via `employee`: Auto-set in `validate()` if a matching Employee already exists for the `job_applicant`; otherwise created later via `make_employee`.
+- [[Employee Grade]] — via `employee_grade`: `fetch_from: employee_onboarding_template.employee_grade`.
+- [[Employee Boarding Activity]] — via `activities`: `allow_on_submit: 1`. See `Employee Boarding Activity.md` (this file also documents its schema below, per spec).
+
 ## Port Notes
 
-- **Frappe framework behaviors relied on implicitly** that a new stack must build explicitly:
+- **Frappe framework behaviors relied on implicitly** (see [[Implicit Framework Behaviors]]) that a new stack must build explicitly:
   - `db_set` calls throughout (`self.db_set(...)`, `activity.db_set(...)`) write directly to the database bypassing the document's own `validate()`/`before_save` hooks and do not create a new revision in the same way a full `.save()` does, but they DO get captured by `track_changes` (see below) as a value-change entry. A port must implement an explicit "patch a single field without re-running full validation" operation if it wants identical behavior (important because `on_submit`'s `db_set("project", ...)` happens before the "creation" transaction's own validate would run again).
   - `track_changes: 1` — every field change is captured in an automatic audit trail (Frappe's Version doctype). A port must implement its own audit-log table if this history is required.
-  - `naming_rule: "Expression"` / `autoname: "HR-EMP-ONB-.YYYY.-.#####"` — Frappe auto-increments the `#####` counter per year automatically via a hidden counter table; a port must implement this as an explicit sequence (e.g., a Postgres sequence or a counters table keyed by year) to reproduce exact naming.
+  - `naming_rule: "Expression"` / `autoname: "HR-EMP-ONB-.YYYY.-.#####"` — Frappe auto-increments the `#####` counter per year automatically via a hidden counter table; a port must implement this as an explicit sequence (e.g., a Postgres sequence or a counters table keyed by year) to reproduce exact naming (see [[Naming and Autoname Rules]]).
   - Amendment (`amend`): Frappe's built-in cancel→amend flow clones the cancelled document into a new Draft, sets `amended_from`, and resets `docstatus` to 0. A port must implement this clone-and-relink behavior explicitly; it is not custom logic in this doctype's `.py` file.
   - `sort_field: "creation"` / `sort_order: "DESC"` — default list ordering.
   - Currency/precision: no currency fields on this doctype.

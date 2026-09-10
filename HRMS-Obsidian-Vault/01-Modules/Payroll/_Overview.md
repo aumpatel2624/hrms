@@ -167,3 +167,7 @@ withholding condition clears.
 - [[Gratuity Rule]] — jurisdiction-specific gratuity calculation rule (slab or service-year based).
 - [[Gratuity Rule Slab]] — child table of tenure-based slab rates inside a Gratuity Rule.
 - [[Gratuity Applicable Component]] — child table of which Salary Components count toward gratuity-relevant pay.
+
+## Related Flow
+
+See [[Payroll Run Lifecycle]] for the end-to-end sequence from Salary Structure Assignment through Payroll Entry to Salary Slip submission.

@@ -61,8 +61,8 @@ A Single doctype (one global record, no list) holding company-wide configuration
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | Create, Read, Write, Email, Print, Share | Full configuration rights (Single doctype has no delete/submit semantics). |
-| HR Manager | Read, Write | Can view and change settings; no explicit create/email/print rights listed in JSON (irrelevant for a Single doctype which always exists as one record). |
+| [[System Manager]] | Create, Read, Write, Email, Print, Share | Full configuration rights (Single doctype has no delete/submit semantics). |
+| [[HR Manager]] | Read, Write | Can view and change settings; no explicit create/email/print rights listed in JSON (irrelevant for a Single doctype which always exists as one record). |
 
 ## Mermaid: State/Flow
 

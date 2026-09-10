@@ -59,6 +59,10 @@ None on this doctype directly. Note: client-side field handlers on this child do
 
 None.
 
+## Related Doctypes
+
+- [[Staffing Plan]] — parent via `staffing_details` table.
+
 ## Port Notes
 
 - **Client-only "vacancies >= current_openings" validation is NOT server-enforced**: `staffing_plan.js`'s `vacancies` field handler throws client-side if `vacancies < current_openings`, but neither `staffing_plan_detail.py` nor `staffing_plan.py`'s `validate()`/`validate_details()`/`set_total_estimated_budget()` repeat this check server-side. A port that accepts API writes bypassing the form UI (e.g. a REST client) could persist `vacancies < current_openings` without any error. Flag this to the port owner as a candidate for adding server-side enforcement, since the ground truth genuinely lacks it.

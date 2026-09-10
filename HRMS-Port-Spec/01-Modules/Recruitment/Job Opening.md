@@ -11,7 +11,7 @@ This doctype is a **Website Generator** (`WebsiteGenerator` base class, not plai
 | Field (fieldname) | Label | Type | Options/Link Target | Required | Default | Read-Only | Notes |
 |---|---|---|---|---|---|---|---|
 | *(job_details_section)* | | Section Break | | | | | group heading |
-| job_opening_template | Job Opening Template | Link | Job Opening Template | no | — | no | on change (client), copies template fields into this doc (see Port Notes) |
+| job_opening_template | Job Opening Template | Link | [[Job Opening Template]] | no | — | no | on change (client), copies template fields into this doc (see Port Notes) |
 | job_title | Job Title | Data | — | yes | — | no | `in_list_view`; title field; client auto-fills from `designation` when designation changes |
 | designation | Designation | Link | Designation | yes | — | no | `in_list_view`, `in_standard_filter` |
 | *(column_break_5)* | | Column Break | | | | | layout only |
@@ -23,12 +23,12 @@ This doctype is a **Website Generator** (`WebsiteGenerator` base class, not plai
 | company | Company | Link | Company | yes | — | no | `in_list_view`, `in_standard_filter` |
 | department | Department | Link | Department | no | — | no | `in_list_view`, `in_standard_filter`; client restricts department query to `company` |
 | *(column_break_dxpv)* | | Column Break | | | | | layout only |
-| employment_type | Employment Type | Link | Employment Type | no | — | no | `in_list_view`, `in_standard_filter` |
+| employment_type | Employment Type | Link | [[Employment Type]] | no | — | no | `in_list_view`, `in_standard_filter` |
 | location | Location | Link | Branch | no | — | no | — |
 | *(references_section "References", collapsible)* | | Section Break | | | | | group heading |
-| staffing_plan | Staffing Plan | Link | Staffing Plan | no | — | yes | auto-derived, see Business Logic |
+| staffing_plan | Staffing Plan | Link | [[Staffing Plan]] | no | — | yes | auto-derived, see Business Logic |
 | planned_vacancies | Planned number of Positions | Int | — | no | — | yes | `depends_on: staffing_plan`; auto-derived |
-| job_requisition | Job Requisition | Link | Job Requisition | no | — | yes | set via `associate_job_opening` or `make_job_opening` mapped-doc flow |
+| job_requisition | Job Requisition | Link | [[Job Requisition]] | no | — | yes | set via `associate_job_opening` or `make_job_opening` mapped-doc flow |
 | vacancies | Vacancies | Int | — | no | — | yes | `depends_on: job_requisition`; fetch_from `job_requisition.no_of_positions` |
 | *(section_break_6)* | | Section Break | | | | | group heading |
 | publish | Publish on website | Check | — | no | `0` | no | `in_list_view`, `in_standard_filter`; drives `is_published_field` for the website generator |
@@ -106,7 +106,7 @@ Whitelisted validation-adjacent method (not part of `validate()`, called from cl
 
 **Job Requisition status sync** (`on_update` → `update_job_requisition_status`):
 1. IF `status == "Closed"` AND `job_requisition` is set:
-   a. Load the linked `Job Requisition` document.
+   a. Load the linked [[Job Requisition]] document.
    b. Set its `status = "Filled"`, `completed_on = today()`.
    c. Save with `flags.ignore_permissions = True` and `flags.ignore_mandatory = True` (bypasses the Job Requisition's own mandatory-field/permission checks, including the "`completed_on` mandatory when Filled" rule — trivially satisfied here anyway since it's being set to today, but also bypasses permission checks entirely).
 
@@ -125,7 +125,7 @@ Whitelisted validation-adjacent method (not part of `validate()`, called from cl
 |---|---|---|---|---|
 | `get_close_warning` (instance method) | Pre-close confirmation text | none | `str` message or `None` | See Validation Rules #5 above. |
 
-(`make_job_opening` and `associate_job_opening`, which also create/modify Job Opening records, are defined on `Job Requisition` — see `Job Requisition.md`. `create_job_opening_from_template` is defined on `Job Opening Template` — see that file.)
+(`make_job_opening` and `associate_job_opening`, which also create/modify Job Opening records, are defined on [[Job Requisition]]. `create_job_opening_from_template` is defined on [[Job Opening Template]].)
 
 ## Permissions
 
@@ -179,7 +179,7 @@ This module renders the public `/jobs` listing page (`get_context`, called by Fr
 
 ## Cross-Doctype Logic (Job Applicant / Job Offer / Employee)
 
-- `hrms/hr/doctype/job_applicant/job_applicant.py`, `before_insert`: IF the new Job Applicant's `job_title` (which actually stores a Job Opening name) resolves to a Job Opening THEN:
+- `hrms/hr/doctype/job_applicant/job_applicant.py`, `before_insert`: IF the new [[Job Applicant]]'s `job_title` (which actually stores a Job Opening name) resolves to a Job Opening THEN:
   - IF that Job Opening's `status == "Closed"` → `frappe.throw(_("Cannot create a Job Applicant against a closed Job Opening"), title=_("Not Allowed"))`.
   - IF that Job Opening's `prevent_duplicate_applicant` is truthy AND the new applicant has an `email_id` → duplicate-email check against existing Job Applicants (full detail belongs in the Job Applicant spec file, owned by another agent — flagged here only because it reads Job Opening fields).
   - Elsewhere in `job_applicant.py`, a Job Opening's `company`, `department`, `employment_type` are fetched (via `frappe.db.get_value`) to populate/default the new Job Applicant's corresponding fields.
@@ -196,3 +196,12 @@ This module renders the public `/jobs` listing page (`get_context`, called by Fr
 - The route-generation discrepancy between client (`job_opening.js: set_route`) and server (`job_opening.py: validate`) noted in Business Logic (hyphen vs. underscore handling) should be resolved one way in the port; server behavior is authoritative since it always runs on save.
 - Frappe automatic behaviors relied on implicitly: `creation`/`modified`/`modified_by`/`owner` audit columns; `sort_field`/`sort_order` = `creation ASC` (note: ascending, opposite of most other doctypes in this module) for default list ordering; `title_field = job_title`; `show_title_field_in_link: 1` (link fields referencing Job Opening display `job_title` instead of the raw `name`); Currency field auto-rounding — `lower_range`/`upper_range` have explicit `precision: 0` (whole-number currency, no decimals) which overrides the site-wide default currency precision and must be explicitly enforced in the port's persistence/formatting layer.
 - `close_expired_job_openings` and `update_job_requisition_status` both save with `ignore_permissions=True, ignore_mandatory=True` — a port's equivalent "system/background job" write path must be able to bypass normal validation/authorization the same way, or the cascading Job Requisition update will silently fail once ported to a stack with strict ORM-level validation.
+
+## Related Doctypes
+
+- [[Job Opening Template]] — optional source of default field values, copied client-side on selection.
+- [[Job Requisition]] — optional internal request this opening fulfills; closing this opening cascades to mark the requisition Filled.
+- [[Staffing Plan]] — auto-associated vacancy source used to cap how many openings can be created for a designation.
+- [[Employment Type]] — the employment type offered for this opening.
+- [[Job Applicant]] — candidates apply against this opening; a closed opening blocks new applications.
+- [[Background Jobs (Scheduler Events)]] — documents the general scheduler mechanism used by `close_expired_job_openings` (daily).

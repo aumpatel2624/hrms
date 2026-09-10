@@ -22,7 +22,7 @@ A child table row on a Travel Request that itemizes the estimated cost of one ex
 ## Relationships
 
 - [[Travel Request]] — parent; a Travel Request has one or more Travel Request Costing rows (`costings` table field), and the parent's `cost_center` applies at the header level.
-- Links to Expense Claim Type (outside assigned scope) via `expense_type` — not documented here as its own file.
+- Links to [[Expense Claim Type]] via `expense_type`.
 
 ## Logic — What Happens and Why
 

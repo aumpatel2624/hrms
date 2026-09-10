@@ -52,9 +52,9 @@ The immutable, submittable transaction log underlying every leave balance in the
 
 | Role | Can Do | Notes |
 |---|---|---|
-| System Manager | full incl. submit | Full |
-| HR Manager | full incl. submit/cancel | Full |
-| HR User | full incl. submit/cancel | Full |
+| [[System Manager]] | full incl. submit | Full |
+| [[HR Manager]] | full incl. submit/cancel | Full |
+| [[HR User]] | full incl. submit/cancel | Full |
 | All | create/write/read/submit (if_owner) | Any user can post entries they own — reflects that this doctype is written programmatically by many other doctypes' controllers, not directly by end users through a form |
 
 ## Mermaid: State/Flow

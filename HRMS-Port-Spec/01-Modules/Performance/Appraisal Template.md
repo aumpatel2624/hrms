@@ -12,8 +12,8 @@ A reusable template of KRAs and rating criteria, assigned per-Designation (via `
 |---|---|---|---|---|---|---|---|
 | template_title | Appraisal Template Title | Data | — | yes | — | — | unique; in_list_view; this is also the document name |
 | description | (no label) | Small Text | — | no | — | — | in_list_view; inside collapsible "Description" section |
-| goals | KRAs | Table (Appraisal Template Goal) | Appraisal Template Goal | yes | — | — | the KRA + weightage blueprint |
-| rating_criteria | Rating Criteria | Table (Employee Feedback Rating) | Employee Feedback Rating | no | — | — | "Criteria based on which employee should be rated in Performance Feedback and Self Appraisal"; the `rating` sub-field is hidden here via that child doctype's own `depends_on` (a template only carries criteria + weightage, no actual rating value) |
+| goals | KRAs | Table (Appraisal Template Goal) | [[Appraisal Template Goal]] | yes | — | — | the KRA + weightage blueprint |
+| rating_criteria | Rating Criteria | Table (Employee Feedback Rating) | [[Employee Feedback Rating]] | no | — | — | "Criteria based on which employee should be rated in Performance Feedback and Self Appraisal"; the `rating` sub-field is hidden here via that child doctype's own `depends_on` (a template only carries criteria + weightage, no actual rating value) |
 
 ## Child Tables
 
@@ -49,7 +49,7 @@ None defined on this doctype's controller. It is *consumed* by whitelisted metho
 - `Appraisal.set_kras_and_rating_criteria()` copies `goals` → `Appraisal.appraisal_kra`/`Appraisal.goals` and `rating_criteria` → `Appraisal.self_ratings`.
 - `Employee Performance Feedback.set_feedback_criteria()` copies `rating_criteria` → `Employee Performance Feedback.feedback_ratings` (looked up via the Appraisal's `appraisal_template`).
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 | Role | Read | Write | Create | Delete | Submit | Cancel | Amend | Report | Export | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -60,6 +60,13 @@ None defined on this doctype's controller. It is *consumed* by whitelisted metho
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Appraisal Template Goal]] — `goals` child table; the KRA + weightage blueprint.
+- [[Employee Feedback Rating]] — `rating_criteria` child table; criteria + weightage blueprint (no `rating` value).
+- [[Appraisal]] — consumer; `set_kras_and_rating_criteria()` copies this template's rows into a new Appraisal's `appraisal_kra`/`goals`/`self_ratings`.
+- [[Employee Performance Feedback]] — consumer; `set_feedback_criteria()` copies `rating_criteria` into `feedback_ratings`.
 
 ## Port Notes
 

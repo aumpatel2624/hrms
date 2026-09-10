@@ -54,13 +54,18 @@ None on this child doctype directly.
 
 None. (Note: `Appraisal.get_kras_for_employee` — a module-level whitelisted method on the parent `Appraisal` controller — queries this table's rows directly via `frappe.get_all("Appraisal KRA", filters={"parent": appraisal, "kra": ("like", ...)})` to power the `Goal.kra` link-field's autocomplete; documented fully in `Appraisal.md`.)
 
-## Permissions
+## Permissions ([[Permission Model (RBAC)]])
 
 Empty `permissions` array in the JSON — governed by parent (`Appraisal`).
 
 ## Scheduled Jobs Touching This Doctype
 
 None.
+
+## Related Doctypes
+
+- [[Appraisal]] — parent doctype; this child table is `Appraisal.appraisal_kra`, used when `rate_goals_manually = 0` (the default).
+- [[Goal]] — read (not a schema link) by `Appraisal.set_goal_score()` to compute `goal_completion`/`goal_score` for each row.
 
 ## Port Notes
 
